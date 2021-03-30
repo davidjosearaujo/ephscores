@@ -30,34 +30,157 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20.0),
-            child: Image.asset('images/EPHScores_logo.png'),
-          ),
-          Column(
-            children: [
-              ToggleButtons(
-                direction: Axis.vertical,
-                renderBorder: false,
-                color: Colors.black,
-                fillColor: Color.fromRGBO(79, 129, 189, 1.0),
-                splashColor: Color.fromRGBO(208, 216, 232, 1.0),
-                children: <Widget>[
-                  Text("Calculadora de escalas"),
-                  Text("Triagem START"),
-                ],
-                onPressed: (int index) {
-                  setState(() {
-                    isSelected[index] = isSelected[index];
-                  });
-                },
-                isSelected: isSelected,
-              )
-            ],
-          ),
-        ],
+      body: Center(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
+              child: Image.asset('images/EPHScores_logo.png'),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  width: double.infinity,
+                  height: 90,
+                  child: ElevatedButton(
+                    child: Text(
+                      "Calculadora de escalas",
+                      style: TextStyle(
+                        fontSize: 24,
+                      ),
+                    ),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed))
+                            return Color.fromRGBO(208, 216, 232, 1.0);
+                          return Color.fromRGBO(79, 129, 189, 1.0);
+                        },
+                      ),
+                      foregroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed))
+                            return Color.fromRGBO(44, 73, 108, 1.0);
+                          return Colors.white;
+                        },
+                      ),
+                    ),
+                    onPressed: () {
+                      setState() {}
+                    },
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  width: double.infinity,
+                  height: 90,
+                  child: ElevatedButton(
+                    child: Text(
+                      "Triagem START",
+                      style: TextStyle(
+                        fontSize: 24,
+                      ),
+                    ),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed))
+                            return Color.fromRGBO(208, 216, 232, 1.0);
+                          return Color.fromRGBO(79, 129, 189, 1.0);
+                        },
+                      ),
+                      foregroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed))
+                            return Color.fromRGBO(44, 73, 108, 1.0);
+                          return Colors.white;
+                        },
+                      ),
+                    ),
+                    onPressed: () {
+                      setState() {}
+                    },
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        height: 110,
+                        child: ElevatedButton(
+                          child: Icon(
+                            Icons.remove_red_eye,
+                            color: Colors.white,
+                            size: 60,
+                          ),
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.pressed))
+                                  return Color.fromRGBO(208, 216, 232, 1.0);
+                                return Color.fromRGBO(79, 129, 189, 1.0);
+                              },
+                            ),
+                            foregroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.pressed))
+                                  return Color.fromRGBO(44, 73, 108, 1.0);
+                                return Colors.white;
+                              },
+                            ),
+                          ),
+                          onPressed: () {
+                            setState() {}
+                          },
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        height: 110,
+                        child: ElevatedButton(
+                          child: Icon(
+                            Icons.hourglass_full,
+                            color: Colors.white,
+                            size: 60,
+                          ),
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.pressed))
+                                  return Color.fromRGBO(208, 216, 232, 1.0);
+                                return Color.fromRGBO(79, 129, 189, 1.0);
+                              },
+                            ),
+                            foregroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.pressed))
+                                  return Color.fromRGBO(44, 73, 108, 1.0);
+                                return Colors.white;
+                              },
+                            ),
+                          ),
+                          onPressed: () {
+                            setState() {}
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

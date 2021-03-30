@@ -1,0 +1,4 @@
+Lightest blue;  #E9EDF4;    233,237,244
+Light blue;     #D0D8E8;    208,216,232
+Blue;           #4F81BD;    79,129,189
+Dark Blue;      #2C496C;    44,73,108
