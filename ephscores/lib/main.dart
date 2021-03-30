@@ -1,31 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_flashlight/flutter_flashlight.dart';
+import 'STARTList.dart';
+import 'Score.dart';
 
 void main() {
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  runApp(EPHScores());
 }
 
-class MyApp extends StatelessWidget {
+class EPHScores extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'EPH Scores',
+      debugShowCheckedModeBanner: false,
+      title: 'EPHScores',
+      initialRoute: '/',
+      routes: {
+        "/": (context) => EPHScoresPage(),
+        "/scores": (context) => Score(),
+        //"/START": (context) => START(),
+        "/START/List": (context) => STARTList()
+      },
       themeMode: ThemeMode.dark,
-      home: MyHomePage(title: 'Home'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class EPHScoresPage extends StatefulWidget {
+  EPHScoresPage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _EPHScoresPageState createState() => _EPHScoresPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _EPHScoresPageState extends State<EPHScoresPage> {
   var isSelected = [false, false];
+  bool flash = false;
+  bool timer = false;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     onPressed: () {
-                      setState() {}
+                      Navigator.pushNamed(context, "/scores");
                     },
                   ),
                 ),
@@ -100,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                     ),
                     onPressed: () {
-                      setState() {}
+                      Navigator.pushNamed(context, "/START/List");
                     },
                   ),
                 ),
@@ -114,7 +130,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: ElevatedButton(
                           child: Icon(
                             Icons.remove_red_eye,
-                            color: Colors.white,
+                            color: !flash
+                                ? Colors.white
+                                : Color.fromRGBO(44, 73, 108, 1.0),
                             size: 60,
                           ),
                           style: ButtonStyle(
@@ -122,21 +140,21 @@ class _MyHomePageState extends State<MyHomePage> {
                                 MaterialStateProperty.resolveWith<Color>(
                               (Set<MaterialState> states) {
                                 if (states.contains(MaterialState.pressed))
-                                  return Color.fromRGBO(208, 216, 232, 1.0);
-                                return Color.fromRGBO(79, 129, 189, 1.0);
-                              },
-                            ),
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                              (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.pressed))
-                                  return Color.fromRGBO(44, 73, 108, 1.0);
-                                return Colors.white;
+                                  return Color.fromRGBO(79, 129, 189, 1.0);
+                                var color = !flash
+                                    ? Color.fromRGBO(79, 129, 189, 1.0)
+                                    : Color.fromRGBO(208, 216, 232, 1.0);
+                                return color;
                               },
                             ),
                           ),
                           onPressed: () {
-                            setState() {}
+                            setState(() {
+                              !flash
+                                  ? Flashlight.lightOff()
+                                  : Flashlight.lightOn();
+                              flash = !flash;
+                            });
                           },
                         ),
                       ),
@@ -147,8 +165,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         height: 110,
                         child: ElevatedButton(
                           child: Icon(
-                            Icons.hourglass_full,
-                            color: Colors.white,
+                            Icons.hourglass_top_rounded,
+                            color: !timer
+                                ? Colors.white
+                                : Color.fromRGBO(44, 73, 108, 1.0),
                             size: 60,
                           ),
                           style: ButtonStyle(
@@ -156,21 +176,18 @@ class _MyHomePageState extends State<MyHomePage> {
                                 MaterialStateProperty.resolveWith<Color>(
                               (Set<MaterialState> states) {
                                 if (states.contains(MaterialState.pressed))
-                                  return Color.fromRGBO(208, 216, 232, 1.0);
-                                return Color.fromRGBO(79, 129, 189, 1.0);
-                              },
-                            ),
-                            foregroundColor:
-                                MaterialStateProperty.resolveWith<Color>(
-                              (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.pressed))
-                                  return Color.fromRGBO(44, 73, 108, 1.0);
-                                return Colors.white;
+                                  return Color.fromRGBO(79, 129, 189, 1.0);
+                                var color = !timer
+                                    ? Color.fromRGBO(79, 129, 189, 1.0)
+                                    : Color.fromRGBO(208, 216, 232, 1.0);
+                                return color;
                               },
                             ),
                           ),
                           onPressed: () {
-                            setState() {}
+                            setState(() {
+                              timer = !timer;
+                            });
                           },
                         ),
                       ),
