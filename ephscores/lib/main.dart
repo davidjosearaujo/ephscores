@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flashlight/flutter_flashlight.dart';
+import 'START.dart';
 import 'STARTList.dart';
 import 'Score.dart';
 
@@ -22,7 +23,7 @@ class EPHScores extends StatelessWidget {
       routes: {
         "/": (context) => EPHScoresPage(),
         "/scores": (context) => Score(),
-        //"/START": (context) => START(),
+        "/START": (context) => START(),
         "/START/List": (context) => STARTList()
       },
       themeMode: ThemeMode.dark,
@@ -116,7 +117,7 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.pushNamed(context, "/START/List");
+                      Navigator.pushNamed(context, "/START");
                     },
                   ),
                 ),
@@ -130,9 +131,8 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                         child: ElevatedButton(
                           child: Icon(
                             Icons.remove_red_eye,
-                            color: !flash
-                                ? Colors.white
-                                : Color.fromRGBO(44, 73, 108, 1.0),
+                            color: flash
+                                ? Color.fromRGBO(44, 73, 108, 1.0) : Colors.white,
                             size: 60,
                           ),
                           style: ButtonStyle(
@@ -150,7 +150,7 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                           ),
                           onPressed: () {
                             setState(() {
-                              !flash
+                              flash
                                   ? Flashlight.lightOff()
                                   : Flashlight.lightOn();
                               flash = !flash;

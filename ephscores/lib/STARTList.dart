@@ -17,10 +17,13 @@ class _STARTListState extends State<STARTList> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Lista",
+          "Sumário",
           style: TextStyle(fontSize: 24),
         ),
         backgroundColor: Color.fromRGBO(79, 129, 189, 1.0),
+        actions: [
+          IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
+        ],
       ),
       body: Column(
         mainAxisSize: MainAxisSize.max,
@@ -32,37 +35,29 @@ class _STARTListState extends State<STARTList> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  child: TextButton(
-                    child: Text(
-                      "${widget.p1}",
-                      style: TextStyle(
-                        fontSize: 80,
+                  child: Container(
+                    child: Center(
+                      child: Text(
+                        "${widget.p1}",
+                        style: TextStyle(
+                            fontSize: 80,
+                            color: Color.fromRGBO(79, 129, 189, 1.0)),
                       ),
                     ),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                        return Color.fromRGBO(234, 67, 53, 1.0);
-                      }),
-                    ),
-                    onPressed: () {},
+                    color: Color.fromRGBO(234, 67, 53, 1.0),
                   ),
                 ),
                 Expanded(
-                  child: TextButton(
-                    child: Text(
-                      "${widget.p2}",
-                      style: TextStyle(
-                        fontSize: 80,
+                  child: Container(
+                    child: Center(
+                      child: Text(
+                        "${widget.p2}",
+                        style: TextStyle(
+                            fontSize: 80,
+                            color: Color.fromRGBO(79, 129, 189, 1.0)),
                       ),
                     ),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                        return Color.fromRGBO(251, 188, 4, 1.0);
-                      }),
-                    ),
-                    onPressed: () {},
+                    color: Color.fromRGBO(251, 188, 4, 1.0),
                   ),
                 ),
               ],
@@ -74,37 +69,29 @@ class _STARTListState extends State<STARTList> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Expanded(
-                  child: TextButton(
-                    child: Text(
-                      "${widget.p3}",
-                      style: TextStyle(
-                        fontSize: 80,
+                  child: Container(
+                    child: Center(
+                      child: Text(
+                        "${widget.p3}",
+                        style: TextStyle(
+                            fontSize: 80,
+                            color: Color.fromRGBO(79, 129, 189, 1.0)),
                       ),
                     ),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                        return Color.fromRGBO(52, 168, 83, 1.0);
-                      }),
-                    ),
-                    onPressed: () {},
+                    color: Color.fromRGBO(52, 168, 83, 1.0),
                   ),
                 ),
                 Expanded(
-                  child: TextButton(
-                    child: Text(
-                      "${widget.p4}",
-                      style: TextStyle(
-                        fontSize: 80,
+                  child: Container(
+                    child: Center(
+                      child: Text(
+                        "${widget.p4}",
+                        style: TextStyle(
+                            fontSize: 80,
+                            color: Color.fromRGBO(79, 129, 189, 1.0)),
                       ),
                     ),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                          (Set<MaterialState> states) {
-                        return Colors.black;
-                      }),
-                    ),
-                    onPressed: () {},
+                    color: Colors.black,
                   ),
                 ),
               ],
