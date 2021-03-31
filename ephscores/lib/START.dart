@@ -13,9 +13,29 @@ class START extends StatefulWidget {
 class _STARTState extends State<START> {
   int page = 0;
   String title = "Triagem START";
-  String state = "P3";
   Widget body;
-  List<bool> isSelected = [false, false];
+  List<bool> isSelected = [false, false, false, false, false, false];
+  List<bool> isEnabled = [true, true, true, true, true, true];
+
+  Color evaluation() {
+    if (isSelected[0]) {
+      return Color.fromRGBO(52, 168, 83, 1.0);
+    } else {
+      if (isSelected[1]) {
+        if (isSelected[4] || isSelected[2]) {
+          return Color.fromRGBO(234, 67, 53, 1.0);
+        }else if(isSelected[4]){
+          return Color.fromRGBO(234, 67, 53, 1.0);
+        }else if(isSelected[5]){
+          return Color.fromRGBO(251, 188, 4, 1.0);
+        }else{
+          return Color.fromRGBO(234, 67, 53, 1.0);
+        }
+      } else {
+        return Colors.black;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,21 +130,7 @@ class _STARTState extends State<START> {
             Expanded(
                 flex: 1,
                 child: Container(
-                  color: ((state) {
-                    Color col = Color.fromRGBO(52, 168, 83, 1.0);
-                    switch (state) {
-                      case "P1":
-                        col = Color.fromRGBO(234, 67, 53, 1.0);
-                        break;
-                      case "P2":
-                        col = Color.fromRGBO(251, 188, 4, 1.0);
-                        break;
-                      case "P3":
-                        col = Color.fromRGBO(52, 168, 83, 1.0);
-                        break;
-                    }
-                    return col;
-                  })(state),
+                  color: evaluation(),
                 )),
             Expanded(
               flex: 4,
@@ -135,57 +141,70 @@ class _STARTState extends State<START> {
                   Expanded(
                     flex: 1,
                     child: TextButton(
-                      onPressed: (){},
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(233, 237, 244, 1.0),
-                          border: Border.all(
-                              color: Color.fromRGBO(208, 216, 232, 1.0)),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Icon(Icons.directions_walk_rounded,
-                                size: 80,
-                                color: Color.fromRGBO(44, 73, 108, 1.0)),
-                            Text(
-                              "Caminha",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
+                      onPressed: () {
+                        setState(() {
+                          isSelected[0] = !isSelected[0];
+                        });
+                      },
+                      style: TextButton.styleFrom(
+                          backgroundColor: ((st) {
+                            return st
+                                ? Color.fromRGBO(208, 216, 232, 1.0)
+                                : Color.fromRGBO(233, 237, 244, 1.0);
+                          })(isSelected[0]),
+                          side: BorderSide(
+                            color: Colors.white,
+                          )),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Icon(Icons.directions_walk_rounded,
+                              size: 70,
+                              color: Color.fromRGBO(44, 73, 108, 1.0)),
+                          Text(
+                            "Caminha",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
                                 color: Color.fromRGBO(44, 73, 108, 1.0),
-                                fontSize: 24
-                              ),
-                            ),
-                          ],
-                        ),
+                                fontSize: 24),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                   Expanded(
                     flex: 1,
-                    child: InkWell(
-                      onTap: () {},
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color.fromRGBO(233, 237, 244, 1.0),
-                          border: Border.all(
-                              color: Color.fromRGBO(208, 216, 232, 1.0)),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(WeatherIcons.windy,
-                                size: 80,
-                                color: Color.fromRGBO(44, 73, 108, 1.0)),
-                            Text(
-                              "Respira",
-                              style: TextStyle(
-                                  color: Color.fromRGBO(44, 73, 108, 1.0),
-                                  fontSize: 24),
-                            ),
-                          ],
-                        ),
+                    child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          isSelected[1] = !isSelected[1];
+                        });
+                      },
+                      style: TextButton.styleFrom(
+                          backgroundColor: ((st) {
+                            return st
+                                ? Color.fromRGBO(208, 216, 232, 1.0)
+                                : Color.fromRGBO(233, 237, 244, 1.0);
+                          })(isSelected[1]),
+                          side: BorderSide(
+                            color: Colors.white,
+                          )),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Icon(WeatherIcons.windy,
+                              size: 70,
+                              color: Color.fromRGBO(44, 73, 108, 1.0)),
+                          Text(
+                            "Respira",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color.fromRGBO(44, 73, 108, 1.0),
+                                fontSize: 24),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -201,15 +220,71 @@ class _STARTState extends State<START> {
                   Expanded(
                     flex: 1,
                     child: TextButton(
-                      onPressed: () {},
-                      child: Text("+30 ciclos/min"),
+                      onPressed: () {
+                        setState(() {
+                          isSelected[2] = !isSelected[2];
+                        });
+                      },
+                      style: TextButton.styleFrom(
+                          backgroundColor: ((st) {
+                            return st
+                                ? Color.fromRGBO(208, 216, 232, 1.0)
+                                : Color.fromRGBO(233, 237, 244, 1.0);
+                          })(isSelected[2]),
+                          side: BorderSide(
+                            color: Colors.white,
+                          )),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Icon(Icons.autorenew_rounded,
+                              size: 70,
+                              color: Color.fromRGBO(44, 73, 108, 1.0)),
+                          Text(
+                            "+30 ciclos/min",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color.fromRGBO(44, 73, 108, 1.0),
+                                fontSize: 24),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Expanded(
                     flex: 1,
                     child: TextButton(
-                      onPressed: () {},
-                      child: Text("Adjuvantes"),
+                      onPressed: () {
+                        setState(() {
+                          isSelected[3] = !isSelected[3];
+                        });
+                      },
+                      style: TextButton.styleFrom(
+                          backgroundColor: ((st) {
+                            return st
+                                ? Color.fromRGBO(208, 216, 232, 1.0)
+                                : Color.fromRGBO(233, 237, 244, 1.0);
+                          })(isSelected[3]),
+                          side: BorderSide(
+                            color: Colors.white,
+                          )),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Icon(Icons.medical_services_outlined,
+                              size: 70,
+                              color: Color.fromRGBO(44, 73, 108, 1.0)),
+                          Text(
+                            "Adjuvantes",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color.fromRGBO(44, 73, 108, 1.0),
+                                fontSize: 24),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -224,15 +299,71 @@ class _STARTState extends State<START> {
                   Expanded(
                     flex: 1,
                     child: TextButton(
-                      onPressed: () {},
-                      child: Text("PC >2 seg"),
+                      onPressed: () {
+                        setState(() {
+                          isSelected[4] = !isSelected[4];
+                        });
+                      },
+                      style: TextButton.styleFrom(
+                          backgroundColor: ((st) {
+                            return st
+                                ? Color.fromRGBO(208, 216, 232, 1.0)
+                                : Color.fromRGBO(233, 237, 244, 1.0);
+                          })(isSelected[4]),
+                          side: BorderSide(
+                            color: Colors.white,
+                          )),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Icon(Icons.favorite_border,
+                              size: 70,
+                              color: Color.fromRGBO(44, 73, 108, 1.0)),
+                          Text(
+                            "PC >2 seg",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color.fromRGBO(44, 73, 108, 1.0),
+                                fontSize: 24),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Expanded(
                     flex: 1,
                     child: TextButton(
-                      onPressed: () {},
-                      child: Text("Cumpre ordens"),
+                      onPressed: () {
+                        setState(() {
+                          isSelected[5] = !isSelected[5];
+                        });
+                      },
+                      style: TextButton.styleFrom(
+                          backgroundColor: ((st) {
+                            return st
+                                ? Color.fromRGBO(208, 216, 232, 1.0)
+                                : Color.fromRGBO(233, 237, 244, 1.0);
+                          })(isSelected[5]),
+                          side: BorderSide(
+                            color: Colors.white,
+                          )),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Icon(Icons.assignment_turned_in_outlined,
+                              size: 70,
+                              color: Color.fromRGBO(44, 73, 108, 1.0)),
+                          Text(
+                            "Cumpre ordens",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color.fromRGBO(44, 73, 108, 1.0),
+                                fontSize: 24),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
