@@ -23,8 +23,7 @@ class EPHScores extends StatelessWidget {
       routes: {
         "/": (context) => EPHScoresPage(),
         "/scores": (context) => Score(),
-        "/START": (context) => START(),
-        "/START/List": (context) => STARTList()
+        "/START": (context) => START(), 
       },
       themeMode: ThemeMode.dark,
     );

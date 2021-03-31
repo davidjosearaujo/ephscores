@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class STARTList extends StatefulWidget {
-  STARTList({Key key, this.title}) : super(key: key);
-  final String title;
-  int p1 = 0, p2 = 0, p3 = 0, p4 = 0;
-
+  int p1, p2, p3, p4;
+  
+  STARTList({this.p1=0, this.p2=0, this.p3=0, this.p4=0});
+  
   @override
   _STARTListState createState() => _STARTListState();
 }
