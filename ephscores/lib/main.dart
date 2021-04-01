@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_flashlight/flutter_flashlight.dart';
 import 'START.dart';
-import 'STARTList.dart';
 import 'Score.dart';
 
 void main() {
@@ -23,7 +23,7 @@ class EPHScores extends StatelessWidget {
       routes: {
         "/": (context) => EPHScoresPage(),
         "/scores": (context) => Score(),
-        "/START": (context) => START(), 
+        "/START": (context) => START(),
       },
       themeMode: ThemeMode.dark,
     );
@@ -53,7 +53,7 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
               flex: 1,
               child: Container(
                 padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
-                child: Image.asset('images/EPHScores_logo.png'),
+                child: Image.asset('assets/EPHScores_logo.png'),
               ),
             ),
             Expanded(
@@ -74,14 +74,16 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                           ),
                         ),
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
                               if (states.contains(MaterialState.pressed))
                                 return Color.fromRGBO(208, 216, 232, 1.0);
                               return Color.fromRGBO(79, 129, 189, 1.0);
                             },
                           ),
-                          foregroundColor: MaterialStateProperty.resolveWith<Color>(
+                          foregroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
                               if (states.contains(MaterialState.pressed))
                                 return Color.fromRGBO(44, 73, 108, 1.0);
@@ -107,14 +109,16 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                           ),
                         ),
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
                               if (states.contains(MaterialState.pressed))
                                 return Color.fromRGBO(208, 216, 232, 1.0);
                               return Color.fromRGBO(79, 129, 189, 1.0);
                             },
                           ),
-                          foregroundColor: MaterialStateProperty.resolveWith<Color>(
+                          foregroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
                               if (states.contains(MaterialState.pressed))
                                 return Color.fromRGBO(44, 73, 108, 1.0);
@@ -142,7 +146,8 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                               child: Icon(
                                 Icons.remove_red_eye,
                                 color: flash
-                                    ? Color.fromRGBO(44, 73, 108, 1.0) : Colors.white,
+                                    ? Color.fromRGBO(44, 73, 108, 1.0)
+                                    : Colors.white,
                                 size: 60,
                               ),
                               style: ButtonStyle(
@@ -197,6 +202,27 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                               onPressed: () {
                                 setState(() {
                                   timer = !timer;
+                                });
+                                Timer(Duration(minutes: 1), () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: new Text("Passou 1 minuto !"),
+                                        actions: <Widget>[
+                                          new TextButton(
+                                            child: new Text("Fechar"),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                  setState(() {
+                                    timer = !timer;
+                                  });
                                 });
                               },
                             ),

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:weather_icons/weather_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class START extends StatefulWidget {
   int p1, p2, p3, p4;
+  SharedPreferences prefs;
 
-  START({this.p1 = 0, this.p2 = 0, this.p3 = 0, this.p4 = 0});
+  START();
 
   @override
   _STARTState createState() => _STARTState();
@@ -14,24 +16,52 @@ class _STARTState extends State<START> {
   int page = 0;
   String title = "Triagem START";
   Widget body;
+  Icon tileicon;
+  Function titlefunc;
+  int p = 3;
   List<bool> isSelected = [false, false, false, false, false, false];
-  List<bool> isEnabled = [true, true, true, true, true, true];
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPreferences.getInstance().then((value) {
+      widget.p1 = value.containsKey('p1') ? value.getInt('p1') : 0;
+      widget.p2 = value.containsKey('p2') ? value.getInt('p2') : 0;
+      widget.p3 = value.containsKey('p3') ? value.getInt('p3') : 0;
+      widget.p4 = value.containsKey('p4') ? value.getInt('p4') : 0;
+    });
+  }
+
+  void refresh() async {
+    widget.prefs = await SharedPreferences.getInstance();
+    widget.prefs.setInt('p1', widget.p1);
+    widget.prefs.setInt('p2', widget.p2);
+    widget.prefs.setInt('p3', widget.p3);
+    widget.prefs.setInt('p4', widget.p4);
+    isSelected = [false, false, false, false, false, false];
+  }
 
   Color evaluation() {
     if (isSelected[0]) {
+      p = 3;
       return Color.fromRGBO(52, 168, 83, 1.0);
     } else {
       if (isSelected[1]) {
         if (isSelected[4] || isSelected[2]) {
+          p = 1;
           return Color.fromRGBO(234, 67, 53, 1.0);
-        }else if(isSelected[4]){
+        } else if (isSelected[4]) {
+          p = 1;
           return Color.fromRGBO(234, 67, 53, 1.0);
-        }else if(isSelected[5]){
+        } else if (isSelected[5]) {
+          p = 2;
           return Color.fromRGBO(251, 188, 4, 1.0);
-        }else{
+        } else {
+          p = 1;
           return Color.fromRGBO(234, 67, 53, 1.0);
         }
       } else {
+        p = 4;
         return Colors.black;
       }
     }
@@ -120,6 +150,25 @@ class _STARTState extends State<START> {
             ),
           ],
         );
+        tileicon = Icon(Icons.delete);
+        titlefunc = () {
+          setState(() {
+            widget.p1 = 0;
+            widget.p2 = 0;
+            widget.p3 = 0;
+            widget.p4 = 0;
+            SnackBar snackBar = SnackBar(
+              backgroundColor: Color.fromRGBO(44, 73, 108, 0.70),
+              content: Text(
+                'Eliminado',
+                textAlign: TextAlign.center,
+              ),
+              duration: Duration(milliseconds: 800),
+            );
+            refresh();
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          });
+        };
         break;
       default:
         title = "Triagem START";
@@ -167,7 +216,7 @@ class _STARTState extends State<START> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Color.fromRGBO(44, 73, 108, 1.0),
-                                fontSize: 24),
+                                fontSize: 20),
                           ),
                         ],
                       ),
@@ -202,7 +251,7 @@ class _STARTState extends State<START> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Color.fromRGBO(44, 73, 108, 1.0),
-                                fontSize: 24),
+                                fontSize: 20),
                           ),
                         ],
                       ),
@@ -246,7 +295,7 @@ class _STARTState extends State<START> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Color.fromRGBO(44, 73, 108, 1.0),
-                                fontSize: 24),
+                                fontSize: 20),
                           ),
                         ],
                       ),
@@ -281,7 +330,7 @@ class _STARTState extends State<START> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Color.fromRGBO(44, 73, 108, 1.0),
-                                fontSize: 24),
+                                fontSize: 20),
                           ),
                         ],
                       ),
@@ -325,7 +374,7 @@ class _STARTState extends State<START> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Color.fromRGBO(44, 73, 108, 1.0),
-                                fontSize: 24),
+                                fontSize: 20),
                           ),
                         ],
                       ),
@@ -360,7 +409,7 @@ class _STARTState extends State<START> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Color.fromRGBO(44, 73, 108, 1.0),
-                                fontSize: 24),
+                                fontSize: 20),
                           ),
                         ],
                       ),
@@ -371,6 +420,35 @@ class _STARTState extends State<START> {
             )
           ],
         );
+        tileicon = Icon(Icons.check);
+        titlefunc = () {
+          setState(() {
+            switch (p) {
+              case 1:
+                widget.p1++;
+                break;
+              case 2:
+                widget.p2++;
+                break;
+              case 3:
+                widget.p3++;
+                break;
+              case 4:
+                widget.p4++;
+                break;
+            }
+            SnackBar snackBar = SnackBar(
+              backgroundColor: Color.fromRGBO(44, 73, 108, 0.70),
+              content: Text(
+                'Guardado',
+                textAlign: TextAlign.center,
+              ),
+              duration: Duration(milliseconds: 800),
+            );
+            refresh();
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          });
+        };
         break;
     }
 
@@ -382,7 +460,10 @@ class _STARTState extends State<START> {
           ),
           backgroundColor: Color.fromRGBO(79, 129, 189, 1.0),
           actions: [
-            IconButton(onPressed: () {}, icon: Icon(Icons.more_vert)),
+            IconButton(
+              icon: tileicon,
+              onPressed: titlefunc,
+            ),
           ],
         ),
         body: body,
