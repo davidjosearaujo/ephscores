@@ -32,296 +32,370 @@ class _ScoreState extends State<Score> {
     false,
   ];
   List<bool> cincinnati = [false, false, false];
-  int ecgvisual = 1, ecgverbal = 1, ecgmove = 1;
+  List<int> ecg = [0, 0, 0];
 
   @override
   void initState() {
     super.initState();
+    load();
   }
 
-  void ecgcount() {
-    widget.s2 = ecgverbal + ecgvisual + ecgmove;
+  void load() async {
+    SharedPreferences.getInstance().then((value) {
+      setState(() {
+        cincinnati[0] =
+            value.containsKey('s1.0') ? value.getBool('s1.0') : false;
+        cincinnati[1] =
+            value.containsKey('s1.1') ? value.getBool('s1.1') : false;
+        cincinnati[2] =
+            value.containsKey('s1.2') ? value.getBool('s1.2') : false;
+        ecg[0] = value.containsKey('s2.0') ? value.getInt('s2.0') : 0;
+        ecg[1] = value.containsKey('s2.1') ? value.getInt('s2.1') : 0;
+        ecg[2] = value.containsKey('s2.2') ? value.getInt('s2.2') : 0;
+      });
+    });
   }
 
-  void refresh() async {
+  Future<bool> save() async {
     widget.prefs1 = await SharedPreferences.getInstance();
-    widget.prefs1.setInt('s1', widget.s1);
-    widget.prefs1.setInt('s2', widget.s2);
-    widget.prefs1.setInt('s3', widget.s3);
-    widget.prefs1.setInt('s4', widget.s4);
+    widget.prefs1.setBool("s1.0", cincinnati[0]);
+    widget.prefs1.setBool("s1.1", cincinnati[1]);
+    widget.prefs1.setBool("s1.2", cincinnati[2]);
+    widget.prefs1.setInt('s2.0', ecg[0]);
+    widget.prefs1.setInt('s2.1', ecg[1]);
+    widget.prefs1.setInt('s2.2', ecg[2]);
+    setState(() {});
+    return true;
+  }
+
+  int cincinattiCount() {
+    int c = 0;
+    for (bool x in cincinnati) {
+      if (x) c++;
+    }
+    return c;
+  }
+
+  int ecgCount() {
+    if (ecg[0] == null || ecg[1] == null || ecg[2] == null) {
+      return 3;
+    } else {
+      return ecg[0] + ecg[1] + ecg[2];
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "Escalas",
-            style: TextStyle(fontSize: 24),
+    return WillPopScope(
+      onWillPop: save,
+      child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              "Escalas",
+              style: TextStyle(fontSize: 24),
+            ),
+            backgroundColor: Color.fromRGBO(79, 129, 189, 1.0),
+            actions: [
+              IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () async {
+                  widget.prefs1 = await SharedPreferences.getInstance();
+                  widget.prefs1.clear();
+                  load();
+                },
+              ),
+            ],
           ),
-          backgroundColor: Color.fromRGBO(79, 129, 189, 1.0),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-
-              },
-            ),
-          ],
-        ),
-        body: ListView(
-          shrinkWrap: true,
-          children: [
-            ExpansionPanelList(
-              expansionCallback: (int index, bool isExpanded) {
-                setState(() {
-                  expanded[index] = !expanded[index];
-                });
-              },
-              expandedHeaderPadding: EdgeInsets.all(0),
-              children: [
-                ExpansionPanel(
-                  headerBuilder: (BuildContext context, bool isExpanded) {
-                    return ListTile(
-                      title: Text(
-                        "Cincinnati",
-                        style: TextStyle(
-                            color: Color.fromRGBO(44, 73, 108, 1.0),
-                            fontSize: 18),
-                      ),
-                      trailing: Text(
-                        "${widget.s1}",
-                        style: TextStyle(
-                          color: ((int e) {
-                            if (e == 0) {
-                              return Color.fromRGBO(52, 168, 83, 1.0);
-                            }
-                            return (e > 2)
-                                ? Color.fromRGBO(234, 67, 53, 1.0)
-                                : Color.fromRGBO(251, 188, 4, 1.0);
-                          })(widget.s1),
-                          fontSize: 36,
-                        ),
-                      ),
-                    );
-                  },
-                  backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
-                  isExpanded: expanded[0],
-                  canTapOnHeader: true,
-                  body: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      ListTile(
-                        tileColor: Color.fromRGBO(233, 237, 244, 1.0),
+          body: ListView(
+            shrinkWrap: true,
+            children: [
+              ExpansionPanelList(
+                expansionCallback: (int index, bool isExpanded) {
+                  setState(() {
+                    expanded[index] = !expanded[index];
+                  });
+                },
+                expandedHeaderPadding: EdgeInsets.all(0),
+                children: [
+                  ExpansionPanel(
+                    headerBuilder: (BuildContext context, bool isExpanded) {
+                      return ListTile(
                         title: Text(
-                          "Paresia facial",
+                          "Cincinnati",
                           style: TextStyle(
                               color: Color.fromRGBO(44, 73, 108, 1.0),
-                              fontSize: 16),
+                              fontSize: 18),
                         ),
-                        trailing: Checkbox(
-                          value: cincinnati[0],
-                          onChanged: (e) {
-                            setState(() {
-                              cincinnati[0] = e;
-                              e ? widget.s1++ : widget.s1--;
-                            });
-                          },
-                        ),
-                      ),
-                      ListTile(
-                        tileColor: Color.fromRGBO(233, 237, 244, 1.0),
-                        title: Text(
-                          "Queda do membro superior",
+                        trailing: Text(
+                          "${cincinattiCount()}",
                           style: TextStyle(
-                              color: Color.fromRGBO(44, 73, 108, 1.0),
-                              fontSize: 16),
+                            color: ((int e) {
+                              if (e == 0) {
+                                return Color.fromRGBO(52, 168, 83, 1.0);
+                              }
+                              return (e > 2)
+                                  ? Color.fromRGBO(234, 67, 53, 1.0)
+                                  : Color.fromRGBO(251, 188, 4, 1.0);
+                            })(cincinattiCount()),
+                            fontSize: 36,
+                          ),
                         ),
-                        trailing: Checkbox(
-                          value: cincinnati[1],
-                          onChanged: (e) {
-                            setState(() {
-                              cincinnati[1] = e;
-                              e ? widget.s1++ : widget.s1--;
-                            });
-                          },
+                      );
+                    },
+                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
+                    isExpanded: expanded[0],
+                    canTapOnHeader: true,
+                    body: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ListTile(
+                          tileColor: Color.fromRGBO(233, 237, 244, 1.0),
+                          title: Text(
+                            "Paresia facial",
+                            style: TextStyle(
+                                color: Color.fromRGBO(44, 73, 108, 1.0),
+                                fontSize: 16),
+                          ),
+                          trailing: Checkbox(
+                            value: cincinnati[0],
+                            onChanged: (e) {
+                              setState(() {
+                                cincinnati[0] = e;
+                                cincinattiCount();
+                              });
+                            },
+                          ),
                         ),
-                      ),
-                      ListTile(
-                        tileColor: Color.fromRGBO(233, 237, 244, 1.0),
-                        title: Text(
-                          "Alteração na fala",
-                          style: TextStyle(
-                              color: Color.fromRGBO(44, 73, 108, 1.0),
-                              fontSize: 16),
+                        ListTile(
+                          tileColor: Color.fromRGBO(233, 237, 244, 1.0),
+                          title: Text(
+                            "Queda do membro superior",
+                            style: TextStyle(
+                                color: Color.fromRGBO(44, 73, 108, 1.0),
+                                fontSize: 16),
+                          ),
+                          trailing: Checkbox(
+                            value: cincinnati[1],
+                            onChanged: (e) {
+                              setState(() {
+                                cincinnati[1] = e;
+                                cincinattiCount();
+                              });
+                            },
+                          ),
                         ),
-                        trailing: Checkbox(
-                          value: cincinnati[2],
-                          onChanged: (e) {
-                            setState(() {
-                              cincinnati[2] = e;
-                              e ? widget.s1++ : widget.s1--;
-                            });
-                          },
-                        ),
-                      )
-                    ],
+                        ListTile(
+                          tileColor: Color.fromRGBO(233, 237, 244, 1.0),
+                          title: Text(
+                            "Alteração na fala",
+                            style: TextStyle(
+                                color: Color.fromRGBO(44, 73, 108, 1.0),
+                                fontSize: 16),
+                          ),
+                          trailing: Checkbox(
+                            value: cincinnati[2],
+                            onChanged: (e) {
+                              setState(() {
+                                cincinnati[2] = e;
+                                cincinattiCount();
+                              });
+                            },
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-                ExpansionPanel(
-                  headerBuilder: (BuildContext context, bool isExpanded) {
-                    return ListTile(
-                      title: Text(
-                        "ECG",
-                        style: TextStyle(
-                            color: Color.fromRGBO(44, 73, 108, 1.0),
-                            fontSize: 18),
-                      ),
-                      trailing: Text(
-                        "${widget.s2}",
-                        style: TextStyle(
-                          color: ((int e) {
-                            if (e == 15) {
-                              return Color.fromRGBO(52, 168, 83, 1.0);
-                            }
-                            return (e < 8)
-                                ? Color.fromRGBO(234, 67, 53, 1.0)
-                                : Color.fromRGBO(251, 188, 4, 1.0);
-                          })(widget.s2),
-                          fontSize: 36,
-                        ),
-                      ),
-                    );
-                  },
-                  backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
-                  isExpanded: expanded[1],
-                  canTapOnHeader: true,
-                  body: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Container(
-                        color: Color.fromRGBO(233, 237, 244, 1.0),
-                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                        child: DropdownButton(
-                          value: ecgvisual,
-                          hint: Text("Resposta Visual"),
-                          iconSize: 0.0,
+                  ExpansionPanel(
+                    headerBuilder: (BuildContext context, bool isExpanded) {
+                      return ListTile(
+                        title: Text(
+                          "ECG",
                           style: TextStyle(
-                              color: Color.fromRGBO(44, 73, 108, 1.0)),
-                          items: [
-                            DropdownMenuItem(
-                              value: 1,
-                              child: Text("Sem resposta"),
-                            ),
-                            DropdownMenuItem(
-                              value: 2,
-                              child: Text("Resposta á dor"),
-                            ),
-                            DropdownMenuItem(
-                              value: 3,
-                              child: Text("Resposta á fala"),
-                            ),
-                            DropdownMenuItem(
-                              value: 4,
-                              child: Text("Espontaneo"),
-                            )
-                          ],
-                          onChanged: (e) {
-                            setState(() {
-                              ecgvisual = e;
-                              ecgcount();
-                            });
-                          },
+                              color: Color.fromRGBO(44, 73, 108, 1.0),
+                              fontSize: 18),
                         ),
-                      ),
-                      Container(
-                        color: Color.fromRGBO(233, 237, 244, 1.0),
-                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                        child: DropdownButton(
-                          value: ecgverbal,
-                          hint: Text("Resposta Verbal"),
-                          iconSize: 0.0,
+                        trailing: Text(
+                          "${ecgCount()}",
                           style: TextStyle(
-                              color: Color.fromRGBO(44, 73, 108, 1.0)),
-                          items: [
-                            DropdownMenuItem(
-                              value: 1,
-                              child: Text("Sem resposta"),
-                            ),
-                            DropdownMenuItem(
-                              value: 2,
-                              child: Text("Sons incompreensiveis"),
-                            ),
-                            DropdownMenuItem(
-                              value: 3,
-                              child: Text("Palavras inapropriadas"),
-                            ),
-                            DropdownMenuItem(
-                              value: 4,
-                              child: Text("Confuso"),
-                            ),
-                            DropdownMenuItem(
-                              value: 5,
-                              child: Text("Orientado no tempo e espaço"),
-                            )
-                          ],
-                          onChanged: (e) {
-                            setState(() {
-                              ecgverbal = e;
-                              ecgcount();
-                            });
-                          },
+                            color: ((int e) {
+                              if (e == 15) {
+                                return Color.fromRGBO(52, 168, 83, 1.0);
+                              }
+                              return (e < 8)
+                                  ? Color.fromRGBO(234, 67, 53, 1.0)
+                                  : Color.fromRGBO(251, 188, 4, 1.0);
+                            })(ecgCount()),
+                            fontSize: 36,
+                          ),
                         ),
-                      ),
-                      Container(
-                        color: Color.fromRGBO(233, 237, 244, 1.0),
-                        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                        child: DropdownButton(
-                          value: ecgmove,
-                          hint: Text("Resposta Motora"),
-                          iconSize: 0.0,
-                          style: TextStyle(
-                              color: Color.fromRGBO(44, 73, 108, 1.0)),
-                          items: [
-                            DropdownMenuItem(
-                              value: 1,
-                              child: Text("Sem resposta"),
-                            ),
-                            DropdownMenuItem(
-                              value: 2,
-                              child: Text("Extensão anormal"),
-                            ),
-                            DropdownMenuItem(
-                              value: 3,
-                              child: Text("Flexão anormal"),
-                            ),
-                            DropdownMenuItem(
-                              value: 4,
-                              child: Text("Flexão normal"),
-                            ),
-                            DropdownMenuItem(
-                              value: 5,
-                              child: Text("Localiza dor"),
-                            ),
-                            DropdownMenuItem(
-                              value: 6,
-                              child: Text("Ao comando"),
-                            )
-                          ],
-                          onChanged: (e) {
-                            setState(() {
-                              ecgmove = e;
-                              ecgcount();
-                            });
-                          },
+                      );
+                    },
+                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
+                    isExpanded: expanded[1],
+                    canTapOnHeader: true,
+                    body: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Container(
+                          color: Color.fromRGBO(233, 237, 244, 1.0),
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                          child: DropdownButton(
+                            value: (() {
+                              return ecg[0] == 0 ? null : ecg[0];
+                            })(),
+                            hint: Text("Resposta Visual"),
+                            iconSize: 0.0,
+                            style: TextStyle(
+                                color: Color.fromRGBO(44, 73, 108, 1.0)),
+                            items: [
+                              DropdownMenuItem(
+                                value: 1,
+                                child: Text("Sem resposta"),
+                              ),
+                              DropdownMenuItem(
+                                value: 2,
+                                child: Text("Resposta á dor"),
+                              ),
+                              DropdownMenuItem(
+                                value: 3,
+                                child: Text("Resposta á fala"),
+                              ),
+                              DropdownMenuItem(
+                                value: 4,
+                                child: Text("Espontaneo"),
+                              )
+                            ],
+                            onChanged: (e) {
+                              setState(() {
+                                ecg[0] = e;
+                                ecgCount();
+                              });
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                        Container(
+                          color: Color.fromRGBO(233, 237, 244, 1.0),
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                          child: DropdownButton(
+                            value: (() {
+                              return ecg[1] == 0 ? null : ecg[1];
+                            })(),
+                            hint: Text("Resposta Verbal"),
+                            iconSize: 0.0,
+                            style: TextStyle(
+                                color: Color.fromRGBO(44, 73, 108, 1.0)),
+                            items: [
+                              DropdownMenuItem(
+                                value: 1,
+                                child: Text("Sem resposta"),
+                              ),
+                              DropdownMenuItem(
+                                value: 2,
+                                child: Text("Sons incompreensiveis"),
+                              ),
+                              DropdownMenuItem(
+                                value: 3,
+                                child: Text("Palavras inapropriadas"),
+                              ),
+                              DropdownMenuItem(
+                                value: 4,
+                                child: Text("Confuso"),
+                              ),
+                              DropdownMenuItem(
+                                value: 5,
+                                child: Text("Orientado no tempo e espaço"),
+                              )
+                            ],
+                            onChanged: (e) {
+                              setState(() {
+                                ecg[1] = e;
+                                ecgCount();
+                              });
+                            },
+                          ),
+                        ),
+                        Container(
+                          color: Color.fromRGBO(233, 237, 244, 1.0),
+                          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                          child: DropdownButton(
+                            value: (() {
+                              return ecg[2] == 0 ? null : ecg[2];
+                            })(),
+                            hint: Text("Resposta Motora"),
+                            iconSize: 0.0,
+                            style: TextStyle(
+                                color: Color.fromRGBO(44, 73, 108, 1.0)),
+                            items: [
+                              DropdownMenuItem(
+                                value: 1,
+                                child: Text("Sem resposta"),
+                              ),
+                              DropdownMenuItem(
+                                value: 2,
+                                child: Text("Extensão anormal"),
+                              ),
+                              DropdownMenuItem(
+                                value: 3,
+                                child: Text("Flexão anormal"),
+                              ),
+                              DropdownMenuItem(
+                                value: 4,
+                                child: Text("Flexão normal"),
+                              ),
+                              DropdownMenuItem(
+                                value: 5,
+                                child: Text("Localiza dor"),
+                              ),
+                              DropdownMenuItem(
+                                value: 6,
+                                child: Text("Ao comando"),
+                              )
+                            ],
+                            onChanged: (e) {
+                              setState(() {
+                                ecg[2] = e;
+                                ecgCount();
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ));
+                  ExpansionPanel(
+                    headerBuilder: (BuildContext context, bool isExpanded) {
+                      return ListTile(
+                        title: Text(
+                          "MGAP",
+                          style: TextStyle(
+                              color: Color.fromRGBO(44, 73, 108, 1.0),
+                              fontSize: 18),
+                        ),
+                        trailing: Text(
+                          "${widget.s3}",
+                          style: TextStyle(
+                            color: ((int e) {
+                              if (e == 15) {
+                                return Color.fromRGBO(52, 168, 83, 1.0);
+                              }
+                              return (e < 8)
+                                  ? Color.fromRGBO(234, 67, 53, 1.0)
+                                  : Color.fromRGBO(251, 188, 4, 1.0);
+                            })(widget.s3),
+                            fontSize: 36,
+                          ),
+                        ),
+                      );
+                    },
+                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
+                    isExpanded: expanded[2],
+                    canTapOnHeader: true,
+                    body: Text("hi"),
+                  ),
+                ],
+              ),
+            ],
+          )),
+    );
   }
 }
