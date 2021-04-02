@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 
 class Cincinnati extends StatefulWidget {
+  Function callback;
+  List<bool> values;
+
+  Cincinnati(this.callback, {this.values = const [false, false, false]});
+
   @override
   _CincinnatiState createState() => _CincinnatiState();
 }
 
 class _CincinnatiState extends State<Cincinnati> {
-  List<bool> cincinnati = List<bool>.filled(3, false);
-
-  int cincinattiCount() {
-    int c = 0;
-    for (bool x in cincinnati) {
-      if (x) c++;
-    }
-    return c;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,12 +25,10 @@ class _CincinnatiState extends State<Cincinnati> {
                 color: Color.fromRGBO(44, 73, 108, 1.0), fontSize: 16),
           ),
           trailing: Checkbox(
-            value: cincinnati[0],
+            value: widget.values[0],
             onChanged: (e) {
-              setState(() {
-                cincinnati[0] = e;
-                cincinattiCount();
-              });
+              widget.values[0] = e;
+              widget.callback(widget.values);
             },
           ),
         ),
@@ -46,12 +40,10 @@ class _CincinnatiState extends State<Cincinnati> {
                 color: Color.fromRGBO(44, 73, 108, 1.0), fontSize: 16),
           ),
           trailing: Checkbox(
-            value: cincinnati[1],
+            value: widget.values[1],
             onChanged: (e) {
-              setState(() {
-                cincinnati[1] = e;
-                cincinattiCount();
-              });
+              widget.values[1] = e;
+              widget.callback(widget.values);
             },
           ),
         ),
@@ -63,12 +55,10 @@ class _CincinnatiState extends State<Cincinnati> {
                 color: Color.fromRGBO(44, 73, 108, 1.0), fontSize: 16),
           ),
           trailing: Checkbox(
-            value: cincinnati[2],
+            value: widget.values[2],
             onChanged: (e) {
-              setState(() {
-                cincinnati[2] = e;
-                cincinattiCount();
-              });
+              widget.values[2] = e;
+              widget.callback(widget.values);
             },
           ),
         )

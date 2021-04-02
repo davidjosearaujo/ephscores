@@ -1,18 +1,11 @@
+import 'package:ephscores/Scores/Cincinnati.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Score extends StatefulWidget {
-  int s1, s2, s3, s4, s5, s6, s7, s8;
   SharedPreferences prefs1;
 
-  Score({
-    this.s3 = 0,
-    this.s4 = 0,
-    this.s5 = 0,
-    this.s6 = 0,
-    this.s7 = 0,
-    this.s8 = 0,
-  });
+  Score();
 
   @override
   _ScoreState createState() => _ScoreState();
@@ -29,9 +22,10 @@ class _ScoreState extends State<Score> {
     false,
     false,
   ];
-  List<bool> cincinnati = List<bool>.filled(3, false);
+  List<bool> cincinnati;
   List<int> ecg = List<int>.filled(3, 0);
   List<int> mgap = List<int>.filled(3, -1);
+  int cin = 0;
 
   @override
   void initState() {
@@ -60,9 +54,6 @@ class _ScoreState extends State<Score> {
 
   Future<bool> save() async {
     widget.prefs1 = await SharedPreferences.getInstance();
-    widget.prefs1.setBool("s1.0", cincinnati[0]);
-    widget.prefs1.setBool("s1.1", cincinnati[1]);
-    widget.prefs1.setBool("s1.2", cincinnati[2]);
     widget.prefs1.setInt('s2.0', ecg[0]);
     widget.prefs1.setInt('s2.1', ecg[1]);
     widget.prefs1.setInt('s2.2', ecg[2]);
@@ -73,12 +64,16 @@ class _ScoreState extends State<Score> {
     return true;
   }
 
-  int cincinattiCount() {
-    int c = 0;
-    for (bool x in cincinnati) {
-      if (x) c++;
+  Future<void> cincinattiCallback(List<bool> i) async {
+    cin = 0;
+    for (bool x in i) {
+      if (x) cin++;
     }
-    return c;
+    widget.prefs1 = await SharedPreferences.getInstance();
+    widget.prefs1.setBool("s1.0", i[0]);
+    widget.prefs1.setBool("s1.1", i[1]);
+    widget.prefs1.setBool("s1.2", i[2]);
+    setState(() {});
   }
 
   int ecgCount() {
@@ -140,7 +135,7 @@ class _ScoreState extends State<Score> {
                               fontSize: 18),
                         ),
                         trailing: Text(
-                          "${cincinattiCount()}",
+                          "${cin}",
                           style: TextStyle(
                             color: ((int e) {
                               if (e == 0) {
@@ -149,7 +144,7 @@ class _ScoreState extends State<Score> {
                               return (e > 2)
                                   ? Color.fromRGBO(234, 67, 53, 1.0)
                                   : Color.fromRGBO(251, 188, 4, 1.0);
-                            })(cincinattiCount()),
+                            })(cin),
                             fontSize: 36,
                           ),
                         ),
@@ -158,65 +153,12 @@ class _ScoreState extends State<Score> {
                     backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
                     isExpanded: expanded[0],
                     canTapOnHeader: true,
-                    body: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        ListTile(
-                          tileColor: Color.fromRGBO(233, 237, 244, 1.0),
-                          title: Text(
-                            "Paresia facial",
-                            style: TextStyle(
-                                color: Color.fromRGBO(44, 73, 108, 1.0),
-                                fontSize: 16),
-                          ),
-                          trailing: Checkbox(
-                            value: cincinnati[0],
-                            onChanged: (e) {
-                              setState(() {
-                                cincinnati[0] = e;
-                                cincinattiCount();
-                              });
-                            },
-                          ),
-                        ),
-                        ListTile(
-                          tileColor: Color.fromRGBO(233, 237, 244, 1.0),
-                          title: Text(
-                            "Queda do membro superior",
-                            style: TextStyle(
-                                color: Color.fromRGBO(44, 73, 108, 1.0),
-                                fontSize: 16),
-                          ),
-                          trailing: Checkbox(
-                            value: cincinnati[1],
-                            onChanged: (e) {
-                              setState(() {
-                                cincinnati[1] = e;
-                                cincinattiCount();
-                              });
-                            },
-                          ),
-                        ),
-                        ListTile(
-                          tileColor: Color.fromRGBO(233, 237, 244, 1.0),
-                          title: Text(
-                            "Alteração na fala",
-                            style: TextStyle(
-                                color: Color.fromRGBO(44, 73, 108, 1.0),
-                                fontSize: 16),
-                          ),
-                          trailing: Checkbox(
-                            value: cincinnati[2],
-                            onChanged: (e) {
-                              setState(() {
-                                cincinnati[2] = e;
-                                cincinattiCount();
-                              });
-                            },
-                          ),
-                        )
-                      ],
-                    ),
+                    body: ((SharedPreferences e) {
+                      return Cincinnati(
+                        this.cincinattiCallback,
+                        values: cincinnati,
+                      );
+                    })(widget.prefs1),
                   ),
                   ExpansionPanel(
                     headerBuilder: (BuildContext context, bool isExpanded) {
