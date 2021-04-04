@@ -4,7 +4,6 @@ class Cincinnati extends StatefulWidget {
   Function callback;
   List<bool> values;
 
-
   Cincinnati(this.callback, this.values);
 
   @override
@@ -12,7 +11,6 @@ class Cincinnati extends StatefulWidget {
 }
 
 class _CincinnatiState extends State<Cincinnati> {
-
   @override
   Widget build(BuildContext context) {
     widget.callback(widget.values);
