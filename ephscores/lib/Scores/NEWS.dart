@@ -17,7 +17,6 @@ class _NEWSState extends State<NEWS> {
 
   @override
   Widget build(BuildContext context) {
-    widget.callback(widget.indices, values);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

@@ -15,7 +15,6 @@ class MGAP extends StatefulWidget {
 class _MGAPState extends State<MGAP> {
   @override
   Widget build(BuildContext context) {
-    widget.callback(widget.values);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

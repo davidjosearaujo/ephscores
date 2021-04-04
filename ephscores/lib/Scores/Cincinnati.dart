@@ -13,7 +13,6 @@ class Cincinnati extends StatefulWidget {
 class _CincinnatiState extends State<Cincinnati> {
   @override
   Widget build(BuildContext context) {
-    widget.callback(widget.values);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [

@@ -14,7 +14,6 @@ class ECG extends StatefulWidget {
 class _ECGState extends State<ECG> {
   @override
   Widget build(BuildContext context) {
-    widget.callback(widget.values);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
