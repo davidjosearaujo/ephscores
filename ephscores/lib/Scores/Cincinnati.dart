@@ -4,7 +4,8 @@ class Cincinnati extends StatefulWidget {
   Function callback;
   List<bool> values;
 
-  Cincinnati(this.callback, {this.values = const [false, false, false]});
+
+  Cincinnati(this.callback, this.values);
 
   @override
   _CincinnatiState createState() => _CincinnatiState();
@@ -14,6 +15,7 @@ class _CincinnatiState extends State<Cincinnati> {
 
   @override
   Widget build(BuildContext context) {
+    widget.callback(widget.values);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
