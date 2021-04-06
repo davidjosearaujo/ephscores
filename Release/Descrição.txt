@@ -1,3 +1,0 @@
-EPHScores dá-te acesso a uma forma rápida de calculares todas as escalas atualmente utilizadas nos verbetes de ocorrência do INEM e ainda mais algumas.
-Para além disso, tens também uma calculadora de Triagem START que ao mesmo tempo regista o número de vítimas por classificação de gravidade.
-Esta aplicação é 100% open source, visita a página de GitHub para saberes mais.
