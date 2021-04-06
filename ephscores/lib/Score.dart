@@ -5,15 +5,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'Scores/MGAP.dart';
 import 'Scores/NEWS.dart';
+import 'Scores/PROACS.dart';
 
 // ignore: must_be_immutable
 class Score extends StatefulWidget {
   SharedPreferences prefs1;
-  List<int> rootvals = [0, 3, 3, 0];
+  List<int> rootvals = [0, 3, 3, 0, 0];
   List<bool> cincinnati = List<bool>.filled(3, false);
   List<int> ecg = List<int>.filled(3, 0);
   List<int> mgap = List<int>.filled(3, -1);
   List<int> news = List<int>.filled(7, null);
+  List<int> proacs = List<int>.filled(4, -1);
 
   @override
   _ScoreState createState() => _ScoreState();
@@ -30,7 +32,11 @@ class _ScoreState extends State<Score> {
 
   void load() async {
     SharedPreferences.getInstance().then((value) {
-      setState(() async {
+      setState(() {
+        widget.rootvals[0] = value.containsKey("s1.r") ? value.get("s1.r") : 0;
+        widget.rootvals[1] = value.containsKey("s2.r") ? value.get("s2.r") : 3;
+        widget.rootvals[2] = value.containsKey("s3.r") ? value.get("s3.r") : 3;
+        widget.rootvals[3] = value.containsKey("s4.r") ? value.get("s4.r") : 0;
 
         widget.cincinnati[0] =
             value.containsKey('s1.0') ? value.getBool('s1.0') : false;
@@ -61,6 +67,15 @@ class _ScoreState extends State<Score> {
             value.containsKey('s4.5') ? value.getInt('s4.5') : null;
         widget.news[6] =
             value.containsKey('s4.6') ? value.getInt('s4.6') : null;
+
+        widget.proacs[0] =
+            value.containsKey('s5.0') ? value.getInt('s5.0') : -1;
+        widget.proacs[1] =
+            value.containsKey('s5.1') ? value.getInt('s5.1') : -1;
+        widget.proacs[2] =
+            value.containsKey('s5.2') ? value.getInt('s5.2') : -1;
+        widget.proacs[3] =
+            value.containsKey('s5.3') ? value.getInt('s5.3') : -1;
       });
     });
   }
@@ -70,14 +85,18 @@ class _ScoreState extends State<Score> {
     widget.prefs1.setBool("s1.0", widget.cincinnati[0]);
     widget.prefs1.setBool("s1.1", widget.cincinnati[1]);
     widget.prefs1.setBool("s1.2", widget.cincinnati[2]);
-    widget.prefs1.setInt("s1.r", widget.rootvals[0]);
     widget.prefs1.setInt('s2.0', widget.ecg[0]);
     widget.prefs1.setInt('s2.1', widget.ecg[1]);
     widget.prefs1.setInt('s2.2', widget.ecg[2]);
-    widget.prefs1.setInt("s2.r", widget.rootvals[1]);
     widget.prefs1.setInt('s3.0', widget.mgap[0]);
     widget.prefs1.setInt('s3.1', widget.mgap[1]);
     widget.prefs1.setInt('s3.2', widget.mgap[2]);
+    widget.prefs1.setInt('s5.0', widget.proacs[0]);
+    widget.prefs1.setInt('s5.1', widget.proacs[1]);
+    widget.prefs1.setInt('s5.2', widget.proacs[2]);
+    widget.prefs1.setInt('s5.3', widget.proacs[3]);
+    widget.prefs1.setInt("s1.r", widget.rootvals[0]);
+    widget.prefs1.setInt("s2.r", widget.rootvals[1]);
     widget.prefs1.setInt("s3.r", widget.rootvals[2]);
     widget.prefs1.setInt("s4.r", widget.rootvals[3]);
     return true;
@@ -88,10 +107,11 @@ class _ScoreState extends State<Score> {
     widget.ecg = List<int>.filled(3, 0);
     widget.mgap = List<int>.filled(3, -1);
     widget.news = List<int>.filled(7, null);
-    widget.rootvals = [0, 3, 3, 0];
+    widget.proacs = List<int>.filled(4, -1);
+    widget.rootvals = [0, 3, 3, 0, 0];
   }
 
-  Future<void> cincinattiCallback(List<bool> i) async {
+  void cincinattiCallback(List<bool> i) {
     setState(() {
       widget.rootvals[0] = 0;
       for (bool x in i) {
@@ -101,7 +121,7 @@ class _ScoreState extends State<Score> {
     });
   }
 
-  Future<void> ecgCallback(List<int> i) async {
+  void ecgCallback(List<int> i) {
     setState(() {
       if (i[0] == 0 && i[1] == 0 && i[2] == 0) {
         widget.rootvals[1] = 3;
@@ -112,7 +132,7 @@ class _ScoreState extends State<Score> {
     });
   }
 
-  Future<void> mgapCallback(List<int> i) async {
+  void mgapCallback(List<int> i) {
     setState(() {
       widget.rootvals[2] = widget.rootvals[1];
       for (int x in i) {
@@ -141,6 +161,16 @@ class _ScoreState extends State<Score> {
         }
       }
       widget.news = i;
+    });
+  }
+
+  void proacsCallback(List<int> i) {
+    setState(() {
+      widget.rootvals[4] = 0;
+      for (int x in i) {
+        if (x != -1) widget.rootvals[4] += x;
+      }
+      widget.proacs = i;
     });
   }
 
@@ -307,6 +337,38 @@ class _ScoreState extends State<Score> {
                     canTapOnHeader: true,
                     body: (() {
                       return NEWS(newsCallback, widget.news);
+                    })(),
+                  ),
+                  ExpansionPanel(
+                    headerBuilder: (BuildContext context, bool isExpanded) {
+                      return ListTile(
+                        title: Text(
+                          "PROACS",
+                          style: TextStyle(
+                              color: Color.fromRGBO(44, 73, 108, 1.0),
+                              fontSize: 18),
+                        ),
+                        trailing: Text(
+                          "${widget.rootvals[4]}",
+                          style: TextStyle(
+                            color: ((int e) {
+                              if (e == 0) {
+                                return Color.fromRGBO(52, 168, 83, 1.0);
+                              }
+                              return (e >= 3)
+                                  ? Color.fromRGBO(234, 67, 53, 1.0)
+                                  : Color.fromRGBO(251, 188, 4, 1.0);
+                            })(widget.rootvals[4]),
+                            fontSize: 36,
+                          ),
+                        ),
+                      );
+                    },
+                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
+                    isExpanded: expanded[4],
+                    canTapOnHeader: true,
+                    body: (() {
+                      return PROACS(proacsCallback, widget.proacs);
                     })(),
                   ),
                 ],
