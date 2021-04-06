@@ -6,16 +6,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'Scores/MGAP.dart';
 import 'Scores/NEWS.dart';
 import 'Scores/PROACS.dart';
+import 'Scores/TAP.dart';
 
 // ignore: must_be_immutable
 class Score extends StatefulWidget {
   SharedPreferences prefs1;
-  List<int> rootvals = [0, 3, 3, 0, 0];
+  List<int> rootvals = [0, 3, 3, 0, 0, 0];
   List<bool> cincinnati = List<bool>.filled(3, false);
   List<int> ecg = List<int>.filled(3, 0);
   List<int> mgap = List<int>.filled(3, -1);
   List<int> news = List<int>.filled(7, null);
   List<int> proacs = List<int>.filled(4, -1);
+  List<int> tap = List<int>.filled(3, -1);
 
   @override
   _ScoreState createState() => _ScoreState();
@@ -37,6 +39,8 @@ class _ScoreState extends State<Score> {
         widget.rootvals[1] = value.containsKey("s2.r") ? value.get("s2.r") : 3;
         widget.rootvals[2] = value.containsKey("s3.r") ? value.get("s3.r") : 3;
         widget.rootvals[3] = value.containsKey("s4.r") ? value.get("s4.r") : 0;
+        widget.rootvals[4] = value.containsKey("s5.r") ? value.get("s5.r") : 0;
+        widget.rootvals[5] = value.containsKey("s6.r") ? value.get("s6.r") : 0;
 
         widget.cincinnati[0] =
             value.containsKey('s1.0') ? value.getBool('s1.0') : false;
@@ -76,6 +80,10 @@ class _ScoreState extends State<Score> {
             value.containsKey('s5.2') ? value.getInt('s5.2') : -1;
         widget.proacs[3] =
             value.containsKey('s5.3') ? value.getInt('s5.3') : -1;
+
+        widget.tap[0] = value.containsKey('s6.0') ? value.getInt('s6.0') : -1;
+        widget.tap[1] = value.containsKey('s6.1') ? value.getInt('s6.1') : -1;
+        widget.tap[2] = value.containsKey('s6.2') ? value.getInt('s6.2') : -1;
       });
     });
   }
@@ -95,10 +103,15 @@ class _ScoreState extends State<Score> {
     widget.prefs1.setInt('s5.1', widget.proacs[1]);
     widget.prefs1.setInt('s5.2', widget.proacs[2]);
     widget.prefs1.setInt('s5.3', widget.proacs[3]);
+    widget.prefs1.setInt('s6.0', widget.tap[0]);
+    widget.prefs1.setInt('s6.1', widget.tap[1]);
+    widget.prefs1.setInt('s6.2', widget.tap[2]);
     widget.prefs1.setInt("s1.r", widget.rootvals[0]);
     widget.prefs1.setInt("s2.r", widget.rootvals[1]);
     widget.prefs1.setInt("s3.r", widget.rootvals[2]);
     widget.prefs1.setInt("s4.r", widget.rootvals[3]);
+    widget.prefs1.setInt("s5.r", widget.rootvals[4]);
+    widget.prefs1.setInt("s6.r", widget.rootvals[5]);
     return true;
   }
 
@@ -108,7 +121,8 @@ class _ScoreState extends State<Score> {
     widget.mgap = List<int>.filled(3, -1);
     widget.news = List<int>.filled(7, null);
     widget.proacs = List<int>.filled(4, -1);
-    widget.rootvals = [0, 3, 3, 0, 0];
+    widget.tap = List<int>.filled(3, -1);
+    widget.rootvals = [0, 3, 3, 0, 0, 0];
   }
 
   void cincinattiCallback(List<bool> i) {
@@ -171,6 +185,16 @@ class _ScoreState extends State<Score> {
         if (x != -1) widget.rootvals[4] += x;
       }
       widget.proacs = i;
+    });
+  }
+
+  void tapCallback(List<int> i) {
+    setState(() {
+      widget.rootvals[5] = 0;
+      for (int x in i) {
+        if (x != -1) widget.rootvals[5] += 1;
+      }
+      widget.tap = i;
     });
   }
 
@@ -369,6 +393,38 @@ class _ScoreState extends State<Score> {
                     canTapOnHeader: true,
                     body: (() {
                       return PROACS(proacsCallback, widget.proacs);
+                    })(),
+                  ),
+                  ExpansionPanel(
+                    headerBuilder: (BuildContext context, bool isExpanded) {
+                      return ListTile(
+                        title: Text(
+                          "TAP",
+                          style: TextStyle(
+                              color: Color.fromRGBO(44, 73, 108, 1.0),
+                              fontSize: 18),
+                        ),
+                        trailing: Text(
+                          "${widget.rootvals[5]}",
+                          style: TextStyle(
+                            color: ((int e) {
+                              if (e == 0) {
+                                return Color.fromRGBO(52, 168, 83, 1.0);
+                              }
+                              return (e >= 3)
+                                  ? Color.fromRGBO(234, 67, 53, 1.0)
+                                  : Color.fromRGBO(251, 188, 4, 1.0);
+                            })(widget.rootvals[5]),
+                            fontSize: 36,
+                          ),
+                        ),
+                      );
+                    },
+                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
+                    isExpanded: expanded[5],
+                    canTapOnHeader: true,
+                    body: (() {
+                      return TAP(tapCallback, widget.tap);
                     })(),
                   ),
                 ],
