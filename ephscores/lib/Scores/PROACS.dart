@@ -111,7 +111,7 @@ class _PROACSState extends State<PROACS> {
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
             value: (() {
-              return widget.values[2] == -1 ? null : widget.values[2];
+              return widget.values[3] == -1 ? null : widget.values[3];
             })(),
             hint: Text("Elevação de ST"),
             iconSize: 0.0,
