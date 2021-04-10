@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
-class TAP extends StatefulWidget {
+class RTS extends StatefulWidget {
   Function callback;
   List<int> values;
 
-  TAP(this.callback, this.values);
+  RTS(this.callback, this.values);
 
   @override
-  _TAPState createState() => _TAPState();
+  _RTSState createState() => _RTSState();
 }
 
-class _TAPState extends State<TAP> {
+class _RTSState extends State<RTS> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -24,35 +24,35 @@ class _TAPState extends State<TAP> {
             value: (() {
               return widget.values[0] == -1 ? null : widget.values[0];
             })(),
-            hint: Text("Aparência"),
+            hint: Text("Frequência respiratoria (cpm)"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
             items: [
               DropdownMenuItem(
                 value: 0,
-                child: Text("Tonús muscular anormal"),
+                child: Text("0"),
               ),
               DropdownMenuItem(
                 value: 1,
-                child: Text("Não interage"),
+                child: Text("1 a 5"),
               ),
               DropdownMenuItem(
                 value: 2,
-                child: Text("Difícil de consolar"),
+                child: Text("6 a 9"),
               ),
               DropdownMenuItem(
                 value: 3,
-                child: Text("Olhar anormal"),
+                child: Text(">29"),
               ),
               DropdownMenuItem(
                 value: 4,
-                child: Text("Choro / Discurso anormal"),
+                child: Text("10 a 29"),
               ),
             ],
             onChanged: (e) {
               setState(() {
                 widget.values[0] = e;
-                widget.callback(widget.values);
+                widget.callback(widget.values, true);
               });
             },
           ),
@@ -64,67 +64,35 @@ class _TAPState extends State<TAP> {
             value: (() {
               return widget.values[1] == -1 ? null : widget.values[1];
             })(),
-            hint: Text("Esforço respiratório"),
+            hint: Text("PAS (mmHg)"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
             items: [
               DropdownMenuItem(
                 value: 0,
-                child: Text("Sons anormais"),
+                child: Text("0"),
               ),
               DropdownMenuItem(
                 value: 1,
-                child: Text("Posição tripé / anormal"),
+                child: Text("1 a 49"),
               ),
               DropdownMenuItem(
                 value: 2,
-                child: Text("Tiragem"),
+                child: Text("50 a 75"),
               ),
               DropdownMenuItem(
                 value: 3,
-                child: Text("Adejo nasal"),
+                child: Text("76 a 89"),
               ),
               DropdownMenuItem(
                 value: 4,
-                child: Text("Apneia / Gasping"),
+                child: Text(">89"),
               ),
             ],
             onChanged: (e) {
               setState(() {
                 widget.values[1] = e;
-                widget.callback(widget.values);
-              });
-            },
-          ),
-        ),
-        Container(
-          color: Color.fromRGBO(233, 237, 244, 1.0),
-          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-          child: DropdownButton(
-            value: (() {
-              return widget.values[2] == -1 ? null : widget.values[2];
-            })(),
-            hint: Text("Circulação"),
-            iconSize: 0.0,
-            style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
-            items: [
-              DropdownMenuItem(
-                value: 0,
-                child: Text("Pele pálida"),
-              ),
-              DropdownMenuItem(
-                value: 1,
-                child: Text("Pele marmoreada"),
-              ),
-              DropdownMenuItem(
-                value: 2,
-                child: Text("Cianose"),
-              ),
-            ],
-            onChanged: (e) {
-              setState(() {
-                widget.values[2] = e;
-                widget.callback(widget.values);
+                widget.callback(widget.values, true);
               });
             },
           ),

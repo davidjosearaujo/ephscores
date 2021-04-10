@@ -41,7 +41,7 @@ class _MGAPState extends State<MGAP> {
             onChanged: (e) {
               setState(() {
                 widget.values[0] = e;
-                widget.callback(widget.values);
+                widget.callback(widget.values, true);
               });
             },
           ),
@@ -69,7 +69,7 @@ class _MGAPState extends State<MGAP> {
             onChanged: (e) {
               setState(() {
                 widget.values[1] = e;
-                widget.callback(widget.values);
+                widget.callback(widget.values, true);
               });
             },
           ),
@@ -101,7 +101,7 @@ class _MGAPState extends State<MGAP> {
             onChanged: (e) {
               setState(() {
                 widget.values[2] = e;
-                widget.callback(widget.values);
+                widget.callback(widget.values, true);
               });
             },
           ),

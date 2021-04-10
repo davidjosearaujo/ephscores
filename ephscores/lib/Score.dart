@@ -7,12 +7,13 @@ import 'Scores/MGAP.dart';
 import 'Scores/NEWS.dart';
 import 'Scores/PROACS.dart';
 import 'Scores/RACE.dart';
+import 'Scores/RTS.dart';
 import 'Scores/TAP.dart';
 
 // ignore: must_be_immutable
 class Score extends StatefulWidget {
   SharedPreferences prefs1;
-  List<int> rootvals = [0, 3, 3, 0, 0, 0, 0];
+  List<int> rootvals = [0, 3, 3, 0, 0, 0, 0, 0];
   List<bool> cincinnati = List<bool>.filled(3, false);
   List<int> ecg = List<int>.filled(3, 0);
   List<int> mgap = List<int>.filled(3, -1);
@@ -20,6 +21,7 @@ class Score extends StatefulWidget {
   List<int> proacs = List<int>.filled(4, -1);
   List<int> tap = List<int>.filled(3, -1);
   List<int> race = List<int>.filled(6, -1);
+  List<int> rts = List<int>.filled(2, -1);
 
   @override
   _ScoreState createState() => _ScoreState();
@@ -43,6 +45,8 @@ class _ScoreState extends State<Score> {
         widget.rootvals[3] = value.containsKey("s4.r") ? value.get("s4.r") : 0;
         widget.rootvals[4] = value.containsKey("s5.r") ? value.get("s5.r") : 0;
         widget.rootvals[5] = value.containsKey("s6.r") ? value.get("s6.r") : 0;
+        widget.rootvals[6] = value.containsKey("s7.r") ? value.get("s7.r") : 0;
+        widget.rootvals[7] = value.containsKey("s8.r") ? value.get("s8.r") : 0;
 
         widget.cincinnati[0] =
             value.containsKey('s1.0') ? value.getBool('s1.0') : false;
@@ -93,6 +97,9 @@ class _ScoreState extends State<Score> {
         widget.race[3] = value.containsKey('s7.3') ? value.getInt('s7.3') : -1;
         widget.race[4] = value.containsKey('s7.4') ? value.getInt('s7.4') : -1;
         widget.race[5] = value.containsKey('s7.5') ? value.getInt('s7.5') : -1;
+
+        widget.rts[0] = value.containsKey('s8.0') ? value.getInt('s8.0') : -1;
+        widget.rts[1] = value.containsKey('s8.1') ? value.getInt('s8.1') : -1;
       });
     });
   }
@@ -127,6 +134,9 @@ class _ScoreState extends State<Score> {
     widget.prefs1.setInt('s7.3', widget.race[3]);
     widget.prefs1.setInt('s7.4', widget.race[4]);
     widget.prefs1.setInt('s7.5', widget.race[5]);
+    // RTS
+    widget.prefs1.setInt('s8.0', widget.rts[0]);
+    widget.prefs1.setInt('s8.1', widget.rts[1]);
     // Display values
     widget.prefs1.setInt("s1.r", widget.rootvals[0]);
     widget.prefs1.setInt("s2.r", widget.rootvals[1]);
@@ -134,7 +144,8 @@ class _ScoreState extends State<Score> {
     widget.prefs1.setInt("s4.r", widget.rootvals[3]);
     widget.prefs1.setInt("s5.r", widget.rootvals[4]);
     widget.prefs1.setInt("s6.r", widget.rootvals[5]);
-    widget.prefs1.setInt("s6.r", widget.rootvals[6]);
+    widget.prefs1.setInt("s7.r", widget.rootvals[6]);
+    widget.prefs1.setInt("s8.r", widget.rootvals[7]);
     return true;
   }
 
@@ -146,7 +157,8 @@ class _ScoreState extends State<Score> {
     widget.proacs = List<int>.filled(4, -1);
     widget.tap = List<int>.filled(3, -1);
     widget.race = List<int>.filled(6, -1);
-    widget.rootvals = [0, 3, 3, 0, 0, 0, 0];
+    widget.rts = List<int>.filled(2, -1);
+    widget.rootvals = [0, 3, 3, 0, 0, 0, 0, 0];
   }
 
   void cincinattiCallback(List<bool> i) {
@@ -170,14 +182,18 @@ class _ScoreState extends State<Score> {
     });
   }
 
-  void mgapCallback(List<int> i) {
-    setState(() {
-      widget.rootvals[2] = widget.rootvals[1];
-      for (int x in i) {
-        if (x != -1) widget.rootvals[2] += x;
-      }
-      widget.mgap = i;
-    });
+  int mgapCallback(List<int> i, bool callback) {
+    widget.rootvals[2] = widget.rootvals[1];
+    if (callback) {
+      setState(() {
+        for (int x in i) {
+          if (x != -1) widget.rootvals[2] += x;
+        }
+        widget.mgap = i;
+      });
+    } else {
+      return widget.rootvals[2];
+    }
   }
 
   Future<void> newsCallback(List<int> i, List<int> v) async {
@@ -217,7 +233,7 @@ class _ScoreState extends State<Score> {
     setState(() {
       widget.rootvals[5] = 0;
       for (int x in i) {
-        if (x != -1) widget.rootvals[5]++;
+        if (x != -1) widget.rootvals[5] += x;
       }
       widget.tap = i;
     });
@@ -231,6 +247,30 @@ class _ScoreState extends State<Score> {
       }
       widget.race = x;
     });
+  }
+
+  int rtsCallback(List<int> i, bool callback) {
+    if (widget.rootvals[1] == 3) {
+      widget.rootvals[7] = 0;
+    } else if (widget.rootvals[1] < 5) {
+      widget.rootvals[7] = 1;
+    } else if (widget.rootvals[1] < 8) {
+      widget.rootvals[7] = 2;
+    } else if (widget.rootvals[1] < 12) {
+      widget.rootvals[7] = 3;
+    } else {
+      widget.rootvals[7] = 4;
+    }
+    if (callback) {
+      setState(() {
+        for (int x in i) {
+          if (x != -1) widget.rootvals[7] += x;
+        }
+        widget.rts = i;
+      });
+    } else {
+      return widget.rootvals[7];
+    }
   }
 
   @override
@@ -345,7 +385,9 @@ class _ScoreState extends State<Score> {
                               fontSize: 18),
                         ),
                         trailing: Text(
-                          "${widget.rootvals[2]}",
+                          "${(() {
+                            return mgapCallback(null, false);
+                          })()}",
                           style: TextStyle(
                             color: ((int e) {
                               if (e >= 23) {
@@ -354,7 +396,7 @@ class _ScoreState extends State<Score> {
                               return (e < 18)
                                   ? Color.fromRGBO(234, 67, 53, 1.0)
                                   : Color.fromRGBO(251, 188, 4, 1.0);
-                            })(widget.rootvals[2]),
+                            })(mgapCallback(null, false)),
                             fontSize: 36,
                           ),
                         ),
@@ -493,6 +535,41 @@ class _ScoreState extends State<Score> {
                     canTapOnHeader: true,
                     body: (() {
                       return RACE(raceCallback, widget.race);
+                    })(),
+                  ),
+                  ExpansionPanel(
+                    headerBuilder: (BuildContext context, bool isExpanded) {
+                      return ListTile(
+                        title: Text(
+                          "RTS",
+                          style: TextStyle(
+                              color: Color.fromRGBO(44, 73, 108, 1.0),
+                              fontSize: 18),
+                        ),
+                        trailing: Text(
+                          "${(() {
+                            print(rtsCallback(null, false));
+                            return rtsCallback(null, false);
+                          })()}",
+                          style: TextStyle(
+                            color: ((int e) {
+                              if (e == 16) {
+                                return Color.fromRGBO(52, 168, 83, 1.0);
+                              }
+                              return (e <= 10)
+                                  ? Color.fromRGBO(234, 67, 53, 1.0)
+                                  : Color.fromRGBO(251, 188, 4, 1.0);
+                            })(rtsCallback(null, false)),
+                            fontSize: 36,
+                          ),
+                        ),
+                      );
+                    },
+                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
+                    isExpanded: expanded[7],
+                    canTapOnHeader: true,
+                    body: (() {
+                      return RTS(rtsCallback, widget.rts);
                     })(),
                   ),
                 ],

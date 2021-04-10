@@ -218,13 +218,31 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                                               233, 237, 244, 1.0),
                                           title: new Text("Passou 1 minuto !"),
                                           actions: <Widget>[
-                                            TextButton(
-                                                onPressed: () {
-                                                  wait = false;
-                                                  Navigator.of(context).pop();
-                                                },
-                                                child: Text("Fechar")),
-                                          ],
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Expanded(
+                                                  child: ElevatedButton(
+                                                    style: ButtonStyle(
+                                                      backgroundColor:  MaterialStateProperty.resolveWith<Color>(
+                                                        (Set<MaterialState>states) {
+                                                          if (states.contains(
+                                                              MaterialState.pressed))
+                                                            return Color.fromRGBO(208,216,232,1.0);
+                                                          return Color.fromRGBO(79,129,189,1.0);
+                                                        },
+                                                      ),
+                                                    ),
+                                                    onPressed: () {
+                                                      wait = false;
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                    child: Text("Fechar")
+                                                  ),
+                                                ),
+                                            ],
+                                            ),
+                                          ]
                                         );
                                       },
                                     );
