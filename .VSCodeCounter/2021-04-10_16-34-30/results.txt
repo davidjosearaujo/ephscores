@@ -1,0 +1,36 @@
+Date : 2021-04-10 16:34:30
+Directory : c:\Users\david\Documents\GitHub_Repositories\EPHScores\ephscores\lib
+Total : 11 files,  2682 codes, 18 comments, 88 blanks, all 2788 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Dart     |         11 |      2,682 |         18 |         88 |      2,788 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                        | files      | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                           |         11 |      2,682 |         18 |         88 |      2,788 |
+| Scores                                                                                      |          8 |      1,398 |          7 |         44 |      1,449 |
++---------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++---------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                                    | language | code       | comment    | blank      | total      |
++---------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\Users\david\Documents\GitHub_Repositories\EPHScores\ephscores\lib\START.dart             | Dart     |        484 |          0 |         10 |        494 |
+| c:\Users\david\Documents\GitHub_Repositories\EPHScores\ephscores\lib\Score.dart             | Dart     |        538 |         10 |         27 |        575 |
+| c:\Users\david\Documents\GitHub_Repositories\EPHScores\ephscores\lib\Scores\Cincinnati.dart | Dart     |         63 |          0 |          5 |         68 |
+| c:\Users\david\Documents\GitHub_Repositories\EPHScores\ephscores\lib\Scores\ECG.dart        | Dart     |        150 |          1 |          5 |        156 |
+| c:\Users\david\Documents\GitHub_Repositories\EPHScores\ephscores\lib\Scores\MGAP.dart       | Dart     |        118 |          1 |          5 |        124 |
+| c:\Users\david\Documents\GitHub_Repositories\EPHScores\ephscores\lib\Scores\NEWS.dart       | Dart     |        391 |          1 |          5 |        397 |
+| c:\Users\david\Documents\GitHub_Repositories\EPHScores\ephscores\lib\Scores\PROACS.dart     | Dart     |        150 |          1 |          5 |        156 |
+| c:\Users\david\Documents\GitHub_Repositories\EPHScores\ephscores\lib\Scores\RACE.dart       | Dart     |        278 |          1 |          9 |        288 |
+| c:\Users\david\Documents\GitHub_Repositories\EPHScores\ephscores\lib\Scores\RTS.dart        | Dart     |        106 |          1 |          5 |        112 |
+| c:\Users\david\Documents\GitHub_Repositories\EPHScores\ephscores\lib\Scores\TAP.dart        | Dart     |        142 |          1 |          5 |        148 |
+| c:\Users\david\Documents\GitHub_Repositories\EPHScores\ephscores\lib\main.dart              | Dart     |        262 |          1 |          7 |        270 |
+| Total                                                                                       |          |      2,682 |         18 |         88 |      2,788 |
++---------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

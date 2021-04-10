@@ -30,7 +30,7 @@ class Score extends StatefulWidget {
 }
 
 class _ScoreState extends State<Score> {
-  List<bool> expanded = List<bool>.filled(8, false);
+  List<bool> expanded = List<bool>.filled(7, false);
 
   @override
   void initState() {
@@ -290,6 +290,7 @@ class _ScoreState extends State<Score> {
                 onPressed: () async {
                   widget.prefs1 = await SharedPreferences.getInstance();
                   setState(() {
+                    expanded = List<bool>.filled(8, false);
                     widget.prefs1.clear();
                     reset();
                   });
