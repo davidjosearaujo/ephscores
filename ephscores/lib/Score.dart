@@ -173,10 +173,10 @@ class _ScoreState extends State<Score> {
 
   void ecgCallback(List<int> i) {
     setState(() {
-      if (i[0] == 0 && i[1] == 0 && i[2] == 0) {
-        widget.rootvals[1] = 3;
-      } else {
+      if (i[0] >= 1 && i[1] >= 1 && i[2] >= 1) {
         widget.rootvals[1] = i[0] + i[1] + i[2];
+      } else {
+        widget.rootvals[1] = 3;
       }
       widget.ecg = i;
     });
@@ -197,7 +197,6 @@ class _ScoreState extends State<Score> {
   }
 
   Future<void> newsCallback(List<int> i, List<int> v) async {
-    print("cal");
     widget.prefs1 = await SharedPreferences.getInstance();
     setState(() {
       bool clean = true;
@@ -548,7 +547,6 @@ class _ScoreState extends State<Score> {
                         ),
                         trailing: Text(
                           "${(() {
-                            print(rtsCallback(null, false));
                             return rtsCallback(null, false);
                           })()}",
                           style: TextStyle(
