@@ -172,20 +172,17 @@ class _ScoreState extends State<Score> {
   }
 
   void ecgCallback(List<int> i) {
-    // Update MGAP and RTS
-    widget.rootvals[2] -= widget.rootvals[1];
-    widget.rootvals[7] -= widget.rootvals[1];
     setState(() {
       if (i[0] >= 1 && i[1] >= 1 && i[2] >= 1) {
+        widget.rootvals[7] -= ECGtoRTS(widget.rootvals[1]);
+        widget.rootvals[2] -= widget.rootvals[1];
         widget.rootvals[1] = i[0] + i[1] + i[2];
+        widget.rootvals[2] += widget.rootvals[1];
+        widget.rootvals[7] += ECGtoRTS(widget.rootvals[1]);
       } else {
         widget.rootvals[1] = 3;
       }
       widget.ecg = i;
-
-      // Update MGAP and RTS
-      widget.rootvals[2] += widget.rootvals[1];
-      widget.rootvals[7] += widget.rootvals[1];
     });
   }
 
@@ -252,23 +249,29 @@ class _ScoreState extends State<Score> {
   }
 
   void rtsCallback(List<int> i) {
-    if (widget.rootvals[1] == 3) {
-      widget.rootvals[7] = 0;
-    } else if (widget.rootvals[1] < 5) {
-      widget.rootvals[7] = 1;
-    } else if (widget.rootvals[1] < 8) {
-      widget.rootvals[7] = 2;
-    } else if (widget.rootvals[1] < 12) {
-      widget.rootvals[7] = 3;
-    } else {
-      widget.rootvals[7] = 4;
-    }
+    widget.rootvals[7] = ECGtoRTS(widget.rootvals[1]);
     setState(() {
       for (int x in i) {
         if (x != -1) widget.rootvals[7] += x;
       }
       widget.rts = i;
     });
+  }
+
+  int ECGtoRTS(ecg) {
+    int rts = 0;
+    if (ecg == 3) {
+      rts = 0;
+    } else if (ecg <= 5) {
+      rts = 1;
+    } else if (ecg <= 8) {
+      rts = 2;
+    } else if (ecg <= 12) {
+      rts = 3;
+    } else {
+      rts = 4;
+    }
+    return rts;
   }
 
   @override
