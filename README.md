@@ -8,12 +8,10 @@
 
 ### Para além disso ainda oferece a possibilidade de realizar triagem START e guardar o número de vítimas, organizadas por gravidade.
 
----
 ## **Construido usando** 
 [![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev/)
 [![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/?gclsrc=ds&gclsrc=ds)
 
----
 ## **Sistema operativo**
 ### Uma vez que construido com Flutter, a aplicação estará disponível tanto para Android como para IOS
 
@@ -26,7 +24,6 @@
 ### Se esperar não for o teu forte e usares Android, poderás descarregar a APK, diretamente do link abaixo
 [![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](Release/app-release.apk)
 
----
 
 ## **Design**
 
@@ -34,6 +31,5 @@ De forma a que a *user interface* fosse o mais simples possivel e similar entre 
 
 [![Material UI](https://img.shields.io/badge/Material--UI-0081CB?style=for-the-badge&logo=material-ui&logoColor=white)](https://material-ui.com/)
 
----
 ### **README built with**
 [![Markdown](https://img.shields.io/badge/Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white)](https://en.wikipedia.org/wiki/Markdown)
