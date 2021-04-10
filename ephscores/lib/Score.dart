@@ -30,7 +30,7 @@ class Score extends StatefulWidget {
 }
 
 class _ScoreState extends State<Score> {
-  List<bool> expanded = List<bool>.filled(7, false);
+  List<bool> expanded = List<bool>.filled(8, false);
 
   @override
   void initState() {
