@@ -5,3 +5,4 @@ Dark Blue;      #2C496C;    44, 73, 108
 Red;            #EA4335;    234, 67, 53
 Green;          #34A853;    52, 168, 83
 Yellow;         #FBBC04;    251, 188, 4
+Bright Yellow   #EFC20F;    239, 194, 15

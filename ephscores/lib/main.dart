@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_flashlight/flutter_flashlight.dart';
 import 'START.dart';
 import 'Score.dart';
@@ -42,10 +43,12 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
   var isSelected = [false, false];
   bool flash = false;
   bool timer = false;
+  bool wait = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(239, 194, 15, 1.0),
       body: Center(
         child: Column(
           children: [
@@ -200,30 +203,36 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                                 ),
                               ),
                               onPressed: () {
-                                setState(() {
-                                  timer = !timer;
-                                });
-                                Timer(Duration(minutes: 1), () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: new Text("Passou 1 minuto !"),
-                                        actions: <Widget>[
-                                          new TextButton(
-                                            child: new Text("Fechar"),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
+                                if (!wait) {
+                                  wait = true;
                                   setState(() {
                                     timer = !timer;
                                   });
-                                });
+                                  Timer(Duration(minutes: 1), () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        FlutterBeep.playSysSound(41);
+                                        return AlertDialog(
+                                          backgroundColor: Color.fromRGBO(
+                                              233, 237, 244, 1.0),
+                                          title: new Text("Passou 1 minuto !"),
+                                          actions: <Widget>[
+                                            TextButton(
+                                                onPressed: () {
+                                                  wait = false;
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text("Fechar")),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                    setState(() {
+                                      timer = !timer;
+                                    });
+                                  });
+                                }
                               },
                             ),
                           ),

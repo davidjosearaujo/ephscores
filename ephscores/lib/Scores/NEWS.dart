@@ -67,6 +67,7 @@ class _NEWSState extends State<NEWS> {
             onChanged: (e) {
               setState(() {
                 widget.indices[0] = e;
+                widget.callback(widget.indices, widget.values);
               });
             },
           ),
@@ -112,6 +113,7 @@ class _NEWSState extends State<NEWS> {
             onChanged: (e) {
               setState(() {
                 widget.indices[1] = e;
+                widget.callback(widget.indices, widget.values);
               });
             },
           ),
@@ -143,6 +145,7 @@ class _NEWSState extends State<NEWS> {
             onChanged: (e) {
               setState(() {
                 widget.indices[2] = e;
+                widget.callback(widget.indices, widget.values);
               });
             },
           ),
@@ -195,6 +198,7 @@ class _NEWSState extends State<NEWS> {
             onChanged: (e) {
               setState(() {
                 widget.indices[3] = e;
+                widget.callback(widget.indices, widget.values);
               });
             },
           ),
@@ -247,6 +251,7 @@ class _NEWSState extends State<NEWS> {
             onChanged: (e) {
               setState(() {
                 widget.indices[4] = e;
+                widget.callback(widget.indices, widget.values);
               });
             },
           ),
@@ -306,6 +311,7 @@ class _NEWSState extends State<NEWS> {
             onChanged: (e) {
               setState(() {
                 widget.indices[5] = e;
+                widget.callback(widget.indices, widget.values);
               });
             },
           ),
@@ -337,6 +343,7 @@ class _NEWSState extends State<NEWS> {
             onChanged: (e) {
               setState(() {
                 widget.indices[6] = e;
+                widget.callback(widget.indices, widget.values);
               });
             },
           ),
