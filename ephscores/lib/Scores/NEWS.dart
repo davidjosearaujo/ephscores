@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 class NEWS extends StatefulWidget {
   Function callback;
   List<int> indices;
-  List<int> values = List.filled(7, 0);
+  List<int> values;
   int sum;
 
-  NEWS(this.callback, this.indices);
+  NEWS(this.callback, this.indices, this.values);
 
   @override
   _NEWSState createState() => _NEWSState();
@@ -23,7 +23,9 @@ class _NEWSState extends State<NEWS> {
           color: Color.fromRGBO(233, 237, 244, 1.0),
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
-            value: widget.indices[0],
+            value: (() {
+              return widget.indices[0] == -1 ? null : widget.indices[0];
+            })(),
             hint: Text("Frequência respiratória"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
@@ -76,7 +78,9 @@ class _NEWSState extends State<NEWS> {
           color: Color.fromRGBO(233, 237, 244, 1.0),
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
-            value: widget.indices[1],
+            value: (() {
+              return widget.indices[1] == -1 ? null : widget.indices[1];
+            })(),
             hint: Text("SPO2"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
@@ -122,7 +126,9 @@ class _NEWSState extends State<NEWS> {
           color: Color.fromRGBO(233, 237, 244, 1.0),
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
-            value: widget.indices[2],
+            value: (() {
+              return widget.indices[2] == -1 ? null : widget.indices[2];
+            })(),
             hint: Text("O2 Suplementar"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
@@ -154,7 +160,9 @@ class _NEWSState extends State<NEWS> {
           color: Color.fromRGBO(233, 237, 244, 1.0),
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
-            value: widget.indices[3],
+            value: (() {
+              return widget.indices[3] == -1 ? null : widget.indices[3];
+            })(),
             hint: Text("Temperatura"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
@@ -207,7 +215,9 @@ class _NEWSState extends State<NEWS> {
           color: Color.fromRGBO(233, 237, 244, 1.0),
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
-            value: widget.indices[4],
+            value: (() {
+              return widget.indices[4] == -1 ? null : widget.indices[4];
+            })(),
             hint: Text("Pressão arterial sistólica"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
@@ -260,7 +270,9 @@ class _NEWSState extends State<NEWS> {
           color: Color.fromRGBO(233, 237, 244, 1.0),
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
-            value: widget.indices[5],
+            value: (() {
+              return widget.indices[5] == -1 ? null : widget.indices[5];
+            })(),
             hint: Text("Frequência cardíaca"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
@@ -320,7 +332,9 @@ class _NEWSState extends State<NEWS> {
           color: Color.fromRGBO(233, 237, 244, 1.0),
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
-            value: widget.indices[6],
+            value: (() {
+              return widget.indices[6] == -1 ? null : widget.indices[6];
+            })(),
             hint: Text("Nível de consciência"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),

@@ -17,7 +17,8 @@ class Score extends StatefulWidget {
   List<bool> cincinnati = List<bool>.filled(3, false);
   List<int> ecg = List<int>.filled(3, 0);
   List<int> mgap = List<int>.filled(3, -1);
-  List<int> news = List<int>.filled(7, null);
+  List<int> news = List<int>.filled(7, -1);
+  List<int> newsv = List<int>.filled(7, 0);
   List<int> proacs = List<int>.filled(4, -1);
   List<int> tap = List<int>.filled(3, -1);
   List<int> race = List<int>.filled(6, -1);
@@ -64,19 +65,19 @@ class _ScoreState extends State<Score> {
         widget.mgap[2] = value.containsKey('s3.2') ? value.getInt('s3.2') : -1;
 
         widget.news[0] =
-            value.containsKey('s4.0') ? value.getInt('s4.0') : null;
+            value.containsKey('s4.0') ? value.getInt('s4.0') : -1;
         widget.news[1] =
-            value.containsKey('s4.1') ? value.getInt('s4.1') : null;
+            value.containsKey('s4.1') ? value.getInt('s4.1') : -1;
         widget.news[2] =
-            value.containsKey('s4.2') ? value.getInt('s4.2') : null;
+            value.containsKey('s4.2') ? value.getInt('s4.2') : -1;
         widget.news[3] =
-            value.containsKey('s4.3') ? value.getInt('s4.3') : null;
+            value.containsKey('s4.3') ? value.getInt('s4.3') : -1;
         widget.news[4] =
-            value.containsKey('s4.4') ? value.getInt('s4.4') : null;
+            value.containsKey('s4.4') ? value.getInt('s4.4') : -1;
         widget.news[5] =
-            value.containsKey('s4.5') ? value.getInt('s4.5') : null;
+            value.containsKey('s4.5') ? value.getInt('s4.5') : -1;
         widget.news[6] =
-            value.containsKey('s4.6') ? value.getInt('s4.6') : null;
+            value.containsKey('s4.6') ? value.getInt('s4.6') : -1;
 
         widget.proacs[0] =
             value.containsKey('s5.0') ? value.getInt('s5.0') : -1;
@@ -114,6 +115,14 @@ class _ScoreState extends State<Score> {
     widget.prefs1.setInt('s2.0', widget.ecg[0]);
     widget.prefs1.setInt('s2.1', widget.ecg[1]);
     widget.prefs1.setInt('s2.2', widget.ecg[2]);
+    // NEWS
+    widget.prefs1.setInt("s4.0", widget.news[0]);
+    widget.prefs1.setInt("s4.1", widget.news[1]);
+    widget.prefs1.setInt("s4.2", widget.news[2]);
+    widget.prefs1.setInt("s4.3", widget.news[3]);
+    widget.prefs1.setInt("s4.4", widget.news[4]);
+    widget.prefs1.setInt("s4.5", widget.news[5]);
+    widget.prefs1.setInt("s4.6", widget.news[6]);
     // MGAP
     widget.prefs1.setInt('s3.0', widget.mgap[0]);
     widget.prefs1.setInt('s3.1', widget.mgap[1]);
@@ -153,7 +162,8 @@ class _ScoreState extends State<Score> {
     widget.cincinnati = List<bool>.filled(3, false);
     widget.ecg = List<int>.filled(3, 0);
     widget.mgap = List<int>.filled(3, -1);
-    widget.news = List<int>.filled(7, null);
+    widget.news = List<int>.filled(7, -1);
+    widget.newsv = List<int>.filled(7, 0);
     widget.proacs = List<int>.filled(4, -1);
     widget.tap = List<int>.filled(3, -1);
     widget.race = List<int>.filled(6, -1);
@@ -196,23 +206,11 @@ class _ScoreState extends State<Score> {
     });
   }
 
-  Future<void> newsCallback(List<int> i, List<int> v) async {
-    widget.prefs1 = await SharedPreferences.getInstance();
+  void newsCallback(List<int> i, List<int> v){
     setState(() {
-      bool clean = true;
-      for (int c in i) {
-        if (c != null) {
-          clean = false;
-          widget.prefs1.setInt("s4." + i.toString(), c);
-        }
-      }
-      if (clean) {
-        widget.rootvals[3] = 0;
-      } else {
-        widget.rootvals[3] = 0;
-        for (int c in v) {
-          widget.rootvals[3] += c;
-        }
+      widget.rootvals[3] = 0;
+      for (int c in v) {
+        widget.rootvals[3] += c;
       }
       widget.news = i;
     });
@@ -437,7 +435,7 @@ class _ScoreState extends State<Score> {
                     isExpanded: expanded[3],
                     canTapOnHeader: true,
                     body: (() {
-                      return NEWS(newsCallback, widget.news);
+                      return NEWS(newsCallback, widget.news, widget.newsv);
                     })(),
                   ),
                   ExpansionPanel(
