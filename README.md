@@ -23,7 +23,7 @@ Uma vez que construido com Flutter, a aplicação estará disponível tanto para
 
 Se esperar não for o teu forte e usares Android, poderás descarregar a APK diretamente do link abaixo
 
-[![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/DavidAraujo98/EPHScores/raw/main/Release/app-release.apk)
+[![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/DavidAraujo98/EPHScores/raw/main/Release/EPHScores.apk)
 
 
 ## **Design**
