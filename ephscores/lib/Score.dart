@@ -14,6 +14,7 @@ import 'Scores/TAP.dart';
 class Score extends StatefulWidget {
   SharedPreferences prefs1;
   List<int> rootvals = [0, 3, 3, 0, 0, 0, 0, 0];
+  bool dir = false;
   List<bool> cincinnati = List<bool>.filled(3, false);
   List<int> ecg = List<int>.filled(3, 0);
   List<int> mgap = List<int>.filled(3, -1);
@@ -64,20 +65,13 @@ class _ScoreState extends State<Score> {
         widget.mgap[1] = value.containsKey('s3.1') ? value.getInt('s3.1') : -1;
         widget.mgap[2] = value.containsKey('s3.2') ? value.getInt('s3.2') : -1;
 
-        widget.news[0] =
-            value.containsKey('s4.0') ? value.getInt('s4.0') : -1;
-        widget.news[1] =
-            value.containsKey('s4.1') ? value.getInt('s4.1') : -1;
-        widget.news[2] =
-            value.containsKey('s4.2') ? value.getInt('s4.2') : -1;
-        widget.news[3] =
-            value.containsKey('s4.3') ? value.getInt('s4.3') : -1;
-        widget.news[4] =
-            value.containsKey('s4.4') ? value.getInt('s4.4') : -1;
-        widget.news[5] =
-            value.containsKey('s4.5') ? value.getInt('s4.5') : -1;
-        widget.news[6] =
-            value.containsKey('s4.6') ? value.getInt('s4.6') : -1;
+        widget.news[0] = value.containsKey('s4.0') ? value.getInt('s4.0') : -1;
+        widget.news[1] = value.containsKey('s4.1') ? value.getInt('s4.1') : -1;
+        widget.news[2] = value.containsKey('s4.2') ? value.getInt('s4.2') : -1;
+        widget.news[3] = value.containsKey('s4.3') ? value.getInt('s4.3') : -1;
+        widget.news[4] = value.containsKey('s4.4') ? value.getInt('s4.4') : -1;
+        widget.news[5] = value.containsKey('s4.5') ? value.getInt('s4.5') : -1;
+        widget.news[6] = value.containsKey('s4.6') ? value.getInt('s4.6') : -1;
 
         widget.proacs[0] =
             value.containsKey('s5.0') ? value.getInt('s5.0') : -1;
@@ -92,6 +86,7 @@ class _ScoreState extends State<Score> {
         widget.tap[1] = value.containsKey('s6.1') ? value.getInt('s6.1') : -1;
         widget.tap[2] = value.containsKey('s6.2') ? value.getInt('s6.2') : -1;
 
+        widget.dir = value.containsKey('s7.d') ? value.getBool('s7.d') : false;
         widget.race[0] = value.containsKey('s7.0') ? value.getInt('s7.0') : -1;
         widget.race[1] = value.containsKey('s7.1') ? value.getInt('s7.1') : -1;
         widget.race[2] = value.containsKey('s7.2') ? value.getInt('s7.2') : -1;
@@ -137,6 +132,7 @@ class _ScoreState extends State<Score> {
     widget.prefs1.setInt('s6.1', widget.tap[1]);
     widget.prefs1.setInt('s6.2', widget.tap[2]);
     // RACE
+    widget.prefs1.setBool('s7.d', widget.dir);
     widget.prefs1.setInt('s7.0', widget.race[0]);
     widget.prefs1.setInt('s7.1', widget.race[1]);
     widget.prefs1.setInt('s7.2', widget.race[2]);
@@ -159,6 +155,7 @@ class _ScoreState extends State<Score> {
   }
 
   void reset() {
+    widget.dir = false;
     widget.cincinnati = List<bool>.filled(3, false);
     widget.ecg = List<int>.filled(3, 0);
     widget.mgap = List<int>.filled(3, -1);
@@ -206,11 +203,11 @@ class _ScoreState extends State<Score> {
     });
   }
 
-  void newsCallback(List<int> i, List<int> v){
+  void newsCallback(List<int> i, List<int> v) {
     setState(() {
       widget.rootvals[3] = 0;
       for (int x in v) {
-        if(x != -1 ) widget.rootvals[3] += x;
+        if (x != -1) widget.rootvals[3] += x;
       }
       widget.news = i;
     });
@@ -236,13 +233,14 @@ class _ScoreState extends State<Score> {
     });
   }
 
-  void raceCallback(List<int> x) {
+  void raceCallback(List<int> x, bool d) {
     setState(() {
       widget.rootvals[6] = 0;
       for (int i = 0; i < x.length; i++) {
         if (x[i] != -1 && i > 0) widget.rootvals[6] += x[i];
       }
       widget.race = x;
+      widget.dir = d;
     });
   }
 
@@ -531,7 +529,7 @@ class _ScoreState extends State<Score> {
                     isExpanded: expanded[6],
                     canTapOnHeader: true,
                     body: (() {
-                      return RACE(raceCallback, widget.race);
+                      return RACE(raceCallback, widget.race, widget.dir);
                     })(),
                   ),
                   ExpansionPanel(

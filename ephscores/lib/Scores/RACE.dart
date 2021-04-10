@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 class RACE extends StatefulWidget {
   Function callback;
   List<int> values;
+  bool dir;
 
-  RACE(this.callback, this.values);
+  RACE(this.callback, this.values, this.dir);
 
   @override
   _RACEState createState() => _RACEState();
 }
 
 class _RACEState extends State<RACE> {
-  bool dir = false;
   List<DropdownMenuItem<int>> dsve = [
     DropdownMenuItem(
       value: 0,
@@ -72,7 +72,7 @@ class _RACEState extends State<RACE> {
       child: Text("Afasia obedece a 1 ordens"),
     ),
     DropdownMenuItem(
-      value: 1,
+      value: 2,
       child: Text("Não executa ordens"),
     ),
     DropdownMenuItem(
@@ -113,12 +113,12 @@ class _RACEState extends State<RACE> {
             onChanged: (e) {
               setState(() {
                 if (e == 0) {
-                  dir = false;
+                  widget.dir = false;
                 } else {
-                  dir = true;
+                  widget.dir = true;
                 }
                 widget.values[0] = e;
-                widget.callback(widget.values);
+                widget.callback(widget.values, widget.dir);
               });
             },
           ),
@@ -154,7 +154,7 @@ class _RACEState extends State<RACE> {
             onChanged: (e) {
               setState(() {
                 widget.values[1] = e;
-                widget.callback(widget.values);
+                widget.callback(widget.values, widget.dir);
               });
             },
           ),
@@ -190,7 +190,7 @@ class _RACEState extends State<RACE> {
             onChanged: (e) {
               setState(() {
                 widget.values[2] = e;
-                widget.callback(widget.values);
+                widget.callback(widget.values, widget.dir);
               });
             },
           ),
@@ -226,7 +226,7 @@ class _RACEState extends State<RACE> {
             onChanged: (e) {
               setState(() {
                 widget.values[3] = e;
-                widget.callback(widget.values);
+                widget.callback(widget.values, widget.dir);
               });
             },
           ),
@@ -238,11 +238,11 @@ class _RACEState extends State<RACE> {
             value: (() {
               return widget.values[4] == -1 ? null : widget.values[4];
             })(),
-            hint: Text("Desvio osculocefálico"),
+            hint: Text("Desvio oculocefálico"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
             items: (() {
-              if (dir) {
+              if (widget.dir) {
                 return dsvr;
               } else {
                 return dsve;
@@ -251,7 +251,7 @@ class _RACEState extends State<RACE> {
             onChanged: (e) {
               setState(() {
                 widget.values[4] = e;
-                widget.callback(widget.values);
+                widget.callback(widget.values, widget.dir);
               });
             },
           ),
@@ -267,7 +267,7 @@ class _RACEState extends State<RACE> {
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
             items: (() {
-              if (dir) {
+              if (widget.dir) {
                 return agr;
               } else {
                 return age;
@@ -276,7 +276,7 @@ class _RACEState extends State<RACE> {
             onChanged: (e) {
               setState(() {
                 widget.values[5] = e;
-                widget.callback(widget.values);
+                widget.callback(widget.values, widget.dir);
               });
             },
           ),

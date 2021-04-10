@@ -365,7 +365,7 @@ class _NEWSState extends State<NEWS> {
             items: [
               DropdownMenuItem(
                 value: 0,
-                child: Text("a"),
+                child: Text("A"),
                 onTap: () {
                   widget.values[6] = 0;
                 },
