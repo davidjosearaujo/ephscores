@@ -22,7 +22,7 @@
 [![IOS](https://img.shields.io/badge/App_Store-0D96F6?style=for-the-badge&logo=app-store&logoColor=white)]()
 
 ### Se esperar não for o teu forte e usares Android, poderás descarregar a APK, diretamente do link abaixo
-[![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](Release/app-release.apk)
+[![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/DavidAraujo98/EPHScores/raw/main/Release/app-release.apk)
 
 
 ## **Design**
