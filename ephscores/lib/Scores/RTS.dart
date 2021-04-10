@@ -48,6 +48,10 @@ class _RTSState extends State<RTS> {
                 value: 4,
                 child: Text("10 a 29"),
               ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
+              ),
             ],
             onChanged: (e) {
               setState(() {
@@ -87,6 +91,10 @@ class _RTSState extends State<RTS> {
               DropdownMenuItem(
                 value: 4,
                 child: Text(">89"),
+              ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
               ),
             ],
             onChanged: (e) {

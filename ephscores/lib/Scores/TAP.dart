@@ -48,6 +48,10 @@ class _TAPState extends State<TAP> {
                 value: 4,
                 child: Text("Choro / Discurso anormal"),
               ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
+              ),
             ],
             onChanged: (e) {
               setState(() {
@@ -88,6 +92,10 @@ class _TAPState extends State<TAP> {
                 value: 4,
                 child: Text("Apneia / Gasping"),
               ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
+              ),
             ],
             onChanged: (e) {
               setState(() {
@@ -119,6 +127,10 @@ class _TAPState extends State<TAP> {
               DropdownMenuItem(
                 value: 2,
                 child: Text("Cianose"),
+              ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
               ),
             ],
             onChanged: (e) {

@@ -65,6 +65,10 @@ class _NEWSState extends State<NEWS> {
                   widget.values[0] = 3;
                 },
               ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
+              ),
             ],
             onChanged: (e) {
               setState(() {
@@ -113,6 +117,10 @@ class _NEWSState extends State<NEWS> {
                   widget.values[1] = 0;
                 },
               ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
+              ),
             ],
             onChanged: (e) {
               setState(() {
@@ -146,6 +154,10 @@ class _NEWSState extends State<NEWS> {
                 onTap: () {
                   widget.values[2] = 0;
                 },
+              ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
               ),
             ],
             onChanged: (e) {
@@ -202,6 +214,10 @@ class _NEWSState extends State<NEWS> {
                   widget.values[3] = 2;
                 },
               ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
+              ),
             ],
             onChanged: (e) {
               setState(() {
@@ -256,6 +272,10 @@ class _NEWSState extends State<NEWS> {
                 onTap: () {
                   widget.values[4] = 3;
                 },
+              ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
               ),
             ],
             onChanged: (e) {
@@ -319,6 +339,10 @@ class _NEWSState extends State<NEWS> {
                   widget.values[5] = 3;
                 },
               ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
+              ),
             ],
             onChanged: (e) {
               setState(() {
@@ -352,6 +376,10 @@ class _NEWSState extends State<NEWS> {
                 onTap: () {
                   widget.values[6] = 3;
                 },
+              ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
               ),
             ],
             onChanged: (e) {

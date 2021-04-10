@@ -37,6 +37,10 @@ class _PROACSState extends State<PROACS> {
                 value: 1,
                 child: Text("≥72"),
               ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
+              ),
             ],
             onChanged: (e) {
               setState(() {
@@ -64,6 +68,10 @@ class _PROACSState extends State<PROACS> {
               DropdownMenuItem(
                 value: 1,
                 child: Text("<116"),
+              ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
               ),
             ],
             onChanged: (e) {
@@ -97,6 +105,10 @@ class _PROACSState extends State<PROACS> {
                 value: 3,
                 child: Text("4"),
               ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
+              ),
             ],
             onChanged: (e) {
               setState(() {
@@ -124,6 +136,10 @@ class _PROACSState extends State<PROACS> {
               DropdownMenuItem(
                 value: 1,
                 child: Text("Sim"),
+              ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
               ),
             ],
             onChanged: (e) {

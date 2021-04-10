@@ -22,6 +22,10 @@ class _RACEState extends State<RACE> {
       value: 1,
       child: Text("Direito presente"),
     ),
+    DropdownMenuItem(
+      value: -1,
+      child: Text("Nenhum"),
+    ),
   ];
 
   List<DropdownMenuItem<int>> dsvr = [
@@ -32,6 +36,10 @@ class _RACEState extends State<RACE> {
     DropdownMenuItem(
       value: 1,
       child: Text("Esquerdo presente"),
+    ),
+    DropdownMenuItem(
+      value: -1,
+      child: Text("Nenhum"),
     ),
   ];
 
@@ -48,6 +56,10 @@ class _RACEState extends State<RACE> {
       value: 2,
       child: Text("Não reconhece nem braço nem o défice"),
     ),
+    DropdownMenuItem(
+      value: -1,
+      child: Text("Nenhum"),
+    ),
   ];
 
   List<DropdownMenuItem<int>> agr = [
@@ -62,6 +74,10 @@ class _RACEState extends State<RACE> {
     DropdownMenuItem(
       value: 1,
       child: Text("Não executa ordens"),
+    ),
+    DropdownMenuItem(
+      value: -1,
+      child: Text("Nenhum"),
     ),
   ];  
 
@@ -88,6 +104,10 @@ class _RACEState extends State<RACE> {
               DropdownMenuItem(
                 value: 1,
                 child: Text("Direito"),
+              ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
               ),
             ],
             onChanged: (e) {
@@ -126,6 +146,10 @@ class _RACEState extends State<RACE> {
                 value: 2,
                 child: Text("Moderada / Severa"),
               ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
+              ),
             ],
             onChanged: (e) {
               setState(() {
@@ -158,6 +182,10 @@ class _RACEState extends State<RACE> {
                 value: 2,
                 child: Text("Severa (não levanta)"),
               ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
+              ),
             ],
             onChanged: (e) {
               setState(() {
@@ -189,6 +217,10 @@ class _RACEState extends State<RACE> {
               DropdownMenuItem(
                 value: 2,
                 child: Text("Severa (não levanta)"),
+              ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
               ),
             ],
             onChanged: (e) {

@@ -209,8 +209,8 @@ class _ScoreState extends State<Score> {
   void newsCallback(List<int> i, List<int> v){
     setState(() {
       widget.rootvals[3] = 0;
-      for (int c in v) {
-        widget.rootvals[3] += c;
+      for (int x in v) {
+        if(x != -1 ) widget.rootvals[3] += x;
       }
       widget.news = i;
     });
@@ -230,7 +230,7 @@ class _ScoreState extends State<Score> {
     setState(() {
       widget.rootvals[5] = 0;
       for (int x in i) {
-        if (x != -1) widget.rootvals[5] += x;
+        if (x != -1) widget.rootvals[5]++;
       }
       widget.tap = i;
     });

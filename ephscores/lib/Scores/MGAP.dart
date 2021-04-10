@@ -37,6 +37,10 @@ class _MGAPState extends State<MGAP> {
                 value: 4,
                 child: Text("Fechado"),
               ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
+              ),
             ],
             onChanged: (e) {
               setState(() {
@@ -64,6 +68,10 @@ class _MGAPState extends State<MGAP> {
               DropdownMenuItem(
                 value: 5,
                 child: Text("<60"),
+              ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
               ),
             ],
             onChanged: (e) {
@@ -96,6 +104,10 @@ class _MGAPState extends State<MGAP> {
               DropdownMenuItem(
                 value: 5,
                 child: Text(">120"),
+              ),
+              DropdownMenuItem(
+                value: -1,
+                child: Text("Nenhum"),
               ),
             ],
             onChanged: (e) {
