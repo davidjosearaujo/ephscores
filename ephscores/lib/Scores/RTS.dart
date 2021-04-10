@@ -52,7 +52,7 @@ class _RTSState extends State<RTS> {
             onChanged: (e) {
               setState(() {
                 widget.values[0] = e;
-                widget.callback(widget.values, true);
+                widget.callback(widget.values);
               });
             },
           ),
@@ -92,7 +92,7 @@ class _RTSState extends State<RTS> {
             onChanged: (e) {
               setState(() {
                 widget.values[1] = e;
-                widget.callback(widget.values, true);
+                widget.callback(widget.values);
               });
             },
           ),

@@ -172,6 +172,9 @@ class _ScoreState extends State<Score> {
   }
 
   void ecgCallback(List<int> i) {
+    // Update MGAP and RTS
+    widget.rootvals[2] -= widget.rootvals[1];
+    widget.rootvals[7] -= widget.rootvals[1];
     setState(() {
       if (i[0] >= 1 && i[1] >= 1 && i[2] >= 1) {
         widget.rootvals[1] = i[0] + i[1] + i[2];
@@ -179,21 +182,21 @@ class _ScoreState extends State<Score> {
         widget.rootvals[1] = 3;
       }
       widget.ecg = i;
+
+      // Update MGAP and RTS
+      widget.rootvals[2] += widget.rootvals[1];
+      widget.rootvals[7] += widget.rootvals[1];
     });
   }
 
-  int mgapCallback(List<int> i, bool callback) {
+  void mgapCallback(List<int> i) {
     widget.rootvals[2] = widget.rootvals[1];
-    if (callback) {
-      setState(() {
-        for (int x in i) {
-          if (x != -1) widget.rootvals[2] += x;
-        }
-        widget.mgap = i;
-      });
-    } else {
-      return widget.rootvals[2];
-    }
+    setState(() {
+      for (int x in i) {
+        if (x != -1) widget.rootvals[2] += x;
+      }
+      widget.mgap = i;
+    });
   }
 
   Future<void> newsCallback(List<int> i, List<int> v) async {
@@ -248,7 +251,7 @@ class _ScoreState extends State<Score> {
     });
   }
 
-  int rtsCallback(List<int> i, bool callback) {
+  void rtsCallback(List<int> i) {
     if (widget.rootvals[1] == 3) {
       widget.rootvals[7] = 0;
     } else if (widget.rootvals[1] < 5) {
@@ -260,16 +263,12 @@ class _ScoreState extends State<Score> {
     } else {
       widget.rootvals[7] = 4;
     }
-    if (callback) {
-      setState(() {
-        for (int x in i) {
-          if (x != -1) widget.rootvals[7] += x;
-        }
-        widget.rts = i;
-      });
-    } else {
-      return widget.rootvals[7];
-    }
+    setState(() {
+      for (int x in i) {
+        if (x != -1) widget.rootvals[7] += x;
+      }
+      widget.rts = i;
+    });
   }
 
   @override
@@ -384,9 +383,7 @@ class _ScoreState extends State<Score> {
                               fontSize: 18),
                         ),
                         trailing: Text(
-                          "${(() {
-                            return mgapCallback(null, false);
-                          })()}",
+                          "${widget.rootvals[2]}",
                           style: TextStyle(
                             color: ((int e) {
                               if (e >= 23) {
@@ -395,7 +392,7 @@ class _ScoreState extends State<Score> {
                               return (e < 18)
                                   ? Color.fromRGBO(234, 67, 53, 1.0)
                                   : Color.fromRGBO(251, 188, 4, 1.0);
-                            })(mgapCallback(null, false)),
+                            })(widget.rootvals[2]),
                             fontSize: 36,
                           ),
                         ),
@@ -546,9 +543,7 @@ class _ScoreState extends State<Score> {
                               fontSize: 18),
                         ),
                         trailing: Text(
-                          "${(() {
-                            return rtsCallback(null, false);
-                          })()}",
+                          "${widget.rootvals[7]}",
                           style: TextStyle(
                             color: ((int e) {
                               if (e == 16) {
@@ -557,7 +552,7 @@ class _ScoreState extends State<Score> {
                               return (e <= 10)
                                   ? Color.fromRGBO(234, 67, 53, 1.0)
                                   : Color.fromRGBO(251, 188, 4, 1.0);
-                            })(rtsCallback(null, false)),
+                            })(widget.rootvals[7]),
                             fontSize: 36,
                           ),
                         ),
