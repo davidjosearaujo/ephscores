@@ -18,7 +18,7 @@ Uma vez que construido com Flutter, a aplicação estará disponível tanto para
 - [ ] Google Play (In review)
 - [ ] App Store
 
-[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)]() 
+[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.davidaraujo.ephscores) 
 [![IOS](https://img.shields.io/badge/App_Store-0D96F6?style=for-the-badge&logo=app-store&logoColor=white)]()
 
 Se esperar não for o teu forte e usares Android, poderás descarregar a APK diretamente do link abaixo
