@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_flashlight/flutter_flashlight.dart';
+import 'Burn.dart';
 import 'START.dart';
 import 'Score.dart';
 
@@ -24,6 +25,7 @@ class EPHScores extends StatelessWidget {
       routes: {
         "/": (context) => EPHScoresPage(),
         "/scores": (context) => Score(),
+        "/burn": (context) => Burn(),
         "/START": (context) => START(),
       },
       themeMode: ThemeMode.dark,
@@ -96,6 +98,41 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                         ),
                         onPressed: () {
                           Navigator.pushNamed(context, "/scores");
+                        },
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Container(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        child: Text(
+                          "Avaliação do queimado",
+                          style: TextStyle(
+                            fontSize: 24,
+                          ),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.pressed))
+                                return Color.fromRGBO(208, 216, 232, 1.0);
+                              return Color.fromRGBO(79, 129, 189, 1.0);
+                            },
+                          ),
+                          foregroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.pressed))
+                                return Color.fromRGBO(44, 73, 108, 1.0);
+                              return Colors.white;
+                            },
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, "/burn");
                         },
                       ),
                     ),
@@ -214,36 +251,52 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                                       builder: (BuildContext context) {
                                         FlutterBeep.playSysSound(41);
                                         return AlertDialog(
-                                          backgroundColor: Color.fromRGBO(
-                                              233, 237, 244, 1.0),
-                                          title: new Text("Passou 1 minuto !"),
-                                          actions: <Widget>[
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Expanded(
-                                                  child: ElevatedButton(
-                                                    style: ButtonStyle(
-                                                      backgroundColor:  MaterialStateProperty.resolveWith<Color>(
-                                                        (Set<MaterialState>states) {
-                                                          if (states.contains(
-                                                              MaterialState.pressed))
-                                                            return Color.fromRGBO(208,216,232,1.0);
-                                                          return Color.fromRGBO(79,129,189,1.0);
+                                            backgroundColor: Color.fromRGBO(
+                                                233, 237, 244, 1.0),
+                                            title:
+                                                new Text("Passou 1 minuto !"),
+                                            actions: <Widget>[
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Expanded(
+                                                    child: ElevatedButton(
+                                                        style: ButtonStyle(
+                                                          backgroundColor:
+                                                              MaterialStateProperty
+                                                                  .resolveWith<
+                                                                      Color>(
+                                                            (Set<MaterialState>
+                                                                states) {
+                                                              if (states.contains(
+                                                                  MaterialState
+                                                                      .pressed))
+                                                                return Color
+                                                                    .fromRGBO(
+                                                                        208,
+                                                                        216,
+                                                                        232,
+                                                                        1.0);
+                                                              return Color
+                                                                  .fromRGBO(
+                                                                      79,
+                                                                      129,
+                                                                      189,
+                                                                      1.0);
+                                                            },
+                                                          ),
+                                                        ),
+                                                        onPressed: () {
+                                                          wait = false;
+                                                          Navigator.of(context)
+                                                              .pop();
                                                         },
-                                                      ),
-                                                    ),
-                                                    onPressed: () {
-                                                      wait = false;
-                                                      Navigator.of(context).pop();
-                                                    },
-                                                    child: Text("Fechar")
+                                                        child: Text("Fechar")),
                                                   ),
-                                                ),
-                                            ],
-                                            ),
-                                          ]
-                                        );
+                                                ],
+                                              ),
+                                            ]);
                                       },
                                     );
                                     setState(() {
