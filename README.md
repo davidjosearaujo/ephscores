@@ -15,15 +15,15 @@ Para além disso ainda oferece a possibilidade de realizar triagem START e guard
 ## **Sistema operativo**
 Uma vez que construido com Flutter, a aplicação estará disponível tanto para Android como para IOS
 
-- [ ] Google Play (In review)
+- [x] Google Play
 - [ ] App Store
 
-[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)]() 
+[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.davidaraujo.ephscores) 
 [![IOS](https://img.shields.io/badge/App_Store-0D96F6?style=for-the-badge&logo=app-store&logoColor=white)]()
 
 Se esperar não for o teu forte e usares Android, poderás descarregar a APK diretamente do link abaixo
 
-[![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/DavidAraujo98/EPHScores/raw/main/Release/app-release.apk)
+[![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/DavidAraujo98/EPHScores/raw/main/Release/EPHScores.apk)
 
 
 ## **Design**
