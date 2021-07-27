@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:touchable/touchable.dart';
-
-import 'Burn/PathPainter.dart';
+import 'Burn/Anterior.dart';
+import 'Burn/Posterior.dart';
 
 class Burn extends StatefulWidget {
   @override
@@ -9,7 +8,7 @@ class Burn extends StatefulWidget {
 }
 
 class _BurnState extends State<Burn> {
-  int page = 0;
+  int chk = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -22,27 +21,21 @@ class _BurnState extends State<Burn> {
           backgroundColor: Color.fromRGBO(79, 129, 189, 1.0),
           actions: [
             IconButton(
-              icon: Icon(Icons.refresh_outlined),
+              icon: Icon(Icons.replay),
               onPressed: () {},
             ),
           ],
         ),
-        body:Container(
-            child: CanvasTouchDetector(
-            builder: (context) => CustomPaint(
-              painter: PathPainter(context, this, true),
-            ),
-          )
-        ),
+        body: (chk == 0) ? Anterior() : Posterior(),
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
           selectedItemColor: Color.fromRGBO(79, 129, 189, 1.0),
           unselectedItemColor: Color.fromRGBO(44, 73, 108, 1.0),
           iconSize: 30,
-          currentIndex: page,
+          currentIndex: chk,
           onTap: (int e) {
             setState(() {
-              e == 1 ? page = 1 : page = 0;
+              chk = e;
             });
           },
           items: [
