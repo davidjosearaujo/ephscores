@@ -2,6 +2,7 @@ Lightest blue;  #E9EDF4;    233, 237, 244
 Light blue;     #D0D8E8;    208, 216, 232
 Blue;           #4F81BD;    79, 129, 189
 Dark Blue;      #2C496C;    44, 73, 108
+Orange;         #ff9933;    255, 153, 51
 Red;            #EA4335;    234, 67, 53
 Green;          #34A853;    52, 168, 83
 Yellow;         #FBBC04;    251, 188, 4

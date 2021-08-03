@@ -9,13 +9,20 @@ class Burn extends StatefulWidget {
 
 class _BurnState extends State<Burn> {
   int chk = 0;
+  double perc = 0;
+
+  refreshSev(double y) {
+    setState(() {
+      perc = y;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            "Queimado",
+            "Queimado - ${perc}",
             style: TextStyle(fontSize: 24),
           ),
           backgroundColor: Color.fromRGBO(79, 129, 189, 1.0),
@@ -26,7 +33,7 @@ class _BurnState extends State<Burn> {
             ),
           ],
         ),
-        body: (chk == 0) ? Anterior() : Posterior(),
+        body: (chk == 0) ? Anterior(refreshSev) : Posterior(),
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
           selectedItemColor: Color.fromRGBO(79, 129, 189, 1.0),
