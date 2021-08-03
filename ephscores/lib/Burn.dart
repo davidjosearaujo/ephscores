@@ -9,11 +9,11 @@ class Burn extends StatefulWidget {
 
 class _BurnState extends State<Burn> {
   int chk = 0;
-  double perc = 0;
+  double _perc = 0;
 
   refreshSev(double y) {
     setState(() {
-      perc = y;
+      _perc = y;
     });
   }
 
@@ -22,7 +22,7 @@ class _BurnState extends State<Burn> {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            "Queimado - ${perc}",
+            "Queimado",
             style: TextStyle(fontSize: 24),
           ),
           backgroundColor: Color.fromRGBO(79, 129, 189, 1.0),
@@ -33,7 +33,49 @@ class _BurnState extends State<Burn> {
             ),
           ],
         ),
-        body: (chk == 0) ? Anterior(refreshSev) : Posterior(),
+        body: Column(
+          children: [
+            Expanded(
+                flex: 12,
+                child: (chk == 0) ? Anterior(refreshSev) : Posterior()),
+            Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 2, 0, 0),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    alignment: AlignmentDirectional.bottomCenter,
+                    children: [
+                      LinearProgressIndicator(
+                        value: _perc * 0.01,
+                        color: ((double e) {
+                          if (e > 32) {
+                            return Color.fromRGBO(234, 67, 53, 1);
+                          } else if (e > 16) {
+                            return Color.fromRGBO(255, 153, 51, 1);
+                          } else if (e > 0) {
+                            return Color.fromRGBO(251, 188, 4, 1);
+                          } else {
+                            return Color.fromRGBO(79, 129, 189, 1);
+                          }
+                        })(_perc),
+                        backgroundColor: Color.fromRGBO(79, 129, 189, 1),
+                      ),
+                      Text(
+                        "${_perc}",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          backgroundColor: Colors.transparent,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          height: 2,
+                        ),
+                      )
+                    ],
+                  ),
+                ))
+          ],
+        ),
         bottomNavigationBar: BottomNavigationBar(
           backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
           selectedItemColor: Color.fromRGBO(79, 129, 189, 1.0),

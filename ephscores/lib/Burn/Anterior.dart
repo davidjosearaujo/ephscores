@@ -43,28 +43,48 @@ class _AnteriorState extends State<Anterior> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
         Expanded(
           flex: 3,
-          child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  _colors[0] = _nextColor(_colors[0], 4.5);
-                });
-              },
-              child: SvgPicture.asset("assets/Front/head_front.svg",
-                  color: _colors[0])),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                  child: Text(
+                "Dir",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Color.fromRGBO(79, 129, 189, 1)),
+              )),
+              Expanded(
+                child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _colors[0] = _nextColor(_colors[0], 4.5);
+                      });
+                    },
+                    child: SvgPicture.asset("assets/Front/head_front.svg",
+                        color: _colors[0])),
+              ),
+              Expanded(
+                  child: Text(
+                "Esq",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Color.fromRGBO(79, 129, 189, 1)),
+              )),
+            ],
+          ),
         ),
         Expanded(
           flex: 7,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
+              Flexible(
                   child: GestureDetector(
                       onTap: () {
                         setState(() {
                           _colors[1] = _nextColor(_colors[1], 4.5);
                         });
                       },
-                      child: SvgPicture.asset("assets/Front/right_arm_front.svg",
+                      child: SvgPicture.asset(
+                          "assets/Front/right_arm_front.svg",
                           color: _colors[1]))),
               Expanded(
                 child: Column(
@@ -109,7 +129,7 @@ class _AnteriorState extends State<Anterior> {
                   ],
                 ),
               ),
-              Expanded(
+              Flexible(
                   child: GestureDetector(
                       onTap: () {
                         setState(() {
