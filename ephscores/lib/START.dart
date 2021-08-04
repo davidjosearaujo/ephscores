@@ -19,7 +19,7 @@ class _STARTState extends State<START> {
   Icon tileicon;
   Function titlefunc;
   int p = 3;
-  List<bool> isSelected = [false, false, false, false, false, false];
+  List<bool> isSelected = List.filled(6, false);
 
   @override
   void initState() {

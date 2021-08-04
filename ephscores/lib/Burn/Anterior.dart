@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+// ignore: must_be_immutable
 class Anterior extends StatefulWidget {
-  Function callback;
+  Function callfront;
+  SharedPreferences prefs;
 
-  Anterior(this.callback);
+  Anterior(this.callfront);
 
   @override
   _AnteriorState createState() => _AnteriorState();
@@ -12,38 +15,79 @@ class Anterior extends StatefulWidget {
 
 class _AnteriorState extends State<Anterior> {
   double _perc = 0;
-  
-  List<Color> _colors = List.filled(8, Color.fromRGBO(79, 129, 189, 1));
-  
-  final List<Color> _sev = [
+
+  List<Color> _limbs = List.filled(8, Color.fromRGBO(79, 129, 189, 1));
+
+  final List<Color> _colors = [
     Color.fromRGBO(79, 129, 189, 1), // Blue
     Color.fromRGBO(251, 188, 4, 1), // Yellow
     Color.fromRGBO(255, 153, 51, 1), // Orange
     Color.fromRGBO(234, 67, 53, 1) // Red
   ];
 
-  _nextColor(Color x, double y) {
-    if (x == Color.fromRGBO(79, 129, 189, 1)) {
-      _perc += y;
-      widget.callback(_perc);
-      return Color.fromRGBO(251, 188, 4, 1);
-    } else if (x == Color.fromRGBO(251, 188, 4, 1)) {
-      return Color.fromRGBO(255, 153, 51, 1);
-    } else if (x == Color.fromRGBO(255, 153, 51, 1)) {
-      return Color.fromRGBO(234, 67, 53, 1);
-    } else {
-      _perc -= y;
-      widget.callback(_perc);
-      return Color.fromRGBO(79, 129, 189, 1);
-    }
+  @override
+  void initState() {
+    super.initState();
+    refresh();
   }
 
-  _resetColor(Color x, double y) {
+  void refresh() {
+    SharedPreferences.getInstance().then((value) {
+      setState(() {
+        _limbs[0] = _colors[
+            value.containsKey("head_front") ? value.getInt("head_front") : 0];
+        _limbs[1] = _colors[value.containsKey("right_arm_front")
+            ? value.getInt("right_arm_front")
+            : 0];
+        _limbs[2] = _colors[value.containsKey("upper_torso_front")
+            ? value.getInt("upper_torso_front")
+            : 0];
+        _limbs[3] = _colors[value.containsKey("lower_torso_front")
+            ? value.getInt("lower_torso_front")
+            : 0];
+        _limbs[4] = _colors[value.containsKey("genitals_front")
+            ? value.getInt("genitals_front")
+            : 0];
+        _limbs[5] = _colors[value.containsKey("left_arm_front")
+            ? value.getInt("left_arm_front")
+            : 0];
+        _limbs[6] = _colors[value.containsKey("right_leg_front")
+            ? value.getInt("right_leg_front")
+            : 0];
+        _limbs[7] = _colors[value.containsKey("left_leg_front")
+            ? value.getInt("left_leg_front")
+            : 0];
+      });
+    });
+    
+  }
+
+  void _nextColor(Color x, double y, String id) async {
+    widget.prefs = await SharedPreferences.getInstance();
+    for (int i = 0; i < _colors.length; i++) {
+      if (x == _colors[i]) {
+        if (i == 0) {
+          _perc += y;
+        } else if (i == 3) {
+          _perc -= y;
+        }
+        widget.prefs.setInt(id, (i == 3 ? 0 : i + 1));
+        widget.prefs.setDouble("_perc", _perc);
+        widget.callfront(_perc);
+      }
+    }
+    refresh();
+  }
+
+  void _resetColor(Color x, double y, String id) async {
+    widget.prefs = await SharedPreferences.getInstance();
     if (x != Color.fromRGBO(79, 129, 189, 1)) {
       _perc -= y;
-      widget.callback(_perc);
+      widget.callfront(_perc);
     }
-    return Color.fromRGBO(79, 129, 189, 1);
+    widget.prefs.setInt(id, 0);
+    widget.prefs.setDouble("_perc", _perc);
+    refresh();
   }
 
   @override
@@ -66,16 +110,16 @@ class _AnteriorState extends State<Anterior> {
                 child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        _colors[0] = _nextColor(_colors[0], 4.5);
+                        _nextColor(_limbs[0], 4.5, "head_front");
                       });
                     },
                     onLongPress: () {
                       setState(() {
-                        _colors[0] = _resetColor(_colors[0], 4.5);
+                        _resetColor(_limbs[0], 4.5, "head_front");
                       });
                     },
                     child: SvgPicture.asset("assets/Front/head_front.svg",
-                        color: _colors[0])),
+                        color: _limbs[0])),
               ),
               Expanded(
                   child: Text(
@@ -95,17 +139,17 @@ class _AnteriorState extends State<Anterior> {
                   child: GestureDetector(
                       onTap: () {
                         setState(() {
-                          _colors[1] = _nextColor(_colors[1], 4.5);
+                          _nextColor(_limbs[1], 4.5, "right_arm_front");
                         });
                       },
                       onLongPress: () {
                         setState(() {
-                          _colors[1] = _resetColor(_colors[1], 4.5);
+                          _resetColor(_limbs[1], 4.5, "right_arm_front");
                         });
                       },
                       child: SvgPicture.asset(
                           "assets/Front/right_arm_front.svg",
-                          color: _colors[1]))),
+                          color: _limbs[1]))),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -116,51 +160,51 @@ class _AnteriorState extends State<Anterior> {
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
-                              _colors[2] = _nextColor(_colors[2], 9.0);
+                              _nextColor(_limbs[2], 9.0, "upper_torso_front");
                             });
                           },
                           onLongPress: () {
                             setState(() {
-                              _colors[2] = _resetColor(_colors[2], 9.0);
+                              _resetColor(_limbs[2], 9.0, "upper_torso_front");
                             });
                           },
                           child: SvgPicture.asset(
                               "assets/Front/upper_torso_front.svg",
-                              color: _colors[2]),
+                              color: _limbs[2]),
                         )),
                     Expanded(
                         flex: 3,
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
-                              _colors[3] = _nextColor(_colors[3], 9.0);
+                              _nextColor(_limbs[3], 9.0, "lower_torso_front");
                             });
                           },
                           onLongPress: () {
                             setState(() {
-                              _colors[3] = _resetColor(_colors[3], 9.0);
+                              _resetColor(_limbs[3], 9.0, "lower_torso_front");
                             });
                           },
                           child: SvgPicture.asset(
                               "assets/Front/lower_torso_front.svg",
-                              color: _colors[3]),
+                              color: _limbs[3]),
                         )),
                     Expanded(
                         flex: 1,
                         child: GestureDetector(
                             onTap: () {
                               setState(() {
-                                _colors[4] = _nextColor(_colors[4], 1.0);
+                                _nextColor(_limbs[4], 1.0, "genitals_front");
                               });
                             },
                             onLongPress: () {
                               setState(() {
-                                _colors[4] = _resetColor(_colors[4], 1.0);
+                                _resetColor(_limbs[4], 1.0, "genitals_front");
                               });
                             },
                             child: SvgPicture.asset(
                                 "assets/Front/genitals_front.svg",
-                                color: _colors[4]))),
+                                color: _limbs[4]))),
                   ],
                 ),
               ),
@@ -168,16 +212,16 @@ class _AnteriorState extends State<Anterior> {
                   child: GestureDetector(
                       onTap: () {
                         setState(() {
-                          _colors[5] = _nextColor(_colors[5], 4.5);
+                          _nextColor(_limbs[5], 4.5, "left_arm_front");
                         });
                       },
                       onLongPress: () {
                         setState(() {
-                          _colors[5] = _resetColor(_colors[5], 4.5);
+                          _resetColor(_limbs[5], 4.5, "left_arm_front");
                         });
                       },
                       child: SvgPicture.asset("assets/Front/left_arm_front.svg",
-                          color: _colors[5]))),
+                          color: _limbs[5]))),
             ],
           ),
         ),
@@ -190,31 +234,31 @@ class _AnteriorState extends State<Anterior> {
                 child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        _colors[6] = _nextColor(_colors[6], 9.0);
+                        _nextColor(_limbs[6], 9.0, "right_leg_front");
                       });
                     },
                     onLongPress: () {
                       setState(() {
-                        _colors[6] = _resetColor(_colors[6], 9.0);
+                        _resetColor(_limbs[6], 9.0, "right_leg_front");
                       });
                     },
                     child: SvgPicture.asset("assets/Front/right_leg_front.svg",
-                        color: _colors[6])),
+                        color: _limbs[6])),
               ),
               Expanded(
                 child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        _colors[7] = _nextColor(_colors[7], 9.0);
+                        _nextColor(_limbs[7], 9.0, "left_leg_front");
                       });
                     },
                     onLongPress: () {
                       setState(() {
-                        _colors[7] = _resetColor(_colors[7], 9.0);
+                        _resetColor(_limbs[7], 9.0, "left_leg_front");
                       });
                     },
                     child: SvgPicture.asset("assets/Front/left_leg_front.svg",
-                        color: _colors[7])),
+                        color: _limbs[7])),
               ),
             ],
           ),
