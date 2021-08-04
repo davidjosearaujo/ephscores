@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="svg863"
+   width="191.05289"
+   height="171.0195"
+   viewBox="0 0 191.05289 171.01951"
+   sodipodi:docname="lower_torso_back.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <metadata
+     id="metadata869">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs867" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview865"
+     showgrid="false"
+     inkscape:zoom="0.71227368"
+     inkscape:cx="-387.7751"
+     inkscape:cy="-89.725209"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg863" />
+  <path
+     style="fill:#4f81bd;fill-opacity:1;stroke-width:1.33333337"
+     d="m 101.98506,158.47179 c 18.48328,-38.76947 43.7116,-59.54731 76.68161,-63.15439 l 8.66667,-0.94817 0.38416,-15.33333 c 0.29356,-11.7173 -0.28216,-18.45003 -2.44123,-28.54924 -3.00689,-14.06502 -2.80064,-18.31748 1.34483,-27.72695 1.38693,-3.14809 2.95146,-9.55689 3.47674,-14.24176 L 191.05288,0 186.52644,0.83404 C 184.0369,1.29276 172.1,3.00484 160,4.63867 141.20504,7.1765 131.8813,7.61226 96,7.62982 54.48452,7.65012 41.70106,6.69667 5.1701,0.85514 L 0,0.0284 v 6.51255 c 0,7.70065 1.94207,15.22212 4.30898,16.68829 2.4955,1.54583 2.06673,19.09082 -0.89135,36.47332 -1.86688,10.9703 -2.24736,17.27092 -1.50968,25 L 2.89419,95.0359 h 4.27277 c 7.14031,0 19.58792,3.74217 30.83304,9.26946 20.45391,10.05366 37.34767,27.83844 50.22212,52.87099 3.91118,7.60472 7.26012,13.83413 7.44212,13.84314 0.18199,0.009 3.02636,-5.63745 6.32082,-12.5477 z"
+     id="path879"
+     inkscape:label="lowertorso"
+     inkscape:connector-curvature="0" />
+</svg>

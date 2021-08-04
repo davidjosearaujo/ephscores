@@ -12,7 +12,9 @@ class Anterior extends StatefulWidget {
 
 class _AnteriorState extends State<Anterior> {
   double _perc = 0;
+  
   List<Color> _colors = List.filled(8, Color.fromRGBO(79, 129, 189, 1));
+  
   final List<Color> _sev = [
     Color.fromRGBO(79, 129, 189, 1), // Blue
     Color.fromRGBO(251, 188, 4, 1), // Yellow
@@ -36,6 +38,14 @@ class _AnteriorState extends State<Anterior> {
     }
   }
 
+  _resetColor(Color x, double y) {
+    if (x != Color.fromRGBO(79, 129, 189, 1)) {
+      _perc -= y;
+      widget.callback(_perc);
+    }
+    return Color.fromRGBO(79, 129, 189, 1);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -57,6 +67,11 @@ class _AnteriorState extends State<Anterior> {
                     onTap: () {
                       setState(() {
                         _colors[0] = _nextColor(_colors[0], 4.5);
+                      });
+                    },
+                    onLongPress: () {
+                      setState(() {
+                        _colors[0] = _resetColor(_colors[0], 4.5);
                       });
                     },
                     child: SvgPicture.asset("assets/Front/head_front.svg",
@@ -83,6 +98,11 @@ class _AnteriorState extends State<Anterior> {
                           _colors[1] = _nextColor(_colors[1], 4.5);
                         });
                       },
+                      onLongPress: () {
+                        setState(() {
+                          _colors[1] = _resetColor(_colors[1], 4.5);
+                        });
+                      },
                       child: SvgPicture.asset(
                           "assets/Front/right_arm_front.svg",
                           color: _colors[1]))),
@@ -99,6 +119,11 @@ class _AnteriorState extends State<Anterior> {
                               _colors[2] = _nextColor(_colors[2], 9.0);
                             });
                           },
+                          onLongPress: () {
+                            setState(() {
+                              _colors[2] = _resetColor(_colors[2], 9.0);
+                            });
+                          },
                           child: SvgPicture.asset(
                               "assets/Front/upper_torso_front.svg",
                               color: _colors[2]),
@@ -111,6 +136,11 @@ class _AnteriorState extends State<Anterior> {
                               _colors[3] = _nextColor(_colors[3], 9.0);
                             });
                           },
+                          onLongPress: () {
+                            setState(() {
+                              _colors[3] = _resetColor(_colors[3], 9.0);
+                            });
+                          },
                           child: SvgPicture.asset(
                               "assets/Front/lower_torso_front.svg",
                               color: _colors[3]),
@@ -121,6 +151,11 @@ class _AnteriorState extends State<Anterior> {
                             onTap: () {
                               setState(() {
                                 _colors[4] = _nextColor(_colors[4], 1.0);
+                              });
+                            },
+                            onLongPress: () {
+                              setState(() {
+                                _colors[4] = _resetColor(_colors[4], 1.0);
                               });
                             },
                             child: SvgPicture.asset(
@@ -136,6 +171,11 @@ class _AnteriorState extends State<Anterior> {
                           _colors[5] = _nextColor(_colors[5], 4.5);
                         });
                       },
+                      onLongPress: () {
+                        setState(() {
+                          _colors[5] = _resetColor(_colors[5], 4.5);
+                        });
+                      },
                       child: SvgPicture.asset("assets/Front/left_arm_front.svg",
                           color: _colors[5]))),
             ],
@@ -146,22 +186,36 @@ class _AnteriorState extends State<Anterior> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _colors[6] = _nextColor(_colors[6], 9.0);
-                    });
-                  },
-                  child: SvgPicture.asset("assets/Front/right_leg_front.svg",
-                      color: _colors[6])),
-              GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _colors[7] = _nextColor(_colors[7], 9.0);
-                    });
-                  },
-                  child: SvgPicture.asset("assets/Front/left_leg_front.svg",
-                      color: _colors[7])),
+              Expanded(
+                child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _colors[6] = _nextColor(_colors[6], 9.0);
+                      });
+                    },
+                    onLongPress: () {
+                      setState(() {
+                        _colors[6] = _resetColor(_colors[6], 9.0);
+                      });
+                    },
+                    child: SvgPicture.asset("assets/Front/right_leg_front.svg",
+                        color: _colors[6])),
+              ),
+              Expanded(
+                child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _colors[7] = _nextColor(_colors[7], 9.0);
+                      });
+                    },
+                    onLongPress: () {
+                      setState(() {
+                        _colors[7] = _resetColor(_colors[7], 9.0);
+                      });
+                    },
+                    child: SvgPicture.asset("assets/Front/left_leg_front.svg",
+                        color: _colors[7])),
+              ),
             ],
           ),
         ),

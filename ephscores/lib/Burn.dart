@@ -9,11 +9,17 @@ class Burn extends StatefulWidget {
 
 class _BurnState extends State<Burn> {
   int chk = 0;
-  double _perc = 0;
+  double _ant = 0, _pos = 0;
 
-  refreshSev(double y) {
+  refreshAnt(double y) {
     setState(() {
-      _perc = y;
+      _ant = y;
+    });
+  }
+
+  refreshPos(double y) {
+    setState(() {
+      _pos = y;
     });
   }
 
@@ -36,18 +42,15 @@ class _BurnState extends State<Burn> {
         body: Column(
           children: [
             Expanded(
-                flex: 12,
-                child: (chk == 0) ? Anterior(refreshSev) : Posterior()),
-            Expanded(
                 flex: 1,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 2, 0, 0),
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
                   child: Stack(
                     fit: StackFit.expand,
                     alignment: AlignmentDirectional.bottomCenter,
                     children: [
                       LinearProgressIndicator(
-                        value: _perc * 0.01,
+                        value: (_ant + _pos) * 0.01,
                         color: ((double e) {
                           if (e > 32) {
                             return Color.fromRGBO(234, 67, 53, 1);
@@ -58,22 +61,28 @@ class _BurnState extends State<Burn> {
                           } else {
                             return Color.fromRGBO(79, 129, 189, 1);
                           }
-                        })(_perc),
+                        })(_ant),
                         backgroundColor: Color.fromRGBO(79, 129, 189, 1),
                       ),
-                      Text(
-                        "${_perc}",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          backgroundColor: Colors.transparent,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                          height: 2,
+                      FittedBox(
+                        fit: BoxFit.fitHeight,
+                        child: Text(
+                          "${_ant + _pos}%",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            backgroundColor: Colors.transparent,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       )
                     ],
                   ),
-                ))
+                )),
+            Expanded(
+                flex: 12,
+                child:
+                    (chk == 0) ? Anterior(refreshAnt) : Posterior(refreshPos)),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
