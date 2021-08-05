@@ -58,13 +58,6 @@ class _BurnState extends State<Burn> {
               onPressed: () async {
                 _prefs = await SharedPreferences.getInstance();
                 setState(() {
-                  /*
-                  _prefs.clear();
-                  _antc = 0;
-                  _posc = 0;
-                  controllerPos.method();
-                  controllerAnt.method();
-                  Previous doesn't work because can't call a method without the page have been openned */
                   if (_chk == 0) {
                     _prefs.remove("head_front");
                     _prefs.remove("right_arm_front");
@@ -90,6 +83,21 @@ class _BurnState extends State<Burn> {
                     controllerPos.method();
                   }
                 });
+                SnackBar snackBar = SnackBar(
+                  backgroundColor: Color.fromRGBO(44, 73, 108, 0.70),
+                  content: Text(
+                    'Plano ${(() {
+                      if (_chk == 0) {
+                        return "anterior";
+                      } else {
+                        return "posterior";
+                      }
+                    })()} limpo',
+                    textAlign: TextAlign.center,
+                  ),
+                  duration: Duration(milliseconds: 800),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
               },
             ),
           ],
