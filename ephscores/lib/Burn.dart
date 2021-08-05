@@ -13,13 +13,12 @@ class _BurnState extends State<Burn> {
   final RefreshController controllerPos = RefreshController();
   final RefreshController controllerAnt = RefreshController();
   SharedPreferences _prefs;
-  int _chk = 0;
   double _antc = 0, _posc = 0;
+  int _chk = 0;
 
   @override
   void initState() {
     super.initState();
-
     SharedPreferences.getInstance().then((value) {
       setState(() {
         _antc = value.containsKey("antc") ? value.getDouble("antc") : 0;
@@ -59,11 +58,37 @@ class _BurnState extends State<Burn> {
               onPressed: () async {
                 _prefs = await SharedPreferences.getInstance();
                 setState(() {
+                  /*
                   _prefs.clear();
                   _antc = 0;
                   _posc = 0;
                   controllerPos.method();
                   controllerAnt.method();
+                  Previous doesn't work because can't call a method without the page have been openned */
+                  if (_chk == 0) {
+                    _prefs.remove("head_front");
+                    _prefs.remove("right_arm_front");
+                    _prefs.remove("upper_torso_front");
+                    _prefs.remove("lower_torso_front");
+                    _prefs.remove("genitals_front");
+                    _prefs.remove("left_arm_front");
+                    _prefs.remove("right_leg_front");
+                    _prefs.remove("left_leg_front");
+                    _prefs.remove("antc");
+                    _antc = 0;
+                    controllerAnt.method();
+                  } else {
+                    _prefs.remove("head_back");
+                    _prefs.remove("right_arm_back");
+                    _prefs.remove("upper_torso_back");
+                    _prefs.remove("lower_torso_back");
+                    _prefs.remove("left_arm_back");
+                    _prefs.remove("right_leg_back");
+                    _prefs.remove("left_leg_back");
+                    _prefs.remove("posc");
+                    _posc = 0;
+                    controllerPos.method();
+                  }
                 });
               },
             ),
