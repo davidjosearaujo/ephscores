@@ -1,20 +1,26 @@
+import 'package:ephscores/Burn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
 class Posterior extends StatefulWidget {
+  final RefreshController controller;
   Function callback;
   SharedPreferences prefs;
+  double perc;
 
-  Posterior(this.callback);
+  Posterior(this.callback, this.perc, this.prefs, this.controller);
 
   @override
-  _PosteriorState createState() => _PosteriorState();
+  _PosteriorState createState() => _PosteriorState(controller);
 }
 
 class _PosteriorState extends State<Posterior> {
-  double _perc = 0;
+
+  _PosteriorState(RefreshController _controller) {
+    _controller.method = refresh;
+  }
 
   List<Color> _limbs = List.filled(8, Color.fromRGBO(79, 129, 189, 1));
 
@@ -63,13 +69,12 @@ class _PosteriorState extends State<Posterior> {
     for (int i = 0; i < _colors.length; i++) {
       if (x == _colors[i]) {
         if (i == 0) {
-          _perc += y;
+          widget.perc += y;
         } else if (i == 3) {
-          _perc -= y;
+          widget.perc -= y;
         }
         widget.prefs.setInt(id, (i == 3 ? 0 : i + 1));
-        widget.prefs.setDouble("_perc", _perc);
-        widget.callback(_perc);
+        widget.callback(widget.perc);
       }
     }
     refresh();
@@ -78,11 +83,10 @@ class _PosteriorState extends State<Posterior> {
   void _resetColor(Color x, double y, String id) async {
     widget.prefs = await SharedPreferences.getInstance();
     if (x != Color.fromRGBO(79, 129, 189, 1)) {
-      _perc -= y;
-      widget.callback(_perc);
+      widget.perc -= y;
+      widget.callback(widget.perc);
     }
     widget.prefs.setInt(id, 0);
-    widget.prefs.setDouble("_perc", _perc);
     refresh();
   }
 
@@ -143,8 +147,7 @@ class _PosteriorState extends State<Posterior> {
                           _resetColor(_limbs[1], 4.5, "right_arm_back");
                         });
                       },
-                      child: SvgPicture.asset(
-                          "assets/Back/right_arm_back.svg",
+                      child: SvgPicture.asset("assets/Back/right_arm_back.svg",
                           color: _limbs[1]))),
               Expanded(
                 child: Column(

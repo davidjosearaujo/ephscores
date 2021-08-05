@@ -184,7 +184,7 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                             padding: const EdgeInsets.all(8.0),
                             child: ElevatedButton(
                               child: Icon(
-                                Icons.remove_red_eye,
+                                Icons.flashlight_on_outlined,
                                 color: flash
                                     ? Color.fromRGBO(44, 73, 108, 1.0)
                                     : Colors.white,

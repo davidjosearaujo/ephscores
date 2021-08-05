@@ -3,26 +3,44 @@ import 'Burn/Anterior.dart';
 import 'Burn/Posterior.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// ignore: must_be_immutable
 class Burn extends StatefulWidget {
-  double ant, pos;
-  SharedPreferences prefs;
-
   @override
   _BurnState createState() => _BurnState();
 }
 
 class _BurnState extends State<Burn> {
-  int chk = 0;
+  final RefreshController controllerPos = RefreshController();
+  final RefreshController controllerAnt = RefreshController();
+  SharedPreferences _prefs;
+  int _chk = 0;
+  double _antc = 0, _posc = 0;
 
-  refreshAnt(double y) {
-    setState(() {
-      widget.ant = y;
+  @override
+  void initState() {
+    super.initState();
+
+    SharedPreferences.getInstance().then((value) {
+      setState(() {
+        _antc = value.containsKey("antc") ? value.getDouble("antc") : 0;
+        _posc = value.containsKey("posc") ? value.getDouble("posc") : 0;
+      });
     });
   }
 
-  refreshPos(double y) {
+  refreshAnt(double y) async {
+    _prefs = await SharedPreferences.getInstance();
     setState(() {
-      widget.pos = y;
+      _antc = y;
+      _prefs.setDouble("antc", _antc);
+    });
+  }
+
+  refreshPos(double y) async {
+    _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _posc = y;
+      _prefs.setDouble("posc", _posc);
     });
   }
 
@@ -37,8 +55,17 @@ class _BurnState extends State<Burn> {
           backgroundColor: Color.fromRGBO(79, 129, 189, 1.0),
           actions: [
             IconButton(
-              icon: Icon(Icons.replay),
-              onPressed: () {},
+              icon: Icon(Icons.delete),
+              onPressed: () async {
+                _prefs = await SharedPreferences.getInstance();
+                setState(() {
+                  _prefs.clear();
+                  _antc = 0;
+                  _posc = 0;
+                  controllerPos.method();
+                  controllerAnt.method();
+                });
+              },
             ),
           ],
         ),
@@ -55,7 +82,7 @@ class _BurnState extends State<Burn> {
                       alignment: AlignmentDirectional.bottomCenter,
                       children: [
                         LinearProgressIndicator(
-                          value: (widget.ant + widget.pos) * 0.01,
+                          value: (_antc + _posc) * 0.01,
                           color: ((double e) {
                             if (e > 32) {
                               return Color.fromRGBO(234, 67, 53, 1);
@@ -66,13 +93,13 @@ class _BurnState extends State<Burn> {
                             } else {
                               return Color.fromRGBO(79, 129, 189, 1);
                             }
-                          })(widget.ant + widget.pos),
+                          })(_antc + _posc),
                           backgroundColor: Color.fromRGBO(79, 129, 189, 1),
                         ),
                         FittedBox(
                           fit: BoxFit.fitHeight,
                           child: Text(
-                            "${widget.ant + widget.pos}%",
+                            "${_antc + _posc}%",
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               backgroundColor: Colors.transparent,
@@ -86,8 +113,9 @@ class _BurnState extends State<Burn> {
                   )),
               Expanded(
                 flex: 12,
-                child:
-                    (chk == 0) ? Anterior(refreshAnt) : Posterior(refreshPos),
+                child: (_chk == 0)
+                    ? Anterior(refreshAnt, _antc, _prefs, controllerAnt)
+                    : Posterior(refreshPos, _posc, _prefs, controllerPos),
               )
             ],
           ),
@@ -97,10 +125,10 @@ class _BurnState extends State<Burn> {
           selectedItemColor: Color.fromRGBO(79, 129, 189, 1.0),
           unselectedItemColor: Color.fromRGBO(44, 73, 108, 1.0),
           iconSize: 30,
-          currentIndex: chk,
+          currentIndex: _chk,
           onTap: (int e) {
             setState(() {
-              chk = e;
+              _chk = e;
             });
           },
           items: [
@@ -115,4 +143,8 @@ class _BurnState extends State<Burn> {
           ],
         ));
   }
+}
+
+class RefreshController {
+  void Function() method;
 }

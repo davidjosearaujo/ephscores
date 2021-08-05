@@ -1,20 +1,26 @@
+import 'package:ephscores/Burn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
 class Anterior extends StatefulWidget {
+  final RefreshController controller;
   Function callfront;
   SharedPreferences prefs;
+  double perc;
 
-  Anterior(this.callfront);
+  Anterior(this.callfront, this.perc, this.prefs, this.controller);
 
   @override
-  _AnteriorState createState() => _AnteriorState();
+  _AnteriorState createState() => _AnteriorState(controller);
 }
 
 class _AnteriorState extends State<Anterior> {
-  double _perc = 0;
+
+  _AnteriorState(RefreshController _controller) {
+    _controller.method = refresh;
+  }
 
   List<Color> _limbs = List.filled(8, Color.fromRGBO(79, 129, 189, 1));
 
@@ -59,7 +65,6 @@ class _AnteriorState extends State<Anterior> {
             : 0];
       });
     });
-    
   }
 
   void _nextColor(Color x, double y, String id) async {
@@ -67,13 +72,13 @@ class _AnteriorState extends State<Anterior> {
     for (int i = 0; i < _colors.length; i++) {
       if (x == _colors[i]) {
         if (i == 0) {
-          _perc += y;
+          widget.perc += y;
         } else if (i == 3) {
-          _perc -= y;
+          widget.perc -= y;
         }
         widget.prefs.setInt(id, (i == 3 ? 0 : i + 1));
-        widget.prefs.setDouble("_perc", _perc);
-        widget.callfront(_perc);
+        widget.callfront(widget.perc);
+        break;
       }
     }
     refresh();
@@ -82,11 +87,10 @@ class _AnteriorState extends State<Anterior> {
   void _resetColor(Color x, double y, String id) async {
     widget.prefs = await SharedPreferences.getInstance();
     if (x != Color.fromRGBO(79, 129, 189, 1)) {
-      _perc -= y;
-      widget.callfront(_perc);
+      widget.perc -= y;
+      widget.callfront(widget.perc);
     }
     widget.prefs.setInt(id, 0);
-    widget.prefs.setDouble("_perc", _perc);
     refresh();
   }
 
