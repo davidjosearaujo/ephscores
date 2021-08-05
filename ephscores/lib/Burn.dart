@@ -166,10 +166,12 @@ class _BurnState extends State<Burn> {
           },
           items: [
             BottomNavigationBarItem(
+              // ignore: deprecated_member_use
               title: Text("Plano anterior"),
               icon: Icon(Icons.accessibility),
             ),
             BottomNavigationBarItem(
+              // ignore: deprecated_member_use
               title: Text("Plano posterior"),
               icon: Icon(Icons.accessibility),
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:weather_icons/weather_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// ignore: must_be_immutable
 class START extends StatefulWidget {
   int p1, p2, p3, p4;
   SharedPreferences prefs;
@@ -480,10 +481,12 @@ class _STARTState extends State<START> {
           },
           items: [
             BottomNavigationBarItem(
+              // ignore: deprecated_member_use
               title: Text("Triagem"),
               icon: Icon(Icons.warning),
             ),
             BottomNavigationBarItem(
+              // ignore: deprecated_member_use
               title: Text("Sumário"),
               icon: Icon(Icons.list),
             ),
