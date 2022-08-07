@@ -482,12 +482,12 @@ class _STARTState extends State<START> {
           items: [
             BottomNavigationBarItem(
               // ignore: deprecated_member_use
-              title: Text("Triagem"),
+              label: "Triagem",
               icon: Icon(Icons.warning),
             ),
             BottomNavigationBarItem(
               // ignore: deprecated_member_use
-              title: Text("Sumário"),
+              label:"Sumário",
               icon: Icon(Icons.list),
             ),
           ],
