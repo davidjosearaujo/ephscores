@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'package:ephscores/components/MenuButton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_flashlight/flutter_flashlight.dart';
 import 'Burn.dart';
-import 'START.dart';
+import 'Start.dart';
 import 'Score.dart';
 
 void main() {
@@ -26,7 +27,7 @@ class EPHScores extends StatelessWidget {
         "/": (context) => EPHScoresPage(),
         "/scores": (context) => Score(),
         "/burn": (context) => Burn(),
-        "/START": (context) => START(),
+        "/start": (context) => Start(),
       },
       themeMode: ThemeMode.dark,
     );
@@ -50,270 +51,43 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(239, 194, 15, 1.0),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        foregroundColor: Color.fromRGBO(44, 73, 108, 1.0),
+        shadowColor: Colors.transparent,
+        title: Text("EPHScores",
+          style: TextStyle(
+            fontSize: 24,
+          )
+        ),
+      ),
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              flex: 1,
-              child: Container(
-                padding: const EdgeInsets.fromLTRB(20, 40, 20, 20),
-                child: Image.asset('assets/EPHScores_logo.png'),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        child: Text(
-                          "Calculadora de escalas",
-                          style: TextStyle(
-                            fontSize: 24,
-                          ),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.pressed))
-                                return Color.fromRGBO(208, 216, 232, 1.0);
-                              return Color.fromRGBO(79, 129, 189, 1.0);
-                            },
-                          ),
-                          foregroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.pressed))
-                                return Color.fromRGBO(44, 73, 108, 1.0);
-                              return Colors.white;
-                            },
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/scores");
-                        },
+                child: Wrap(
+                    alignment: WrapAlignment.center,
+                    spacing: 10.0,
+                    runSpacing: 10.0,
+                    children: <Widget>[
+                      MenuButton(
+                        text: "Calculadora de escalas",
+                        icon: Icons.person,
+                        path: "/scores"
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        child: Text(
-                          "Avaliação do queimado",
-                          style: TextStyle(
-                            fontSize: 24,
-                          ),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.pressed))
-                                return Color.fromRGBO(208, 216, 232, 1.0);
-                              return Color.fromRGBO(79, 129, 189, 1.0);
-                            },
-                          ),
-                          foregroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.pressed))
-                                return Color.fromRGBO(44, 73, 108, 1.0);
-                              return Colors.white;
-                            },
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/burn");
-                        },
+                      MenuButton(
+                      text: "Avaliação do queimado",
+                      icon: Icons.fireplace_outlined,
+                      path: "/burn"
                       ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                        child: Text(
-                          "Triagem START",
-                          style: TextStyle(
-                            fontSize: 24,
-                          ),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.pressed))
-                                return Color.fromRGBO(208, 216, 232, 1.0);
-                              return Color.fromRGBO(79, 129, 189, 1.0);
-                            },
-                          ),
-                          foregroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              if (states.contains(MaterialState.pressed))
-                                return Color.fromRGBO(44, 73, 108, 1.0);
-                              return Colors.white;
-                            },
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/START");
-                        },
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ElevatedButton(
-                              child: Icon(
-                                Icons.flashlight_on_outlined,
-                                color: flash
-                                    ? Color.fromRGBO(44, 73, 108, 1.0)
-                                    : Colors.white,
-                                size: 60,
-                              ),
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
-                                    if (states.contains(MaterialState.pressed))
-                                      return Color.fromRGBO(79, 129, 189, 1.0);
-                                    var color = !flash
-                                        ? Color.fromRGBO(79, 129, 189, 1.0)
-                                        : Color.fromRGBO(208, 216, 232, 1.0);
-                                    return color;
-                                  },
-                                ),
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  flash
-                                      ? Flashlight.lightOff()
-                                      : Flashlight.lightOn();
-                                  flash = !flash;
-                                });
-                              },
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            child: ElevatedButton(
-                              child: Icon(
-                                Icons.hourglass_top_rounded,
-                                color: !timer
-                                    ? Colors.white
-                                    : Color.fromRGBO(44, 73, 108, 1.0),
-                                size: 60,
-                              ),
-                              style: ButtonStyle(
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
-                                    if (states.contains(MaterialState.pressed))
-                                      return Color.fromRGBO(79, 129, 189, 1.0);
-                                    var color = !timer
-                                        ? Color.fromRGBO(79, 129, 189, 1.0)
-                                        : Color.fromRGBO(208, 216, 232, 1.0);
-                                    return color;
-                                  },
-                                ),
-                              ),
-                              onPressed: () {
-                                if (!wait) {
-                                  wait = true;
-                                  setState(() {
-                                    timer = !timer;
-                                  });
-                                  Timer(Duration(minutes: 1), () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        FlutterBeep.playSysSound(41);
-                                        return AlertDialog(
-                                            backgroundColor: Color.fromRGBO(
-                                                233, 237, 244, 1.0),
-                                            title:
-                                                new Text("Passou 1 minuto !"),
-                                            actions: <Widget>[
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  Expanded(
-                                                    child: ElevatedButton(
-                                                        style: ButtonStyle(
-                                                          backgroundColor:
-                                                              MaterialStateProperty
-                                                                  .resolveWith<
-                                                                      Color>(
-                                                            (Set<MaterialState>
-                                                                states) {
-                                                              if (states.contains(
-                                                                  MaterialState
-                                                                      .pressed))
-                                                                return Color
-                                                                    .fromRGBO(
-                                                                        208,
-                                                                        216,
-                                                                        232,
-                                                                        1.0);
-                                                              return Color
-                                                                  .fromRGBO(
-                                                                      79,
-                                                                      129,
-                                                                      189,
-                                                                      1.0);
-                                                            },
-                                                          ),
-                                                        ),
-                                                        onPressed: () {
-                                                          wait = false;
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        },
-                                                        child: Text("Fechar")),
-                                                  ),
-                                                ],
-                                              ),
-                                            ]);
-                                      },
-                                    );
-                                    setState(() {
-                                      timer = !timer;
-                                    });
-                                  });
-                                }
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
+                      MenuButton(
+                      text: "Triagem START",
+                      icon: Icons.checklist,
+                      path: "/start")
+                ]))
           ],
         ),
       ),

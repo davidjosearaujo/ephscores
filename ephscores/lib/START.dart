@@ -3,17 +3,17 @@ import 'package:weather_icons/weather_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
-class START extends StatefulWidget {
+class Start extends StatefulWidget {
   int p1, p2, p3, p4;
   SharedPreferences prefs;
 
-  START();
+  Start();
 
   @override
-  _STARTState createState() => _STARTState();
+  _StartState createState() => _StartState();
 }
 
-class _STARTState extends State<START> {
+class _StartState extends State<Start> {
   int page = 0;
   String title = "Triagem START";
   Widget body;
@@ -172,7 +172,7 @@ class _STARTState extends State<START> {
         };
         break;
       default:
-        title = "Triagem START";
+        title = "Triagem Start";
         body = Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
