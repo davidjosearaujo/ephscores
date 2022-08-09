@@ -277,16 +277,24 @@ class _ScoreState extends State<Score> {
         return save();
       },
       child: Scaffold(
-          backgroundColor: Color.fromRGBO(233, 237, 244, 1.0),
+          //backgroundColor: Color.fromRGBO(233, 237, 244, 1.0),
           appBar: AppBar(
+            backgroundColor: Colors.white,
+            foregroundColor: Color.fromRGBO(44, 73, 108, 1.0),
+            shadowColor: Colors.transparent,
             title: Text(
-              "Escalas",
-              style: TextStyle(fontSize: 24),
+              "Avaliação Adulto",
+              style: TextStyle(
+                fontSize: 24,
+                color: Color.fromRGBO(44, 73, 108, 1.0)
+              ),
             ),
-            backgroundColor: Color.fromRGBO(79, 129, 189, 1.0),
             actions: [
               IconButton(
-                icon: Icon(Icons.delete),
+                icon: Icon(
+                  Icons.delete,
+                  color: Color.fromRGBO(44, 73, 108, 1.0),
+                ),
                 onPressed: () async {
                   widget.prefs1 = await SharedPreferences.getInstance();
                   setState(() {
@@ -312,6 +320,8 @@ class _ScoreState extends State<Score> {
                   ExpansionPanel(
                     headerBuilder: (BuildContext context, bool isExpanded) {
                       return ListTile(
+                        tileColor: Colors.white,
+                        iconColor: Colors.white,
                         title: Text(
                           "Cincinnati",
                           style: TextStyle(
@@ -334,7 +344,6 @@ class _ScoreState extends State<Score> {
                         ),
                       );
                     },
-                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
                     isExpanded: expanded[0],
                     canTapOnHeader: true,
                     body: (() {
@@ -344,6 +353,7 @@ class _ScoreState extends State<Score> {
                   ExpansionPanel(
                     headerBuilder: (BuildContext context, bool isExpanded) {
                       return ListTile(
+                        tileColor: Colors.white,
                         title: Text(
                           "ECG",
                           style: TextStyle(
@@ -366,7 +376,6 @@ class _ScoreState extends State<Score> {
                         ),
                       );
                     },
-                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
                     isExpanded: expanded[1],
                     canTapOnHeader: true,
                     body: (() {
@@ -376,6 +385,7 @@ class _ScoreState extends State<Score> {
                   ExpansionPanel(
                     headerBuilder: (BuildContext context, bool isExpanded) {
                       return ListTile(
+                        tileColor: Colors.white,
                         title: Text(
                           "MGAP",
                           style: TextStyle(
@@ -398,7 +408,6 @@ class _ScoreState extends State<Score> {
                         ),
                       );
                     },
-                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
                     isExpanded: expanded[2],
                     canTapOnHeader: true,
                     body: (() {
@@ -408,6 +417,7 @@ class _ScoreState extends State<Score> {
                   ExpansionPanel(
                     headerBuilder: (BuildContext context, bool isExpanded) {
                       return ListTile(
+                        tileColor: Colors.white,
                         title: Text(
                           "NEWS",
                           style: TextStyle(
@@ -430,7 +440,6 @@ class _ScoreState extends State<Score> {
                         ),
                       );
                     },
-                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
                     isExpanded: expanded[3],
                     canTapOnHeader: true,
                     body: (() {
@@ -440,6 +449,7 @@ class _ScoreState extends State<Score> {
                   ExpansionPanel(
                     headerBuilder: (BuildContext context, bool isExpanded) {
                       return ListTile(
+                        tileColor: Colors.white,
                         title: Text(
                           "PROACS",
                           style: TextStyle(
@@ -462,7 +472,6 @@ class _ScoreState extends State<Score> {
                         ),
                       );
                     },
-                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
                     isExpanded: expanded[4],
                     canTapOnHeader: true,
                     body: (() {
@@ -472,6 +481,7 @@ class _ScoreState extends State<Score> {
                   ExpansionPanel(
                     headerBuilder: (BuildContext context, bool isExpanded) {
                       return ListTile(
+                        tileColor: Colors.white,
                         title: Text(
                           "TAP",
                           style: TextStyle(
@@ -494,7 +504,6 @@ class _ScoreState extends State<Score> {
                         ),
                       );
                     },
-                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
                     isExpanded: expanded[5],
                     canTapOnHeader: true,
                     body: (() {
@@ -504,6 +513,7 @@ class _ScoreState extends State<Score> {
                   ExpansionPanel(
                     headerBuilder: (BuildContext context, bool isExpanded) {
                       return ListTile(
+                        tileColor: Colors.white,
                         title: Text(
                           "RACE",
                           style: TextStyle(
@@ -526,7 +536,6 @@ class _ScoreState extends State<Score> {
                         ),
                       );
                     },
-                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
                     isExpanded: expanded[6],
                     canTapOnHeader: true,
                     body: (() {
@@ -536,6 +545,7 @@ class _ScoreState extends State<Score> {
                   ExpansionPanel(
                     headerBuilder: (BuildContext context, bool isExpanded) {
                       return ListTile(
+                        tileColor: Colors.white,
                         title: Text(
                           "RTS",
                           style: TextStyle(
@@ -558,7 +568,6 @@ class _ScoreState extends State<Score> {
                         ),
                       );
                     },
-                    backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
                     isExpanded: expanded[7],
                     canTapOnHeader: true,
                     body: (() {

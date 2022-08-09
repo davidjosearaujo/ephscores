@@ -18,7 +18,7 @@ class _ECGState extends State<ECG> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Container(
-          color: Color.fromRGBO(233, 237, 244, 1.0),
+          color: Colors.grey.shade100,
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
             value: (() {
@@ -58,7 +58,7 @@ class _ECGState extends State<ECG> {
           ),
         ),
         Container(
-          color: Color.fromRGBO(233, 237, 244, 1.0),
+          color: Colors.grey.shade100,
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
             value: (() {
@@ -102,7 +102,7 @@ class _ECGState extends State<ECG> {
           ),
         ),
         Container(
-          color: Color.fromRGBO(233, 237, 244, 1.0),
+          color: Colors.grey.shade100,
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
             value: (() {

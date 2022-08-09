@@ -172,7 +172,7 @@ class _StartState extends State<Start> {
         };
         break;
       default:
-        title = "Triagem Start";
+        title = "Triagem START";
         body = Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -200,7 +200,7 @@ class _StartState extends State<Start> {
                           backgroundColor: ((st) {
                             return st
                                 ? Color.fromRGBO(208, 216, 232, 1.0)
-                                : Color.fromRGBO(233, 237, 244, 1.0);
+                                : Colors.grey.shade300;
                           })(isSelected[0]),
                           side: BorderSide(
                             color: Colors.white,
@@ -235,7 +235,7 @@ class _StartState extends State<Start> {
                           backgroundColor: ((st) {
                             return st
                                 ? Color.fromRGBO(208, 216, 232, 1.0)
-                                : Color.fromRGBO(233, 237, 244, 1.0);
+                                : Colors.grey.shade300;
                           })(isSelected[1]),
                           side: BorderSide(
                             color: Colors.white,
@@ -279,7 +279,7 @@ class _StartState extends State<Start> {
                           backgroundColor: ((st) {
                             return st
                                 ? Color.fromRGBO(208, 216, 232, 1.0)
-                                : Color.fromRGBO(233, 237, 244, 1.0);
+                                : Colors.grey.shade300;
                           })(isSelected[2]),
                           side: BorderSide(
                             color: Colors.white,
@@ -314,7 +314,7 @@ class _StartState extends State<Start> {
                           backgroundColor: ((st) {
                             return st
                                 ? Color.fromRGBO(208, 216, 232, 1.0)
-                                : Color.fromRGBO(233, 237, 244, 1.0);
+                                : Colors.grey.shade300;
                           })(isSelected[3]),
                           side: BorderSide(
                             color: Colors.white,
@@ -358,7 +358,7 @@ class _StartState extends State<Start> {
                           backgroundColor: ((st) {
                             return st
                                 ? Color.fromRGBO(208, 216, 232, 1.0)
-                                : Color.fromRGBO(233, 237, 244, 1.0);
+                                : Colors.grey.shade300;
                           })(isSelected[4]),
                           side: BorderSide(
                             color: Colors.white,
@@ -393,7 +393,7 @@ class _StartState extends State<Start> {
                           backgroundColor: ((st) {
                             return st
                                 ? Color.fromRGBO(208, 216, 232, 1.0)
-                                : Color.fromRGBO(233, 237, 244, 1.0);
+                                : Colors.grey.shade300;
                           })(isSelected[5]),
                           side: BorderSide(
                             color: Colors.white,
@@ -455,13 +455,16 @@ class _StartState extends State<Start> {
 
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.white,
+          foregroundColor: Color.fromRGBO(44, 73, 108, 1.0),
+          shadowColor: Colors.transparent,
           title: Text(
             title,
             style: TextStyle(fontSize: 24),
           ),
-          backgroundColor: Color.fromRGBO(79, 129, 189, 1.0),
           actions: [
             IconButton(
+              color: Color.fromRGBO(44, 73, 108, 1.0),
               icon: tileicon,
               onPressed: titlefunc,
             ),
@@ -469,9 +472,9 @@ class _StartState extends State<Start> {
         ),
         body: body,
         bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
-          selectedItemColor: Color.fromRGBO(79, 129, 189, 1.0),
-          unselectedItemColor: Color.fromRGBO(44, 73, 108, 1.0),
+          backgroundColor: Colors.white,
+          selectedItemColor: Color.fromRGBO(44, 73, 108, 1.0),
+          unselectedItemColor: Colors.grey.shade600,
           iconSize: 30,
           currentIndex: page,
           onTap: (int e) {

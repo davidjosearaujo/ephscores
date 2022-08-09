@@ -28,6 +28,8 @@ class EPHScores extends StatelessWidget {
         "/scores": (context) => Score(),
         "/burn": (context) => Burn(),
         "/start": (context) => Start(),
+        //"/ped_scores": (context) => PediatricScore(),
+        //"/phone_book": (context) => PhoneBook(),
       },
       themeMode: ThemeMode.dark,
     );
@@ -57,36 +59,48 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
         foregroundColor: Color.fromRGBO(44, 73, 108, 1.0),
         shadowColor: Colors.transparent,
         title: Text("EPHScores",
-          style: TextStyle(
-            fontSize: 24,
-          )
-        ),
+            style: TextStyle(
+              fontSize: 30,
+            )),
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+              child: Image(
+                image: AssetImage("assets/EPHScores_logo.png"),
+                width: 250,
+                height: 250,
+              ),
+            ),
             Expanded(
                 child: Wrap(
                     alignment: WrapAlignment.center,
-                    spacing: 10.0,
-                    runSpacing: 10.0,
+                    spacing: 20.0,
+                    runSpacing: 20.0,
                     children: <Widget>[
                       MenuButton(
-                        text: "Calculadora de escalas",
-                        icon: Icons.person,
-                        path: "/scores"
-                      ),
+                          text: "Avaliação Adulto",
+                          icon: Icons.person,
+                          path: "/scores"),
                       MenuButton(
-                      text: "Avaliação do queimado",
-                      icon: Icons.fireplace_outlined,
-                      path: "/burn"
-                      ),
+                          text: "Avaliação Pediatrica",
+                          icon: Icons.child_care,
+                          path: "/ped_scores"),
                       MenuButton(
-                      text: "Triagem START",
-                      icon: Icons.checklist,
-                      path: "/start")
+                          text: "Avaliação Queimado",
+                          icon: Icons.local_fire_department,
+                          path: "/burn"),
+                      MenuButton(
+                          text: "Triagem START",
+                          icon: Icons.checklist,
+                          path: "/start"),
+                      MenuButton(
+                          text: "Contactos",
+                          icon: Icons.phone,
+                          path: "/phone_book")
+
                 ]))
           ],
         ),

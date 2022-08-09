@@ -18,7 +18,7 @@ class _CincinnatiState extends State<Cincinnati> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         ListTile(
-          tileColor: Color.fromRGBO(233, 237, 244, 1.0),
+          tileColor: Colors.grey.shade100,
           title: Text(
             "Paresia facial",
             style: TextStyle(
@@ -33,7 +33,7 @@ class _CincinnatiState extends State<Cincinnati> {
           ),
         ),
         ListTile(
-          tileColor: Color.fromRGBO(233, 237, 244, 1.0),
+          tileColor: Colors.grey.shade100,
           title: Text(
             "Queda do membro superior",
             style: TextStyle(
@@ -48,7 +48,7 @@ class _CincinnatiState extends State<Cincinnati> {
           ),
         ),
         ListTile(
-          tileColor: Color.fromRGBO(233, 237, 244, 1.0),
+          tileColor: Colors.grey.shade100,
           title: Text(
             "Alteração na fala",
             style: TextStyle(
