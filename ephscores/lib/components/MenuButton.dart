@@ -21,31 +21,38 @@ class MenuButton extends StatefulWidget {
 class _MenuButtonState extends State<MenuButton> {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      child: Column(
-        children: [
-          Icon(widget.icon),
-          Text(
-            widget.text,
-            softWrap: true,
+    return InkWell(
+      highlightColor: Colors.transparent,
+      splashColor:Color.fromARGB(100, 0, 255, 229),
+      borderRadius: BorderRadius.all(Radius.circular(5)),
+      child: Card(
+        color: Color.fromARGB(255, 223, 226, 232),
+        child: Container(
+          alignment: Alignment.center,
+          width: 80,
+          height: 80,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                widget.icon,
+                color: Color.fromRGBO(44, 73, 108, 1.0),
+              ),
+              Text(
+                widget.text,
+                softWrap: true,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color.fromRGBO(44, 73, 108, 1.0),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.resolveWith<Color>(
-          (Set<MaterialState> states) {
-            if (states.contains(MaterialState.pressed))
-              return Colors.white;
-            return Color.fromARGB(255, 223, 226, 232);
-          },
         ),
-        foregroundColor: MaterialStateProperty.resolveWith<Color>(
-          (Set<MaterialState> states) {
-            return Color.fromRGBO(44, 73, 108, 1.0);
-          },
-        ),
+        
       ),
-      onPressed: () {
+      onTap: (){
         Navigator.pushNamed(context, widget.path);
       },
     );
