@@ -5,14 +5,12 @@ import 'package:flutter/src/widgets/framework.dart';
 class MenuButton extends StatefulWidget {
   final String text;
   final IconData icon;
-  final String path;
   final Function onPressed;
 
   const MenuButton(
       {Key key,
       this.text = "New Button",
       this.icon = Icons.add,
-      this.path = "/home", 
       this.onPressed})
       : super(key: key);
 
@@ -54,9 +52,7 @@ class _MenuButtonState extends State<MenuButton> {
           ),
         ),
       ),
-      onTap: () {
-        Navigator.pushNamed(context, widget.path);
-      },
+      onTap: widget.onPressed,
     );
   }
 }

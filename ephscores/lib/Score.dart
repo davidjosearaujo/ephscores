@@ -13,7 +13,7 @@ import 'Scores/TAP.dart';
 // ignore: must_be_immutable
 class Score extends StatefulWidget {
   SharedPreferences prefs1;
-  List<int> rootvals = [0, 3, 3, 0, 0, 0, 0, 0];
+  List<int> rootvals = [0, 3, 3, 0, 0, 0, 0];
   bool dir = false;
   List<bool> cincinnati = List<bool>.filled(3, false);
   List<int> ecg = List<int>.filled(3, 0);
@@ -21,7 +21,6 @@ class Score extends StatefulWidget {
   List<int> news = List<int>.filled(7, -1);
   List<int> newsv = List<int>.filled(7, 0);
   List<int> proacs = List<int>.filled(4, -1);
-  List<int> tap = List<int>.filled(3, -1);
   List<int> race = List<int>.filled(6, -1);
   List<int> rts = List<int>.filled(2, -1);
 
@@ -46,9 +45,8 @@ class _ScoreState extends State<Score> {
         widget.rootvals[2] = value.containsKey("s3.r") ? value.get("s3.r") : 3;
         widget.rootvals[3] = value.containsKey("s4.r") ? value.get("s4.r") : 0;
         widget.rootvals[4] = value.containsKey("s5.r") ? value.get("s5.r") : 0;
-        widget.rootvals[5] = value.containsKey("s6.r") ? value.get("s6.r") : 0;
-        widget.rootvals[6] = value.containsKey("s7.r") ? value.get("s7.r") : 0;
-        widget.rootvals[7] = value.containsKey("s8.r") ? value.get("s8.r") : 0;
+        widget.rootvals[5] = value.containsKey("s7.r") ? value.get("s7.r") : 0;
+        widget.rootvals[6] = value.containsKey("s8.r") ? value.get("s8.r") : 0;
 
         widget.cincinnati[0] =
             value.containsKey('s1.0') ? value.getBool('s1.0') : false;
@@ -81,10 +79,6 @@ class _ScoreState extends State<Score> {
             value.containsKey('s5.2') ? value.getInt('s5.2') : -1;
         widget.proacs[3] =
             value.containsKey('s5.3') ? value.getInt('s5.3') : -1;
-
-        widget.tap[0] = value.containsKey('s6.0') ? value.getInt('s6.0') : -1;
-        widget.tap[1] = value.containsKey('s6.1') ? value.getInt('s6.1') : -1;
-        widget.tap[2] = value.containsKey('s6.2') ? value.getInt('s6.2') : -1;
 
         widget.dir = value.containsKey('s7.d') ? value.getBool('s7.d') : false;
         widget.race[0] = value.containsKey('s7.0') ? value.getInt('s7.0') : -1;
@@ -127,10 +121,6 @@ class _ScoreState extends State<Score> {
     widget.prefs1.setInt('s5.1', widget.proacs[1]);
     widget.prefs1.setInt('s5.2', widget.proacs[2]);
     widget.prefs1.setInt('s5.3', widget.proacs[3]);
-    // TAP
-    widget.prefs1.setInt('s6.0', widget.tap[0]);
-    widget.prefs1.setInt('s6.1', widget.tap[1]);
-    widget.prefs1.setInt('s6.2', widget.tap[2]);
     // RACE
     widget.prefs1.setBool('s7.d', widget.dir);
     widget.prefs1.setInt('s7.0', widget.race[0]);
@@ -148,9 +138,8 @@ class _ScoreState extends State<Score> {
     widget.prefs1.setInt("s3.r", widget.rootvals[2]);
     widget.prefs1.setInt("s4.r", widget.rootvals[3]);
     widget.prefs1.setInt("s5.r", widget.rootvals[4]);
-    widget.prefs1.setInt("s6.r", widget.rootvals[5]);
-    widget.prefs1.setInt("s7.r", widget.rootvals[6]);
-    widget.prefs1.setInt("s8.r", widget.rootvals[7]);
+    widget.prefs1.setInt("s7.r", widget.rootvals[5]);
+    widget.prefs1.setInt("s8.r", widget.rootvals[6]);
     return true;
   }
 
@@ -162,10 +151,9 @@ class _ScoreState extends State<Score> {
     widget.news = List<int>.filled(7, -1);
     widget.newsv = List<int>.filled(7, 0);
     widget.proacs = List<int>.filled(4, -1);
-    widget.tap = List<int>.filled(3, -1);
     widget.race = List<int>.filled(6, -1);
     widget.rts = List<int>.filled(2, -1);
-    widget.rootvals = [0, 3, 3, 0, 0, 0, 0, 0];
+    widget.rootvals = [0, 3, 3, 0, 0, 0, 0];
   }
 
   void cincinattiCallback(List<bool> i) {
@@ -223,21 +211,11 @@ class _ScoreState extends State<Score> {
     });
   }
 
-  void tapCallback(List<int> i) {
-    setState(() {
-      widget.rootvals[5] = 0;
-      for (int x in i) {
-        if (x != -1) widget.rootvals[5]++;
-      }
-      widget.tap = i;
-    });
-  }
-
   void raceCallback(List<int> x, bool d) {
     setState(() {
-      widget.rootvals[6] = 0;
+      widget.rootvals[5] = 0;
       for (int i = 0; i < x.length; i++) {
-        if (x[i] != -1 && i > 0) widget.rootvals[6] += x[i];
+        if (x[i] != -1 && i > 0) widget.rootvals[5] += x[i];
       }
       widget.race = x;
       widget.dir = d;
@@ -245,10 +223,10 @@ class _ScoreState extends State<Score> {
   }
 
   void rtsCallback(List<int> i) {
-    widget.rootvals[7] = ECGtoRTS(widget.rootvals[1]);
+    widget.rootvals[6] = ECGtoRTS(widget.rootvals[1]);
     setState(() {
       for (int x in i) {
-        if (x != -1) widget.rootvals[7] += x;
+        if (x != -1) widget.rootvals[6] += x;
       }
       widget.rts = i;
     });
@@ -483,7 +461,7 @@ class _ScoreState extends State<Score> {
                       return ListTile(
                         tileColor: Colors.white,
                         title: Text(
-                          "TAP",
+                          "RACE",
                           style: TextStyle(
                               color: Color.fromRGBO(44, 73, 108, 1.0),
                               fontSize: 18),
@@ -495,7 +473,7 @@ class _ScoreState extends State<Score> {
                               if (e == 0) {
                                 return Color.fromRGBO(52, 168, 83, 1.0);
                               }
-                              return (e >= 3)
+                              return (e >= 5)
                                   ? Color.fromRGBO(234, 67, 53, 1.0)
                                   : Color.fromRGBO(251, 188, 4, 1.0);
                             })(widget.rootvals[5]),
@@ -505,38 +483,6 @@ class _ScoreState extends State<Score> {
                       );
                     },
                     isExpanded: expanded[5],
-                    canTapOnHeader: true,
-                    body: (() {
-                      return TAP(tapCallback, widget.tap);
-                    })(),
-                  ),
-                  ExpansionPanel(
-                    headerBuilder: (BuildContext context, bool isExpanded) {
-                      return ListTile(
-                        tileColor: Colors.white,
-                        title: Text(
-                          "RACE",
-                          style: TextStyle(
-                              color: Color.fromRGBO(44, 73, 108, 1.0),
-                              fontSize: 18),
-                        ),
-                        trailing: Text(
-                          "${widget.rootvals[6]}",
-                          style: TextStyle(
-                            color: ((int e) {
-                              if (e == 0) {
-                                return Color.fromRGBO(52, 168, 83, 1.0);
-                              }
-                              return (e >= 5)
-                                  ? Color.fromRGBO(234, 67, 53, 1.0)
-                                  : Color.fromRGBO(251, 188, 4, 1.0);
-                            })(widget.rootvals[6]),
-                            fontSize: 36,
-                          ),
-                        ),
-                      );
-                    },
-                    isExpanded: expanded[6],
                     canTapOnHeader: true,
                     body: (() {
                       return RACE(raceCallback, widget.race, widget.dir);
@@ -553,7 +499,7 @@ class _ScoreState extends State<Score> {
                               fontSize: 18),
                         ),
                         trailing: Text(
-                          "${widget.rootvals[7]}",
+                          "${widget.rootvals[6]}",
                           style: TextStyle(
                             color: ((int e) {
                               if (e == 16) {
@@ -562,13 +508,13 @@ class _ScoreState extends State<Score> {
                               return (e <= 10)
                                   ? Color.fromRGBO(234, 67, 53, 1.0)
                                   : Color.fromRGBO(251, 188, 4, 1.0);
-                            })(widget.rootvals[7]),
+                            })(widget.rootvals[6]),
                             fontSize: 36,
                           ),
                         ),
                       );
                     },
-                    isExpanded: expanded[7],
+                    isExpanded: expanded[6],
                     canTapOnHeader: true,
                     body: (() {
                       return RTS(rtsCallback, widget.rts);

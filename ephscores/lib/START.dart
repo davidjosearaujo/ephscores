@@ -90,7 +90,7 @@ class _StartState extends State<Start> {
                           "${widget.p1}",
                           style: TextStyle(
                               fontSize: 80,
-                              color: Color.fromRGBO(79, 129, 189, 1.0)),
+                              color: Colors.white),
                         ),
                       ),
                       color: Color.fromRGBO(234, 67, 53, 1.0),
@@ -104,7 +104,7 @@ class _StartState extends State<Start> {
                           "${widget.p2}",
                           style: TextStyle(
                               fontSize: 80,
-                              color: Color.fromRGBO(79, 129, 189, 1.0)),
+                              color: Colors.white),
                         ),
                       ),
                       color: Color.fromRGBO(251, 188, 4, 1.0),
@@ -126,7 +126,7 @@ class _StartState extends State<Start> {
                           "${widget.p3}",
                           style: TextStyle(
                               fontSize: 80,
-                              color: Color.fromRGBO(79, 129, 189, 1.0)),
+                              color: Colors.white),
                         ),
                       ),
                       color: Color.fromRGBO(52, 168, 83, 1.0),
@@ -140,7 +140,7 @@ class _StartState extends State<Start> {
                           "${widget.p4}",
                           style: TextStyle(
                               fontSize: 80,
-                              color: Color.fromRGBO(79, 129, 189, 1.0)),
+                              color: Colors.white),
                         ),
                       ),
                       color: Colors.black,
