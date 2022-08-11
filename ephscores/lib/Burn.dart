@@ -47,11 +47,15 @@ class _BurnState extends State<Burn> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.white,
+          foregroundColor: Color.fromRGBO(44, 73, 108, 1.0),
+          shadowColor: Colors.transparent,
           title: Text(
             "Queimado",
-            style: TextStyle(fontSize: 24),
+            style: TextStyle(
+              fontSize: 24,
+            ),
           ),
-          backgroundColor: Color.fromRGBO(79, 129, 189, 1.0),
           actions: [
             IconButton(
               icon: Icon(Icons.delete),
@@ -84,7 +88,7 @@ class _BurnState extends State<Burn> {
                   }
                 });
                 SnackBar snackBar = SnackBar(
-                  backgroundColor: Color.fromRGBO(44, 73, 108, 0.70),
+                  backgroundColor: Colors.grey.shade300,
                   content: Text(
                     'Plano ${(() {
                       if (_chk == 0) {
@@ -94,6 +98,9 @@ class _BurnState extends State<Burn> {
                       }
                     })()} limpo',
                     textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color.fromRGBO(44, 73, 108, 1.0)
+                    ),
                   ),
                   duration: Duration(milliseconds: 800),
                 );
@@ -103,7 +110,7 @@ class _BurnState extends State<Burn> {
           ],
         ),
         body: Container(
-          color: Color.fromRGBO(233, 237, 244, 1),
+          color: Colors.grey.shade200,
           child: Column(
             children: [
               Expanded(
@@ -123,11 +130,9 @@ class _BurnState extends State<Burn> {
                               return Color.fromRGBO(255, 153, 51, 1);
                             } else if (e > 0) {
                               return Color.fromRGBO(251, 188, 4, 1);
-                            } else {
-                              return Color.fromRGBO(79, 129, 189, 1);
                             }
                           })(_antc + _posc),
-                          backgroundColor: Color.fromRGBO(79, 129, 189, 1),
+                          backgroundColor: Colors.grey.shade500,
                         ),
                         FittedBox(
                           fit: BoxFit.fitHeight,
@@ -154,9 +159,9 @@ class _BurnState extends State<Burn> {
           ),
         ),
         bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Color.fromRGBO(208, 216, 232, 1.0),
-          selectedItemColor: Color.fromRGBO(79, 129, 189, 1.0),
-          unselectedItemColor: Color.fromRGBO(44, 73, 108, 1.0),
+          backgroundColor: Colors.white,
+          selectedItemColor: Color.fromRGBO(44, 73, 108, 1.0),
+          unselectedItemColor: Colors.grey.shade600,
           iconSize: 30,
           currentIndex: _chk,
           onTap: (int e) {

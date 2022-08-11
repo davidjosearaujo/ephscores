@@ -261,7 +261,7 @@ class _ScoreState extends State<Score> {
             foregroundColor: Color.fromRGBO(44, 73, 108, 1.0),
             shadowColor: Colors.transparent,
             title: Text(
-              "Avaliação Adulto",
+              "Escalas",
               style: TextStyle(
                 fontSize: 24,
                 color: Color.fromRGBO(44, 73, 108, 1.0)

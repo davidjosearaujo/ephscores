@@ -75,13 +75,13 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                       runSpacing: 20.0,
                       children: <Widget>[
                     MenuButton(
-                        text: "Avaliação Adulto",
+                        text: "Escalas",
                         icon: Icons.person,
                         onPressed: () {
                           Navigator.pushNamed(context, "/scores");
                         }),
                     MenuButton(
-                        text: "Avaliação Pediátrica",
+                        text: "Escalas Pediátricas",
                         icon: Icons.child_care,
                         onPressed: () {
                           Navigator.pushNamed(context, "/ped_scores");

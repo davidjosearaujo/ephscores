@@ -22,10 +22,10 @@ class _PosteriorState extends State<Posterior> {
     _controller.method = refresh;
   }
 
-  List<Color> _limbs = List.filled(8, Color.fromRGBO(79, 129, 189, 1));
+  List<Color> _limbs = List.filled(8, Color.fromRGBO(44, 73, 108, 1.0));
 
   final List<Color> _colors = [
-    Color.fromRGBO(79, 129, 189, 1), // Blue
+    Color.fromRGBO(44, 73, 108, 1.0), // Blue
     Color.fromRGBO(251, 188, 4, 1), // Yellow
     Color.fromRGBO(255, 153, 51, 1), // Orange
     Color.fromRGBO(234, 67, 53, 1) // Red
@@ -82,7 +82,7 @@ class _PosteriorState extends State<Posterior> {
 
   void _resetColor(Color x, double y, String id) async {
     widget.prefs = await SharedPreferences.getInstance();
-    if (x != Color.fromRGBO(79, 129, 189, 1)) {
+    if (x != Color.fromRGBO(44, 73, 108, 1.0)) {
       widget.perc -= y;
       widget.callback(widget.perc);
     }
@@ -104,7 +104,7 @@ class _PosteriorState extends State<Posterior> {
                   child: Text(
                 "Dir",
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Color.fromRGBO(79, 129, 189, 1)),
+                style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
               )),
               Expanded(
                 child: GestureDetector(
@@ -125,7 +125,7 @@ class _PosteriorState extends State<Posterior> {
                   child: Text(
                 "Esq",
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Color.fromRGBO(79, 129, 189, 1)),
+                style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
               )),
             ],
           ),

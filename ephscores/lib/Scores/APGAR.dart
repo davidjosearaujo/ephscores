@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
-class PTS extends StatefulWidget {
+class APGAR extends StatefulWidget {
   Function callback;
   List<int> values;
 
-  PTS(this.callback, this.values);
+  APGAR(this.callback, this.values);
 
   @override
-  _PTSState createState() => _PTSState();
+  _APGARState createState() => _APGARState();
 }
 
-class _PTSState extends State<PTS> {
+class _APGARState extends State<APGAR> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -22,26 +22,26 @@ class _PTSState extends State<PTS> {
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
             value: (() {
-              return widget.values[0] == 0 ? null : widget.values[0];
+              return widget.values[0] == -1 ? null : widget.values[0];
             })(),
-            hint: Text("Peso"),
+            hint: Text("Respiração"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
             items: [
               DropdownMenuItem(
                 value: 2,
-                child: Text(">20 kg"),
+                child: Text("Chora vigorosamente"),
               ),
               DropdownMenuItem(
                 value: 1,
-                child: Text("10-20kg"),
-              ),
-              DropdownMenuItem(
-                value: -1,
-                child: Text("<10 kg"),
+                child: Text("Lenta e irregular, fraca"),
               ),
               DropdownMenuItem(
                 value: 0,
+                child: Text("Não ventila"),
+              ),
+              DropdownMenuItem(
+                value: -1,
                 child: Text("Nenhum"),
               ),
             ],
@@ -58,26 +58,26 @@ class _PTSState extends State<PTS> {
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
             value: (() {
-              return widget.values[1] == 0 ? null : widget.values[1];
+              return widget.values[1] == -1 ? null : widget.values[1];
             })(),
-            hint: Text("Via aérea"),
+            hint: Text("Frequência cardíaca"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
             items: [
               DropdownMenuItem(
                 value: 2,
-                child: Text("Normal"),
+                child: Text(">100"),
               ),
               DropdownMenuItem(
                 value: 1,
-                child: Text("Estabilizável"),
-              ),
-              DropdownMenuItem(
-                value: -1,
-                child: Text("Não estabilizável"),
+                child: Text("<100"),
               ),
               DropdownMenuItem(
                 value: 0,
+                child: Text("Ausente"),
+              ),
+              DropdownMenuItem(
+                value: -1,
                 child: Text("Nenhum"),
               ),
             ],
@@ -94,26 +94,26 @@ class _PTSState extends State<PTS> {
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
             value: (() {
-              return widget.values[2] == 0 ? null : widget.values[2];
+              return widget.values[2] == -1 ? null : widget.values[2];
             })(),
-            hint: Text("Pressão arterial sistólica"),
+            hint: Text("Irritabilidade reflexa"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
             items: [
               DropdownMenuItem(
                 value: 2,
-                child: Text(">90 mmHg (ou pulso periférico)"),
+                child: Text("Chora, espirra ou tosse em resposta a estímulos"),
               ),
               DropdownMenuItem(
                 value: 1,
-                child: Text("50-90 mmHg (ou pulso fémural)"),
-              ),
-              DropdownMenuItem(
-                value: -1,
-                child: Text("<50 mmHg (ou sem pulso pálpavel)"),
+                child: Text("Responde a estímulos"),
               ),
               DropdownMenuItem(
                 value: 0,
+                child: Text("Não responde a estímulos"),
+              ),
+              DropdownMenuItem(
+                value: -1,
                 child: Text("Nenhum"),
               ),
             ],
@@ -130,26 +130,26 @@ class _PTSState extends State<PTS> {
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
             value: (() {
-              return widget.values[3] == 0 ? null : widget.values[3];
+              return widget.values[3] == -1 ? null : widget.values[3];
             })(),
-            hint: Text("Nivel de Consciência"),
+            hint: Text("Tónus muscular"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
             items: [
               DropdownMenuItem(
                 value: 2,
-                child: Text("Acordado"),
+                child: Text("Ativo, músculos tensos e fletidos"),
               ),
               DropdownMenuItem(
                 value: 1,
-                child: Text("Lentificado"),
-              ),
-              DropdownMenuItem(
-                value: -1,
-                child: Text("Inconsciente"),
+                child: Text("Alguma tensão muscular e flexão dos músculos"),
               ),
               DropdownMenuItem(
                 value: 0,
+                child: Text("Músculos moles e caídos, sem atividade"),
+              ),
+              DropdownMenuItem(
+                value: -1,
                 child: Text("Nenhum"),
               ),
             ],
@@ -166,68 +166,32 @@ class _PTSState extends State<PTS> {
           padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
           child: DropdownButton(
             value: (() {
-              return widget.values[4] == 0 ? null : widget.values[4];
+              return widget.values[4] == -1 ? null : widget.values[4];
             })(),
-            hint: Text("Traumatismos"),
+            hint: Text("Cor"),
             iconSize: 0.0,
             style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
             items: [
               DropdownMenuItem(
                 value: 2,
-                child: Text("Ausentes"),
+                child: Text("Completamente rosado"),
               ),
               DropdownMenuItem(
                 value: 1,
-                child: Text("Fratura fechada"),
-              ),
-              DropdownMenuItem(
-                value: -1,
-                child: Text("Fratura(s) aberta/múltiplas"),
+                child: Text("Rosado com extremidades cianosadas"),
               ),
               DropdownMenuItem(
                 value: 0,
+                child: Text("Pálido ou cianosado"),
+              ),
+              DropdownMenuItem(
+                value: -1,
                 child: Text("Nenhum"),
               ),
             ],
             onChanged: (e) {
               setState(() {
                 widget.values[4] = e;
-                widget.callback(widget.values);
-              });
-            },
-          ),
-        ),
-        Container(
-          color: Colors.grey.shade100,
-          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-          child: DropdownButton(
-            value: (() {
-              return widget.values[5] == 0 ? null : widget.values[5];
-            })(),
-            hint: Text("Feridas"),
-            iconSize: 0.0,
-            style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
-            items: [
-              DropdownMenuItem(
-                value: 2,
-                child: Text("Ausentes"),
-              ),
-              DropdownMenuItem(
-                value: 1,
-                child: Text("Superficiais"),
-              ),
-              DropdownMenuItem(
-                value: -1,
-                child: Text("Profundas/Penetrantes"),
-              ),
-              DropdownMenuItem(
-                value: 0,
-                child: Text("Nenhum"),
-              ),
-            ],
-            onChanged: (e) {
-              setState(() {
-                widget.values[5] = e;
                 widget.callback(widget.values);
               });
             },
