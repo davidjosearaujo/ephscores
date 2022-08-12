@@ -17,7 +17,7 @@ class _BurnState extends State<Burn> {
   SharedPreferences _prefs;
   double _antc = 0, _posc = 0;
   int _chk = 0;
-  bool adult = true;
+  bool _adult = true;
 
   @override
   void initState() {
@@ -65,7 +65,7 @@ class _BurnState extends State<Burn> {
                 onPressed: () async {
                   _prefs = await SharedPreferences.getInstance();
                   setState(() {
-                    adult = !adult;
+                    _adult = !_adult;
                     _prefs.clear();
                     _antc = 0;
                     controllerAnt.method();
@@ -165,7 +165,7 @@ class _BurnState extends State<Burn> {
                   )),
               Expanded(
                   flex: 12,
-                  child: (adult)
+                  child: (_adult)
                       ? ((_chk == 0)
                           ? Anterior(refreshAnt, _antc, _prefs, controllerAnt)
                           : Posterior(refreshPos, _posc, _prefs, controllerPos))
