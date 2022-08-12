@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'Burn/Anterior.dart';
 import 'Burn/Posterior.dart';
+import 'BurnPed/Anterior.dart' as AnteriorPed;
+import 'BurnPed/Posterior.dart' as PosteriorPed;
 import 'package:shared_preferences/shared_preferences.dart';
 
 // ignore: must_be_immutable
@@ -15,6 +17,7 @@ class _BurnState extends State<Burn> {
   SharedPreferences _prefs;
   double _antc = 0, _posc = 0;
   int _chk = 0;
+  bool adult = true;
 
   @override
   void initState() {
@@ -58,6 +61,19 @@ class _BurnState extends State<Burn> {
           ),
           actions: [
             IconButton(
+                icon: Icon(Icons.child_care),
+                onPressed: () async {
+                  _prefs = await SharedPreferences.getInstance();
+                  setState(() {
+                    adult = !adult;
+                    _prefs.clear();
+                    _antc = 0;
+                    controllerAnt.method();
+                    _posc = 0;
+                    controllerPos.method();
+                  });
+                }),
+            IconButton(
               icon: Icon(Icons.delete),
               onPressed: () async {
                 _prefs = await SharedPreferences.getInstance();
@@ -98,9 +114,7 @@ class _BurnState extends State<Burn> {
                       }
                     })()} limpo',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Color.fromRGBO(44, 73, 108, 1.0)
-                    ),
+                    style: TextStyle(color: Color.fromRGBO(44, 73, 108, 1.0)),
                   ),
                   duration: Duration(milliseconds: 800),
                 );
@@ -150,11 +164,16 @@ class _BurnState extends State<Burn> {
                     ),
                   )),
               Expanded(
-                flex: 12,
-                child: (_chk == 0)
-                    ? Anterior(refreshAnt, _antc, _prefs, controllerAnt)
-                    : Posterior(refreshPos, _posc, _prefs, controllerPos),
-              )
+                  flex: 12,
+                  child: (adult)
+                      ? ((_chk == 0)
+                          ? Anterior(refreshAnt, _antc, _prefs, controllerAnt)
+                          : Posterior(refreshPos, _posc, _prefs, controllerPos))
+                      : ((_chk == 0)
+                          ? AnteriorPed.Anterior(
+                              refreshAnt, _antc, _prefs, controllerAnt)
+                          : PosteriorPed.Posterior(
+                              refreshPos, _posc, _prefs, controllerPos)))
             ],
           ),
         ),

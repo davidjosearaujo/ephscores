@@ -76,7 +76,7 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                       children: <Widget>[
                     MenuButton(
                         text: "Escalas",
-                        icon: Icons.person,
+                        icon: Icons.person_outline,
                         onPressed: () {
                           Navigator.pushNamed(context, "/scores");
                         }),
@@ -88,19 +88,19 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                         }),
                     MenuButton(
                         text: "Avaliação Queimado",
-                        icon: Icons.local_fire_department,
+                        icon: Icons.local_fire_department_outlined,
                         onPressed: () {
                           Navigator.pushNamed(context, "/burn");
                         }),
                     MenuButton(
                         text: "Triagem START",
-                        icon: Icons.checklist,
+                        icon: Icons.checklist_outlined,
                         onPressed: () {
                           Navigator.pushNamed(context, "/start");
                         }),
                     MenuButton(
                         text: "Contactos", 
-                        icon: Icons.phone, 
+                        icon: Icons.phone_outlined, 
                         onPressed: () {
                           Navigator.pushNamed(context, "/phone_book");
                         })
