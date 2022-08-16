@@ -41,21 +41,21 @@ class _PosteriorState extends State<Posterior> {
     SharedPreferences.getInstance().then((value) {
       setState(() {
         _limbs[0] = _colors[
-            value.containsKey("head") ? value.getInt("head") : 0];
-        _limbs[1] = _colors[value.containsKey("right_arm")
-            ? value.getInt("right_arm")
+            value.containsKey("head_back") ? value.getInt("head_back") : 0];
+        _limbs[1] = _colors[value.containsKey("right_arm_back")
+            ? value.getInt("right_arm_back")
             : 0];
-        _limbs[2] = _colors[value.containsKey("torso")
-            ? value.getInt("torso")
+        _limbs[2] = _colors[value.containsKey("torso_back")
+            ? value.getInt("torso_back")
             : 0];
-        _limbs[3] = _colors[value.containsKey("left_arm")
-            ? value.getInt("left_arm")
+        _limbs[3] = _colors[value.containsKey("left_arm_back")
+            ? value.getInt("left_arm_back")
             : 0];
-        _limbs[4] = _colors[value.containsKey("right_leg")
-            ? value.getInt("right_leg")
+        _limbs[4] = _colors[value.containsKey("right_leg_back")
+            ? value.getInt("right_leg_back")
             : 0];
-        _limbs[5] = _colors[value.containsKey("left_leg")
-            ? value.getInt("left_leg")
+        _limbs[5] = _colors[value.containsKey("left_leg_back")
+            ? value.getInt("left_leg_back")
             : 0];
       });
     });
@@ -93,7 +93,7 @@ class _PosteriorState extends State<Posterior> {
       padding: EdgeInsets.fromLTRB(0, 8, 0, 8),
       child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
         Expanded(
-          flex: 3,
+          flex: 4,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -107,12 +107,12 @@ class _PosteriorState extends State<Posterior> {
                 child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        _nextColor(_limbs[0], 9, "head");
+                        _nextColor(_limbs[0], 9, "head_back");
                       });
                     },
                     onLongPress: () {
                       setState(() {
-                        _resetColor(_limbs[0], 9, "head");
+                        _resetColor(_limbs[0], 9, "head_back");
                       });
                     },
                     child: SvgPicture.asset("assets/Ped/head.svg",
@@ -136,12 +136,12 @@ class _PosteriorState extends State<Posterior> {
                   child: GestureDetector(
                       onTap: () {
                         setState(() {
-                          _nextColor(_limbs[1], 4.5, "right_arm");
+                          _nextColor(_limbs[1], 4.5, "right_arm_back");
                         });
                       },
                       onLongPress: () {
                         setState(() {
-                          _resetColor(_limbs[1], 4.5, "right_arm");
+                          _resetColor(_limbs[1], 4.5, "right_arm_back");
                         });
                       },
                       child: SvgPicture.asset("assets/Ped/right_arm.svg",
@@ -156,12 +156,12 @@ class _PosteriorState extends State<Posterior> {
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
-                              _nextColor(_limbs[2], 9.0, "torso");
+                              _nextColor(_limbs[2], 9.0, "torso_back");
                             });
                           },
                           onLongPress: () {
                             setState(() {
-                              _resetColor(_limbs[2], 9.0, "torso");
+                              _resetColor(_limbs[2], 9.0, "torso_back");
                             });
                           },
                           child: SvgPicture.asset(
@@ -175,12 +175,12 @@ class _PosteriorState extends State<Posterior> {
                   child: GestureDetector(
                       onTap: () {
                         setState(() {
-                          _nextColor(_limbs[3], 4.5, "left_arm");
+                          _nextColor(_limbs[3], 4.5, "left_arm_back");
                         });
                       },
                       onLongPress: () {
                         setState(() {
-                          _resetColor(_limbs[3], 4.5, "left_arm");
+                          _resetColor(_limbs[3], 4.5, "left_arm_back");
                         });
                       },
                       child: SvgPicture.asset("assets/Ped/left_arm.svg",
@@ -189,7 +189,7 @@ class _PosteriorState extends State<Posterior> {
           ),
         ),
         Expanded(
-          flex: 9,
+          flex: 8,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -197,12 +197,12 @@ class _PosteriorState extends State<Posterior> {
                 child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        _nextColor(_limbs[4], 7.0, "right_leg");
+                        _nextColor(_limbs[4], 7.0, "right_leg_back");
                       });
                     },
                     onLongPress: () {
                       setState(() {
-                        _resetColor(_limbs[4], 7.0, "right_leg");
+                        _resetColor(_limbs[4], 7.0, "right_leg_back");
                       });
                     },
                     child: SvgPicture.asset("assets/Ped/right_leg.svg",
@@ -212,12 +212,12 @@ class _PosteriorState extends State<Posterior> {
                 child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        _nextColor(_limbs[5], 7.0, "left_leg");
+                        _nextColor(_limbs[5], 7.0, "left_leg_back");
                       });
                     },
                     onLongPress: () {
                       setState(() {
-                        _resetColor(_limbs[5], 7.0, "left_leg");
+                        _resetColor(_limbs[5], 7.0, "left_leg_back");
                       });
                     },
                     child: SvgPicture.asset("assets/Ped/left_leg.svg",
