@@ -68,9 +68,7 @@ class _BurnState extends State<Burn> {
                     _adult = !_adult;
                     _prefs.clear();
                     _antc = 0;
-                    controllerAnt.method();
                     _posc = 0;
-                    controllerPos.method();
                   });
                 }),
             IconButton(
