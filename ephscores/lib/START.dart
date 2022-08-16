@@ -86,11 +86,21 @@ class _StartState extends State<Start> {
                     flex: 1,
                     child: Container(
                       child: Center(
-                        child: Text(
-                          "${widget.p1}",
-                          style: TextStyle(
-                              fontSize: 80,
-                              color: Colors.white),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "P1",
+                              style: TextStyle(
+                                  fontSize: 30,
+                                  color: Color.fromRGBO(44, 73, 108, 1.0)),
+                            ),
+                            Text(
+                              "${widget.p1}",
+                              style:
+                                  TextStyle(fontSize: 80, color: Colors.white),
+                            ),
+                          ],
                         ),
                       ),
                       color: Color.fromRGBO(234, 67, 53, 1.0),
@@ -100,11 +110,21 @@ class _StartState extends State<Start> {
                     flex: 1,
                     child: Container(
                       child: Center(
-                        child: Text(
-                          "${widget.p2}",
-                          style: TextStyle(
-                              fontSize: 80,
-                              color: Colors.white),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "P2",
+                              style: TextStyle(
+                                  fontSize: 30,
+                                  color: Color.fromRGBO(44, 73, 108, 1.0)),
+                            ),
+                            Text(
+                              "${widget.p2}",
+                              style:
+                                  TextStyle(fontSize: 80, color: Colors.white),
+                            ),
+                          ],
                         ),
                       ),
                       color: Color.fromRGBO(251, 188, 4, 1.0),
@@ -122,11 +142,21 @@ class _StartState extends State<Start> {
                     flex: 1,
                     child: Container(
                       child: Center(
-                        child: Text(
-                          "${widget.p3}",
-                          style: TextStyle(
-                              fontSize: 80,
-                              color: Colors.white),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "P3",
+                              style: TextStyle(
+                                  fontSize: 30,
+                                  color: Color.fromRGBO(44, 73, 108, 1.0)),
+                            ),
+                            Text(
+                              "${widget.p3}",
+                              style:
+                                  TextStyle(fontSize: 80, color: Colors.white),
+                            ),
+                          ],
                         ),
                       ),
                       color: Color.fromRGBO(52, 168, 83, 1.0),
@@ -136,11 +166,21 @@ class _StartState extends State<Start> {
                     flex: 1,
                     child: Container(
                       child: Center(
-                        child: Text(
-                          "${widget.p4}",
-                          style: TextStyle(
-                              fontSize: 80,
-                              color: Colors.white),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "P4",
+                              style: TextStyle(
+                                  fontSize: 30,
+                                  color: Color.fromRGBO(44, 73, 108, 1.0)),
+                            ),
+                            Text(
+                              "${widget.p4}",
+                              style:
+                                  TextStyle(fontSize: 80, color: Colors.white),
+                            ),
+                          ],
                         ),
                       ),
                       color: Colors.black,
@@ -484,13 +524,12 @@ class _StartState extends State<Start> {
           },
           items: [
             BottomNavigationBarItem(
-              // ignore: deprecated_member_use
-              label: "Triagem",
-              icon: Icon(Icons.warning),
-            ),
+                // ignore: deprecated_member_use
+                label: "Triagem",
+                icon: Icon(Icons.checklist)),
             BottomNavigationBarItem(
               // ignore: deprecated_member_use
-              label:"Sumário",
+              label: "Sumário",
               icon: Icon(Icons.list),
             ),
           ],
