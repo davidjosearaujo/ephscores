@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:ephscores/components/MenuButton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,7 @@ import 'Burn.dart';
 import 'PediatricScore.dart';
 import 'Start.dart';
 import 'Score.dart';
+import 'Contacts.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +32,7 @@ class EPHScores extends StatelessWidget {
         "/burn": (context) => Burn(),
         "/start": (context) => Start(),
         "/ped_scores": (context) => PediatricScore(),
-        //"/phone_book": (context) => PhoneBook(),
+        "/contacts": (context) => Contacts(),
       },
       themeMode: ThemeMode.dark,
     );
@@ -99,10 +101,10 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
                           Navigator.pushNamed(context, "/start");
                         }),
                     MenuButton(
-                        text: "Contactos", 
-                        icon: Icons.phone, 
+                        text: "Contactos Importantes",
+                        icon: Icons.phone,
                         onPressed: () {
-                          Navigator.pushNamed(context, "/phone_book");
+                          Navigator.pushNamed(context, "/contacts");
                         })
                   ]))
             ],

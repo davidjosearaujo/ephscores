@@ -54,7 +54,7 @@ class _BurnState extends State<Burn> {
           foregroundColor: Color.fromRGBO(44, 73, 108, 1.0),
           shadowColor: Colors.transparent,
           title: Text(
-            "Queimado",
+            "Avaliação Queimado",
             style: TextStyle(
               fontSize: 24,
             ),
