@@ -1,24 +1,44 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
-
 import 'components/Contact.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class Contacts extends StatefulWidget {
-  //final List<Contact  > contacts;
+  List<Contact> contacts;
 
-  const Contacts({Key key}) : super(key: key);
+  Contacts({Key key}) : super(key: key);
 
   @override
   State<Contacts> createState() => _ContactsState();
 }
 
 class _ContactsState extends State<Contacts> {
-  // TODO Read online database
+  JsonDecoder decoder = JsonDecoder();
+
   // TODO Write local database if non-existing
   // TODO Create list of contacts
   // TODO Filter the contact onChange of the TextField of search
+
+  Future<String> loadAsset() async {
+    return await rootBundle.loadString('assets/Contacts.json');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      Contact y;
+      loadAsset().then((value) => {
+        for(Map<String, dynamic> x in decoder.convert(value)["contacts"]){
+          //widget.contacts.addd()
+        }
+      });
+    });
+  }
 
   void _updateList(String e) {}
 

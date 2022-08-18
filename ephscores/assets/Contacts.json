@@ -1,0 +1,129 @@
+{
+    "contacts": [
+    {
+        "title":"Alcoólicos Anónimos",
+        "description":"Comunidade de homens e mulheres que partilham entre si a sua experiência, força e esperança para resolverem o seu problema comum e ajudarem outros a se recuperarem do alcoolismo.",
+        "number":"217162969"
+    },
+    {
+        "title":"Apoio a Cidadão com Deficiência",
+        "description":"A Linha do Cidadão com Deficiência é uma linha telefónica gratuita especialmente vocacionada para os problemas das pessoas com algum tipo de deficiência, prestando informações sobre os direitos e apoios que assistem a estes cidadãos, nomeadamente em áreas como a saúde, segurança social, habitação, equipamentos e serviços.",
+        "number":"800208462"
+    },
+    {
+        "title":"Apoio a Cidadão Idoso",
+        "description":"A Linha do Cidadão Idoso é uma linha telefónica gratuita especialmente vocacionada para os problemas da população com uma idade mais avançada, prestando informações sobre os direitos e apoios que assistem aos mais velhos, nomeadamente em áreas como a saúde, segurança social, habitação, equipamentos e serviços.",
+        "number":"800203531"
+    },
+    {
+        "title":"Apoio a Grávidas",
+        "description":"'Somos uma instituição particular de solidariedade social e já ajudámos mais de 4.000 mulheres a terem os seus filhos e a fortalecerem as suas famílias. Com 20 anos de trabalho no terreno, existimos para dar às mulheres o poder de decidir com liberdade.'",
+        "number":"800208090"
+    },
+    {
+        "title":"Apoio a Jovens",
+        "description":"",
+        "number":"800208020"
+    },
+    {
+        "title":"Associação de Apoio à Vítima",
+        "description":"A Associação Portuguesa de Apoio à Vítima (APAV) é uma instituição particular de solidariedade social, pessoa colectiva de utilidade pública, que tem como objectivo estatutário promover e contribuir para a informação, protecção e apoio aos cidadãos vítimas de infracções penais.",
+        "number":"707200077"
+    },
+    {
+        "title":"Centro de Informação Antivenenos",
+        "description":"O Centro de Informação Antivenenos (CIAV) é um centro médico de consulta telefónica na área da toxicologia, responsável pela prestação, em tempo útil, das informações necessárias e adequadas a profissionais de saúde ou ao público em geral, visando uma abordagem correta e eficaz a vítimas de intoxicação.",
+        "number":"800250250"
+    },
+    {
+        "title":"Comando Distrital de Operações de Socorro",
+        "description":"",
+        "number":"117"
+    },
+    {
+        "title":"Comissão para a Cidadania e a Igualdade de Género",
+        "description":"A Comissão para a Cidadania e a Igualdade de Género (CIG) é o organismo nacional responsável pela promoção e defesa desse princípio, procurando responder às profundas alterações sociais e políticas da sociedade em matéria de cidadania e igualdade de género.",
+        "number":"800202148"
+    },
+    {
+        "title":"Conversa Amiga",
+        "description":"É um serviço de atendimento telefónico com o objetivo de prestar apoio e acompanhamento emocional a todos os cidadãos.",
+        "number":"808237327"
+    },
+    {
+        "title":"Criança Desaparecida",
+        "description":"É o número europeu para crianças desaparecidas, que fornece um apoio qualificado quando as crianças/jovens desaparecem.",
+        "number":"116000"
+    },
+    {
+        "title":"Emergência Social",
+        "description":"Tem como objetivo garantir resposta imediata a situações que necessitem de atuação emergente e urgente no âmbito da proteção social, bem como assegurar a acessibilidade a um posterior encaminhamento/acompanhamento social, numa perspetiva de inserção e autonomia.",
+        "number":"144"
+    },
+    {
+        "title":"Linha Abraço",
+        "description":"Linha de apoio a pessoas com HIV-SIDA",
+        "number":"800225115"
+    },
+    {
+        "title":"LUA",
+        "description":"A Linha Universidade de Aveiro [LUA] é um serviço integrado inclusivo de apoio e aconselhamento emocional, psicológico e emocional aos alunos, durante a noite.",
+        "number":"800208448"
+    },
+    {
+        "title":"Narcóticos Anónimos",
+        "description":"'Somos adictos em recuperação que nos reunimos regularmente com o intuito de nos ajudarmos mutuamente e de nos mantermos limpos.'",
+        "number":"800202013"
+    },
+    {
+        "title":"Saúde 24",
+        "description":"Serviço criado para o ajudar nas suas dúvidas com a sua saúde. Oferece também um conjunto de serviços que permite resolver assuntos sem a necessidade de se deslocar para o seu centro de saúde ou hospital.",
+        "number":"808242424"
+    },
+    {
+        "title":"Sexualidade em Linha",
+        "description":"Linha que informa, orienta, encaminha e esclarece dúvidas sobre Saúde Sexual e Reprodutiva, como: sexualidade, desenvolvimento, relações de namoro, amizade, conjugalidade, contraceção; gravidez e gravidez não desejada, violência sexual, infeções sexualmente transmissíveis, orientação sexual, entre outras.",
+        "number":"808222003"
+    },
+    {
+        "title":"SOS Ambiente e Território",
+        "description":"O serviço de atendimento telefónico sos ambiente e território é um número de telefone disponível 24 horas por dia durante todo o ano, através do qual poderá expor situações que possam violar a legislação ambiental e os instrumentos de ordenamento do território.",
+        "number":"800200520"
+    },
+    {
+        "title":"SOS Bullying",
+        "description":"",
+        "number":"808962006"
+    },
+    {
+        "title":"SOS Criança",
+        "description":"Este serviço tem como objetivo dar apoio à criança, principalmente à criança em risco, maltratada e/ou abusada sexualmente, desaparecida, desintegrada da escola, com conflitos com os pais, que se sente rejeitada ou tem ideação suicida, procurando encontrar soluções para para estas situações.",
+        "number":"116111"
+    },
+    {
+        "title":"SOS Deixe de Fumar",
+        "description":"",
+        "number":"808208888"
+    },
+    {
+        "title":"SOS Droga",
+        "description":"É um Serviço de Aconselhamento cujo objetivo é prestar suporte emocional em situações de crise, esclarecer dúvidas e refletir sobre questões relacionadas com os comportamentos aditivos, dependências e temáticas associadas.",
+        "number":"1414"
+    },
+    {
+        "title":"SOS Mulher",
+        "description":"Apoiar as mulheres vítimas de violência doméstica e intervir no sentido de combater as causas que levam à violência de género.",
+        "number":"808200175"
+    },
+    {
+        "title":"SOS Racismo",
+        "description":"O SOS RACISMO existe desde 1990 e propõe uma sociedade mais justa, igualitária e intercultural onde todos, nacionais e estrangeiros com qualquer tom de pele, possam usufruir dos mesmos direitos de cidadania.",
+        "number":"217552700"
+    },
+    {
+        "title":"SOS SIDA",
+        "description":"nformar sobre diversos aspetos da infeção pelo VIH e a SIDA particularmente, sobre vias de transmissão, comportamentos de risco e comportamentos seguros, locais de realização de análises, consultas especializadas, locais de tratamento serviços de apoio psicológico e/ou psiquiátrico para sujeitos afetados e/ou preocupados e famílias, recursos comunitários específicos...",
+        "number":"800201040"
+    }
+    ]
+}

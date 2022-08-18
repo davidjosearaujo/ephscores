@@ -1,10 +1,7 @@
 import 'dart:async';
-
 import 'package:ephscores/components/MenuButton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_beep/flutter_beep.dart';
-import 'package:flutter_flashlight/flutter_flashlight.dart';
 import 'Burn.dart';
 import 'PediatricScore.dart';
 import 'Start.dart';
@@ -49,8 +46,6 @@ class EPHScoresPage extends StatefulWidget {
 
 class _EPHScoresPageState extends State<EPHScoresPage> {
   var isSelected = [false, false];
-  bool flash = false;
-  bool timer = false;
   bool wait = false;
 
   @override
