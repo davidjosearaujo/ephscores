@@ -8,7 +8,7 @@ import 'components/Contact.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class Contacts extends StatefulWidget {
-  List<Contact> contacts;
+  final List<Contact> contacts = List<Contact>.empty(growable: true);
 
   Contacts({Key key}) : super(key: key);
 
@@ -30,17 +30,17 @@ class _ContactsState extends State<Contacts> {
   @override
   void initState() {
     super.initState();
+    loadAsset().then((value) => {
+          for (Map<String, dynamic> x in decoder.convert(value)["contacts"])
+            {
+            }
+        });
     setState(() {
-      Contact y;
-      loadAsset().then((value) => {
-        for(Map<String, dynamic> x in decoder.convert(value)["contacts"]){
-          //widget.contacts.addd()
-        }
-      });
     });
   }
 
-  void _updateList(String e) {}
+  void _updateList(String e) {
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +82,8 @@ class _ContactsState extends State<Contacts> {
               ),
             ),
             ListView(shrinkWrap: true, children: [
-              Contact(),
+              Contact(title: "1", description: "1", number: "1"),
+              Contact(title: "2", description: "3", number: "2")
             ]),
           ],
         ),

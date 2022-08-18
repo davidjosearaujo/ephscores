@@ -41,7 +41,7 @@ class _ContactState extends State<Contact> {
         children: [
           ListTile(
             title: Text(widget.title),
-            subtitle: Text("Subtitle"),
+            subtitle: Text(widget.description),
             textColor: Color.fromRGBO(44, 73, 108, 1.0),
             trailing: GestureDetector(
               child: Icon(
