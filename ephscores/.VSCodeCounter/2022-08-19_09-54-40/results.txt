@@ -1,0 +1,150 @@
+Date : 2022-08-19 09:54:40
+Directory : c:\Users\david\Documents\EPHScores\ephscores
+Total : 76 files,  7068 codes, 163 comments, 316 blanks, all 7547 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| Dart       |         22 |      4,562 |         39 |        191 |      4,792 |
+| SVG        |         23 |      1,860 |         23 |         46 |      1,929 |
+| XML        |         14 |        227 |         41 |         15 |        283 |
+| JSON       |          4 |        181 |          0 |          2 |        183 |
+| Groovy     |          4 |         97 |          1 |         24 |        122 |
+| HTML       |          1 |         79 |         14 |          6 |         99 |
+| YAML       |          1 |         24 |         45 |         15 |         84 |
+| Markdown   |          2 |         13 |          0 |          9 |         22 |
+| Swift      |          1 |         12 |          0 |          2 |         14 |
+| Properties |          2 |          8 |          0 |          2 |         10 |
+| kotlin     |          1 |          4 |          0 |          3 |          7 |
+| C          |          1 |          1 |          0 |          1 |          2 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                                        | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                           |         76 |      7,068 |        163 |        316 |      7,547 |
+| android                                                                                                                     |         15 |        188 |         40 |         38 |        266 |
+| android\app                                                                                                                 |         10 |        143 |         40 |         26 |        209 |
+| android\app\src                                                                                                             |          9 |         83 |         39 |         12 |        134 |
+| android\app\src\debug                                                                                                       |          1 |          4 |          3 |          1 |          8 |
+| android\app\src\main                                                                                                        |          7 |         75 |         33 |         10 |        118 |
+| android\app\src\main\kotlin                                                                                                 |          1 |          4 |          0 |          3 |          7 |
+| android\app\src\main\kotlin\com                                                                                             |          1 |          4 |          0 |          3 |          7 |
+| android\app\src\main\kotlin\com\example                                                                                     |          1 |          4 |          0 |          3 |          7 |
+| android\app\src\main\kotlin\com\example\ephscores                                                                           |          1 |          4 |          0 |          3 |          7 |
+| android\app\src\main\res                                                                                                    |          5 |         40 |         22 |          6 |         68 |
+| android\app\src\main\res\drawable                                                                                           |          1 |          9 |          2 |          2 |         13 |
+| android\app\src\main\res\drawable-v21                                                                                       |          1 |          9 |          2 |          2 |         13 |
+| android\app\src\main\res\values                                                                                             |          2 |         13 |          9 |          1 |         23 |
+| android\app\src\main\res\values-night                                                                                       |          1 |          9 |          9 |          1 |         19 |
+| android\app\src\profile                                                                                                     |          1 |          4 |          3 |          1 |          8 |
+| android\gradle                                                                                                              |          1 |          5 |          0 |          1 |          6 |
+| android\gradle\wrapper                                                                                                      |          1 |          5 |          0 |          1 |          6 |
+| assets                                                                                                                      |         24 |      1,994 |         23 |         46 |      2,063 |
+| assets\Back                                                                                                                 |          8 |        485 |          8 |         16 |        509 |
+| assets\Front                                                                                                                |          9 |        765 |          9 |         18 |        792 |
+| assets\Ped                                                                                                                  |          6 |        610 |          6 |         12 |        628 |
+| ios                                                                                                                         |         11 |        188 |          2 |         12 |        202 |
+| ios\Flutter                                                                                                                 |          1 |         26 |          0 |          1 |         27 |
+| ios\Runner                                                                                                                  |          8 |        146 |          2 |          9 |        157 |
+| ios\Runner.xcodeproj                                                                                                        |          1 |          8 |          0 |          1 |          9 |
+| ios\Runner.xcodeproj\project.xcworkspace                                                                                    |          1 |          8 |          0 |          1 |          9 |
+| ios\Runner.xcodeproj\project.xcworkspace\xcshareddata                                                                       |          1 |          8 |          0 |          1 |          9 |
+| ios\Runner.xcworkspace                                                                                                      |          1 |          8 |          0 |          1 |          9 |
+| ios\Runner.xcworkspace\xcshareddata                                                                                         |          1 |          8 |          0 |          1 |          9 |
+| ios\Runner\Assets.xcassets                                                                                                  |          3 |         27 |          0 |          3 |         30 |
+| ios\Runner\Assets.xcassets\AppIcon.appiconset                                                                               |          1 |          1 |          0 |          0 |          1 |
+| ios\Runner\Assets.xcassets\LaunchImage.imageset                                                                             |          2 |         26 |          0 |          3 |         29 |
+| ios\Runner\Base.lproj                                                                                                       |          2 |         61 |          2 |          2 |         65 |
+| lib                                                                                                                         |         22 |      4,562 |         39 |        191 |      4,792 |
+| lib\Burn                                                                                                                    |          2 |        499 |          2 |         25 |        526 |
+| lib\BurnPed                                                                                                                 |          2 |        438 |          2 |         26 |        466 |
+| lib\Scores                                                                                                                  |         10 |      1,830 |         10 |         54 |      1,894 |
+| lib\components                                                                                                              |          2 |        115 |          0 |         12 |        127 |
+| web                                                                                                                         |          2 |        102 |         14 |          7 |        123 |
++-----------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                                                    | language   | code       | comment    | blank      | total      |
++-----------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\david\Documents\EPHScores\ephscores\README.md                                                                      | Markdown   |         10 |          0 |          7 |         17 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\app\build.gradle                                                       | Groovy     |         60 |          1 |         14 |         75 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\app\src\debug\AndroidManifest.xml                                      | XML        |          4 |          3 |          1 |          8 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\app\src\main\AndroidManifest.xml                                       | XML        |         31 |         11 |          1 |         43 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\app\src\main\kotlin\com\example\ephscores\MainActivity.kt              | kotlin     |          4 |          0 |          3 |          7 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\app\src\main\res\drawable-v21\launch_background.xml                    | XML        |          9 |          2 |          2 |         13 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\app\src\main\res\drawable\launch_background.xml                        | XML        |          9 |          2 |          2 |         13 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\app\src\main\res\values-night\styles.xml                               | XML        |          9 |          9 |          1 |         19 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\app\src\main\res\values\colors.xml                                     | XML        |          4 |          0 |          0 |          4 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\app\src\main\res\values\styles.xml                                     | XML        |          9 |          9 |          1 |         19 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\app\src\profile\AndroidManifest.xml                                    | XML        |          4 |          3 |          1 |          8 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\build.gradle                                                           | Groovy     |         28 |          0 |          5 |         33 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\gradle.properties                                                      | Properties |          3 |          0 |          1 |          4 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\gradle\wrapper\gradle-wrapper.properties                               | Properties |          5 |          0 |          1 |          6 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\settings.gradle                                                        | Groovy     |          8 |          0 |          4 |         12 |
+| c:\Users\david\Documents\EPHScores\ephscores\android\settings_aar.gradle                                                    | Groovy     |          1 |          0 |          1 |          2 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Back\back.svg                                                           | SVG        |         86 |          1 |          2 |         89 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Back\head_back.svg                                                      | SVG        |         57 |          1 |          2 |         60 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Back\left_arm_back.svg                                                  | SVG        |         57 |          1 |          2 |         60 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Back\left_leg_back.svg                                                  | SVG        |         57 |          1 |          2 |         60 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Back\lower_torso_back.svg                                               | SVG        |         57 |          1 |          2 |         60 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Back\right_arm_back.svg                                                 | SVG        |         57 |          1 |          2 |         60 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Back\right_leg_back.svg                                                 | SVG        |         57 |          1 |          2 |         60 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Back\upper_torso_back.svg                                               | SVG        |         57 |          1 |          2 |         60 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Contacts.json                                                           | JSON       |        134 |          0 |          0 |        134 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Front\Frente.svg                                                        | SVG        |         85 |          1 |          2 |         88 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Front\genitals_front.svg                                                | SVG        |         85 |          1 |          2 |         88 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Front\head_front.svg                                                    | SVG        |         85 |          1 |          2 |         88 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Front\left_arm_front.svg                                                | SVG        |         85 |          1 |          2 |         88 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Front\left_leg_front.svg                                                | SVG        |         85 |          1 |          2 |         88 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Front\lower_torso_front.svg                                             | SVG        |         85 |          1 |          2 |         88 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Front\right_arm_front.svg                                               | SVG        |         85 |          1 |          2 |         88 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Front\right_leg_front.svg                                               | SVG        |         85 |          1 |          2 |         88 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Front\upper_torso_front.svg                                             | SVG        |         85 |          1 |          2 |         88 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Ped\head.svg                                                            | SVG        |         85 |          1 |          2 |         88 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Ped\left_arm.svg                                                        | SVG        |         93 |          1 |          2 |         96 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Ped\left_leg.svg                                                        | SVG        |        105 |          1 |          2 |        108 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Ped\right_arm.svg                                                       | SVG        |         91 |          1 |          2 |         94 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Ped\right_leg.svg                                                       | SVG        |        105 |          1 |          2 |        108 |
+| c:\Users\david\Documents\EPHScores\ephscores\assets\Ped\torso.svg                                                           | SVG        |        131 |          1 |          2 |        134 |
+| c:\Users\david\Documents\EPHScores\ephscores\ios\Flutter\AppFrameworkInfo.plist                                             | XML        |         26 |          0 |          1 |         27 |
+| c:\Users\david\Documents\EPHScores\ephscores\ios\Runner.xcodeproj\project.xcworkspace\xcshareddata\IDEWorkspaceChecks.plist | XML        |          8 |          0 |          1 |          9 |
+| c:\Users\david\Documents\EPHScores\ephscores\ios\Runner.xcworkspace\xcshareddata\IDEWorkspaceChecks.plist                   | XML        |          8 |          0 |          1 |          9 |
+| c:\Users\david\Documents\EPHScores\ephscores\ios\Runner\AppDelegate.swift                                                   | Swift      |         12 |          0 |          2 |         14 |
+| c:\Users\david\Documents\EPHScores\ephscores\ios\Runner\Assets.xcassets\AppIcon.appiconset\Contents.json                    | JSON       |          1 |          0 |          0 |          1 |
+| c:\Users\david\Documents\EPHScores\ephscores\ios\Runner\Assets.xcassets\LaunchImage.imageset\Contents.json                  | JSON       |         23 |          0 |          1 |         24 |
+| c:\Users\david\Documents\EPHScores\ephscores\ios\Runner\Assets.xcassets\LaunchImage.imageset\README.md                      | Markdown   |          3 |          0 |          2 |          5 |
+| c:\Users\david\Documents\EPHScores\ephscores\ios\Runner\Base.lproj\LaunchScreen.storyboard                                  | XML        |         36 |          1 |          1 |         38 |
+| c:\Users\david\Documents\EPHScores\ephscores\ios\Runner\Base.lproj\Main.storyboard                                          | XML        |         25 |          1 |          1 |         27 |
+| c:\Users\david\Documents\EPHScores\ephscores\ios\Runner\Info.plist                                                          | XML        |         45 |          0 |          1 |         46 |
+| c:\Users\david\Documents\EPHScores\ephscores\ios\Runner\Runner-Bridging-Header.h                                            | C          |          1 |          0 |          1 |          2 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Burn.dart                                                                  | Dart       |        197 |          3 |          8 |        208 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\BurnPed\Anterior.dart                                                      | Dart       |        219 |          1 |         13 |        233 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\BurnPed\Posterior.dart                                                     | Dart       |        219 |          1 |         13 |        233 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Burn\Anterior.dart                                                         | Dart       |        260 |          1 |         12 |        273 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Burn\Posterior.dart                                                        | Dart       |        239 |          1 |         13 |        253 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Contacts.dart                                                              | Dart       |        113 |          3 |          9 |        125 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\PediatricScore.dart                                                        | Dart       |        245 |          5 |         15 |        265 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Score.dart                                                                 | Dart       |        495 |         10 |         25 |        530 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Scores\APGAR.dart                                                          | Dart       |        198 |          1 |          5 |        204 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Scores\Cincinnati.dart                                                     | Dart       |         63 |          1 |          5 |         69 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Scores\ECG.dart                                                            | Dart       |        150 |          1 |          5 |        156 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Scores\MGAP.dart                                                           | Dart       |        118 |          1 |          5 |        124 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Scores\NEWS.dart                                                           | Dart       |        391 |          1 |          5 |        397 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Scores\PROACS.dart                                                         | Dart       |        150 |          1 |          5 |        156 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Scores\PTS.dart                                                            | Dart       |        234 |          1 |          5 |        240 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Scores\RACE.dart                                                           | Dart       |        278 |          1 |          9 |        288 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Scores\RTS.dart                                                            | Dart       |        106 |          1 |          5 |        112 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Scores\TAP.dart                                                            | Dart       |        142 |          1 |          5 |        148 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\Start.dart                                                                 | Dart       |        526 |          3 |         10 |        539 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\components\Contact.dart                                                    | Dart       |         61 |          0 |          7 |         68 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\components\MenuButton.dart                                                 | Dart       |         54 |          0 |          5 |         59 |
+| c:\Users\david\Documents\EPHScores\ephscores\lib\main.dart                                                                  | Dart       |        104 |          1 |          7 |        112 |
+| c:\Users\david\Documents\EPHScores\ephscores\pubspec.yaml                                                                   | YAML       |         24 |         45 |         15 |         84 |
+| c:\Users\david\Documents\EPHScores\ephscores\web\index.html                                                                 | HTML       |         79 |         14 |          6 |         99 |
+| c:\Users\david\Documents\EPHScores\ephscores\web\manifest.json                                                              | JSON       |         23 |          0 |          1 |         24 |
+| Total                                                                                                                       |            |      7,068 |        163 |        316 |      7,547 |
++-----------------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

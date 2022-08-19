@@ -52,58 +52,70 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+          child: Image(
+            image: AssetImage("assets/EPHScores_logo.png"),
+          ),
+        ),
+        backgroundColor: Colors.white,
+        foregroundColor: Color.fromRGBO(44, 73, 108, 1.0),
+        shadowColor: Colors.transparent,
+        title: Text(
+          "EPHScores",
+          style: TextStyle(
+            fontSize: 30,
+          ),
+        ),
+      ),
       body: SafeArea(
+        minimum: EdgeInsets.fromLTRB(8, 10, 8, 10),
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                child: Image(
-                  image: AssetImage("assets/EPHScores_logo.png"),
-                  width: 250,
-                  height: 250,
-                ),
-              ),
-              Expanded(
-                  child: Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 20.0,
-                      runSpacing: 20.0,
-                      children: <Widget>[
-                    MenuButton(
-                        text: "Escalas Gerais",
-                        icon: Icons.person,
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/scores");
-                        }),
-                    MenuButton(
-                        text: "Escalas Pediátricas",
-                        icon: Icons.child_care,
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/ped_scores");
-                        }),
-                    MenuButton(
-                        text: "Avaliação Queimado",
-                        icon: Icons.local_fire_department,
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/burn");
-                        }),
-                    MenuButton(
-                        text: "Triagem START",
-                        icon: Icons.groups,
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/start");
-                        }),
-                    MenuButton(
-                        text: "Contactos Importantes",
-                        icon: Icons.phone,
-                        onPressed: () {
-                          Navigator.pushNamed(context, "/contacts");
-                        })
-                  ]))
-            ],
-          ),
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+            Expanded(
+              child: MenuButton(
+                  text: "Escalas Gerais",
+                  icon: Icons.person,
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/scores");
+                  }),
+            ),
+            Expanded(
+              child: MenuButton(
+                  text: "Escalas Pediátricas",
+                  icon: Icons.child_care,
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/ped_scores");
+                  }),
+            ),
+            Expanded(
+              child: MenuButton(
+                  text: "Avaliação Queimado",
+                  icon: Icons.local_fire_department,
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/burn");
+                  }),
+            ),
+            Expanded(
+              child: MenuButton(
+                  text: "Triagem START",
+                  icon: Icons.groups,
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/start");
+                  }),
+            ),
+            Expanded(
+              child: MenuButton(
+                  text: "Contactos Importantes",
+                  icon: Icons.phone,
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/contacts");
+                  }),
+            )
+          ]),
         ),
       ),
     );
