@@ -28,26 +28,26 @@ class _PediatricScoreState extends State<PediatricScore> {
   void load() async {
     SharedPreferences.getInstance().then((value) {
       setState(() {
-        widget.rootvals[0] = value.containsKey("s1.r") ? value.get("s1.r") : 0;
-        widget.rootvals[1] = value.containsKey("s2.r") ? value.get("s2.r") : 0;
-        widget.rootvals[2] = value.containsKey("s3.r") ? value.get("s3.r") : 0;
+        widget.rootvals[0] = value.containsKey("s1p.r") ? value.get("s1p.r") : 0;
+        widget.rootvals[1] = value.containsKey("s2p.r") ? value.get("s2p.r") : 0;
+        widget.rootvals[2] = value.containsKey("s3p.r") ? value.get("s3p.r") : 0;
 
-        widget.tap[0] = value.containsKey('s1.0') ? value.getInt('s1.0') : -1;
-        widget.tap[1] = value.containsKey('s1.1') ? value.getInt('s1.1') : -1;
-        widget.tap[2] = value.containsKey('s1.2') ? value.getInt('s1.2') : -1;
+        widget.tap[0] = value.containsKey('s1p.0') ? value.getInt('s1p.0') : -1;
+        widget.tap[1] = value.containsKey('s1p.1') ? value.getInt('s1p.1') : -1;
+        widget.tap[2] = value.containsKey('s1p.2') ? value.getInt('s1p.2') : -1;
 
-        widget.pts[0] = value.containsKey('s2.0') ? value.getInt('s2.0') : 0;
-        widget.pts[1] = value.containsKey('s2.1') ? value.getInt('s2.1') : 0;
-        widget.pts[2] = value.containsKey('s2.2') ? value.getInt('s2.2') : 0;
-        widget.pts[3] = value.containsKey('s2.3') ? value.getInt('s2.3') : 0;
-        widget.pts[4] = value.containsKey('s2.4') ? value.getInt('s2.4') : 0;
-        widget.pts[5] = value.containsKey('s2.5') ? value.getInt('s2.5') : 0;
+        widget.pts[0] = value.containsKey('s2p.0') ? value.getInt('s2p.0') : 0;
+        widget.pts[1] = value.containsKey('s2p.1') ? value.getInt('s2p.1') : 0;
+        widget.pts[2] = value.containsKey('s2p.2') ? value.getInt('s2p.2') : 0;
+        widget.pts[3] = value.containsKey('s2p.3') ? value.getInt('s2p.3') : 0;
+        widget.pts[4] = value.containsKey('s2p.4') ? value.getInt('s2p.4') : 0;
+        widget.pts[5] = value.containsKey('s2p.5') ? value.getInt('s2p.5') : 0;
 
-        widget.apgar[0] = value.containsKey('s3.0') ? value.getInt('s3.0') : -1;
-        widget.apgar[1] = value.containsKey('s3.1') ? value.getInt('s3.1') : -1;
-        widget.apgar[2] = value.containsKey('s3.2') ? value.getInt('s3.2') : -1;
-        widget.apgar[3] = value.containsKey('s3.3') ? value.getInt('s3.3') : -1;
-        widget.apgar[4] = value.containsKey('s3.4') ? value.getInt('s3.4') : -1;
+        widget.apgar[0] = value.containsKey('s3p.0') ? value.getInt('s3p.0') : -1;
+        widget.apgar[1] = value.containsKey('s3p.1') ? value.getInt('s3p.1') : -1;
+        widget.apgar[2] = value.containsKey('s3p.2') ? value.getInt('s3p.2') : -1;
+        widget.apgar[3] = value.containsKey('s3p.3') ? value.getInt('s3p.3') : -1;
+        widget.apgar[4] = value.containsKey('s3p.4') ? value.getInt('s3p.4') : -1;
       });
     });
   }
@@ -55,26 +55,26 @@ class _PediatricScoreState extends State<PediatricScore> {
   Future<bool> save() async {
     widget.prefs1 = await SharedPreferences.getInstance();
     // TAP
-    widget.prefs1.setInt('s1.0', widget.tap[0]);
-    widget.prefs1.setInt('s1.1', widget.tap[1]);
-    widget.prefs1.setInt('s1.2', widget.tap[2]);
+    widget.prefs1.setInt('s1p.0', widget.tap[0]);
+    widget.prefs1.setInt('s1p.1', widget.tap[1]);
+    widget.prefs1.setInt('s1p.2', widget.tap[2]);
     // PTS
-    widget.prefs1.setInt('s2.0', widget.pts[0]);
-    widget.prefs1.setInt('s2.1', widget.pts[1]);
-    widget.prefs1.setInt('s2.2', widget.pts[2]);
-    widget.prefs1.setInt('s2.3', widget.pts[3]);
-    widget.prefs1.setInt('s2.4', widget.pts[4]);
-    widget.prefs1.setInt('s2.5', widget.pts[5]);
+    widget.prefs1.setInt('s2p.0', widget.pts[0]);
+    widget.prefs1.setInt('s2p.1', widget.pts[1]);
+    widget.prefs1.setInt('s2p.2', widget.pts[2]);
+    widget.prefs1.setInt('s2p.3', widget.pts[3]);
+    widget.prefs1.setInt('s2p.4', widget.pts[4]);
+    widget.prefs1.setInt('s2p.5', widget.pts[5]);
     // APGAR
-    widget.prefs1.setInt('s3.0', widget.apgar[0]);
-    widget.prefs1.setInt('s3.1', widget.apgar[1]);
-    widget.prefs1.setInt('s3.2', widget.apgar[2]);
-    widget.prefs1.setInt('s3.3', widget.apgar[3]);
-    widget.prefs1.setInt('s3.4', widget.apgar[4]);
+    widget.prefs1.setInt('s3p.0', widget.apgar[0]);
+    widget.prefs1.setInt('s3p.1', widget.apgar[1]);
+    widget.prefs1.setInt('s3p.2', widget.apgar[2]);
+    widget.prefs1.setInt('s3p.3', widget.apgar[3]);
+    widget.prefs1.setInt('s3p.4', widget.apgar[4]);
     // Display values
-    widget.prefs1.setInt("s1.r", widget.rootvals[0]);
-    widget.prefs1.setInt("s2.r", widget.rootvals[1]);
-    widget.prefs1.setInt("s3.r", widget.rootvals[2]);
+    widget.prefs1.setInt("s1p.r", widget.rootvals[0]);
+    widget.prefs1.setInt("s2p.r", widget.rootvals[1]);
+    widget.prefs1.setInt("s3p.r", widget.rootvals[2]);
     return true;
   }
 

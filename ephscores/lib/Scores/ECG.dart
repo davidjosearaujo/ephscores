@@ -45,7 +45,7 @@ class _ECGState extends State<ECG> {
                 child: Text("Espontaneo"),
               ),
               DropdownMenuItem(
-                value: -1,
+                value: 0,
                 child: Text("Nenhum"),
               ),
             ],
@@ -89,7 +89,7 @@ class _ECGState extends State<ECG> {
                 child: Text("Orientado no tempo e espaço"),
               ),
               DropdownMenuItem(
-                value: -1,
+                value: 0,
                 child: Text("Nenhum"),
               ),
             ],
@@ -137,7 +137,7 @@ class _ECGState extends State<ECG> {
                 child: Text("Ao comando"),
               ),
               DropdownMenuItem(
-                value: -1,
+                value: 0,
                 child: Text("Nenhum"),
               ),
             ],

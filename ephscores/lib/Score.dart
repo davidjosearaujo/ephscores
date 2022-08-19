@@ -34,10 +34,10 @@ class _ScoreState extends State<Score> {
   @override
   void initState() {
     super.initState();
-    load();
+    load().then((value) => setState(() => {}));
   }
 
-  void load() async {
+  Future<void> load() async {
     SharedPreferences.getInstance().then((value) {
       setState(() {
         widget.rootvals[0] = value.containsKey("s1.r") ? value.get("s1.r") : 0;
@@ -45,8 +45,8 @@ class _ScoreState extends State<Score> {
         widget.rootvals[2] = value.containsKey("s3.r") ? value.get("s3.r") : 3;
         widget.rootvals[3] = value.containsKey("s4.r") ? value.get("s4.r") : 0;
         widget.rootvals[4] = value.containsKey("s5.r") ? value.get("s5.r") : 0;
-        widget.rootvals[5] = value.containsKey("s7.r") ? value.get("s7.r") : 0;
-        widget.rootvals[6] = value.containsKey("s8.r") ? value.get("s8.r") : 0;
+        widget.rootvals[5] = value.containsKey("s6.r") ? value.get("s6.r") : 0;
+        widget.rootvals[6] = value.containsKey("s7.r") ? value.get("s7.r") : 0;
 
         widget.cincinnati[0] =
             value.containsKey('s1.0') ? value.getBool('s1.0') : false;
@@ -80,16 +80,16 @@ class _ScoreState extends State<Score> {
         widget.proacs[3] =
             value.containsKey('s5.3') ? value.getInt('s5.3') : -1;
 
-        widget.dir = value.containsKey('s7.d') ? value.getBool('s7.d') : false;
-        widget.race[0] = value.containsKey('s7.0') ? value.getInt('s7.0') : -1;
-        widget.race[1] = value.containsKey('s7.1') ? value.getInt('s7.1') : -1;
-        widget.race[2] = value.containsKey('s7.2') ? value.getInt('s7.2') : -1;
-        widget.race[3] = value.containsKey('s7.3') ? value.getInt('s7.3') : -1;
-        widget.race[4] = value.containsKey('s7.4') ? value.getInt('s7.4') : -1;
-        widget.race[5] = value.containsKey('s7.5') ? value.getInt('s7.5') : -1;
+        widget.dir = value.containsKey('s6.d') ? value.getBool('s6.d') : false;
+        widget.race[0] = value.containsKey('s6.0') ? value.getInt('s6.0') : -1;
+        widget.race[1] = value.containsKey('s6.1') ? value.getInt('s6.1') : -1;
+        widget.race[2] = value.containsKey('s6.2') ? value.getInt('s6.2') : -1;
+        widget.race[3] = value.containsKey('s6.3') ? value.getInt('s6.3') : -1;
+        widget.race[4] = value.containsKey('s6.4') ? value.getInt('s6.4') : -1;
+        widget.race[5] = value.containsKey('s6.5') ? value.getInt('s6.5') : -1;
 
-        widget.rts[0] = value.containsKey('s8.0') ? value.getInt('s8.0') : -1;
-        widget.rts[1] = value.containsKey('s8.1') ? value.getInt('s8.1') : -1;
+        widget.rts[0] = value.containsKey('s7.0') ? value.getInt('s7.0') : -1;
+        widget.rts[1] = value.containsKey('s7.1') ? value.getInt('s7.1') : -1;
       });
     });
   }
@@ -122,24 +122,24 @@ class _ScoreState extends State<Score> {
     widget.prefs1.setInt('s5.2', widget.proacs[2]);
     widget.prefs1.setInt('s5.3', widget.proacs[3]);
     // RACE
-    widget.prefs1.setBool('s7.d', widget.dir);
-    widget.prefs1.setInt('s7.0', widget.race[0]);
-    widget.prefs1.setInt('s7.1', widget.race[1]);
-    widget.prefs1.setInt('s7.2', widget.race[2]);
-    widget.prefs1.setInt('s7.3', widget.race[3]);
-    widget.prefs1.setInt('s7.4', widget.race[4]);
-    widget.prefs1.setInt('s7.5', widget.race[5]);
+    widget.prefs1.setBool('s6.d', widget.dir);
+    widget.prefs1.setInt('s6.0', widget.race[0]);
+    widget.prefs1.setInt('s6.1', widget.race[1]);
+    widget.prefs1.setInt('s6.2', widget.race[2]);
+    widget.prefs1.setInt('s6.3', widget.race[3]);
+    widget.prefs1.setInt('s6.4', widget.race[4]);
+    widget.prefs1.setInt('s6.5', widget.race[5]);
     // RTS
-    widget.prefs1.setInt('s8.0', widget.rts[0]);
-    widget.prefs1.setInt('s8.1', widget.rts[1]);
+    widget.prefs1.setInt('s7.0', widget.rts[0]);
+    widget.prefs1.setInt('s7.1', widget.rts[1]);
     // Display values
     widget.prefs1.setInt("s1.r", widget.rootvals[0]);
     widget.prefs1.setInt("s2.r", widget.rootvals[1]);
     widget.prefs1.setInt("s3.r", widget.rootvals[2]);
     widget.prefs1.setInt("s4.r", widget.rootvals[3]);
     widget.prefs1.setInt("s5.r", widget.rootvals[4]);
-    widget.prefs1.setInt("s7.r", widget.rootvals[5]);
-    widget.prefs1.setInt("s8.r", widget.rootvals[6]);
+    widget.prefs1.setInt("s6.r", widget.rootvals[5]);
+    widget.prefs1.setInt("s7.r", widget.rootvals[6]);
     return true;
   }
 
@@ -167,13 +167,14 @@ class _ScoreState extends State<Score> {
   }
 
   void ecgCallback(List<int> i) {
+    print(i);
     setState(() {
       if (i[0] >= 1 && i[1] >= 1 && i[2] >= 1) {
-        widget.rootvals[7] -= ECGtoRTS(widget.rootvals[1]);
+        widget.rootvals[6] -= ECGtoRTS(widget.rootvals[1]);
         widget.rootvals[2] -= widget.rootvals[1];
         widget.rootvals[1] = i[0] + i[1] + i[2];
         widget.rootvals[2] += widget.rootvals[1];
-        widget.rootvals[7] += ECGtoRTS(widget.rootvals[1]);
+        widget.rootvals[6] += ECGtoRTS(widget.rootvals[1]);
       } else {
         widget.rootvals[1] = 3;
       }
@@ -263,9 +264,7 @@ class _ScoreState extends State<Score> {
             title: Text(
               "Escalas",
               style: TextStyle(
-                fontSize: 24,
-                color: Color.fromRGBO(44, 73, 108, 1.0)
-              ),
+                  fontSize: 24, color: Color.fromRGBO(44, 73, 108, 1.0)),
             ),
             actions: [
               IconButton(

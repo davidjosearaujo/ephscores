@@ -53,12 +53,14 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-          child: Image(
-            image: AssetImage("assets/EPHScores_logo.png"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+            child: Image(
+              image: AssetImage("assets/EPHScores_logo.png"),
+            ),
           ),
-        ),
+        ],
         backgroundColor: Colors.white,
         foregroundColor: Color.fromRGBO(44, 73, 108, 1.0),
         shadowColor: Colors.transparent,
@@ -73,49 +75,49 @@ class _EPHScoresPageState extends State<EPHScoresPage> {
         minimum: EdgeInsets.fromLTRB(8, 10, 8, 10),
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-            Expanded(
-              child: MenuButton(
-                  text: "Escalas Gerais",
-                  icon: Icons.person,
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/scores");
-                  }),
-            ),
-            Expanded(
-              child: MenuButton(
-                  text: "Escalas Pediátricas",
-                  icon: Icons.child_care,
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/ped_scores");
-                  }),
-            ),
-            Expanded(
-              child: MenuButton(
-                  text: "Avaliação Queimado",
-                  icon: Icons.local_fire_department,
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/burn");
-                  }),
-            ),
-            Expanded(
-              child: MenuButton(
-                  text: "Triagem START",
-                  icon: Icons.groups,
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/start");
-                  }),
-            ),
-            Expanded(
-              child: MenuButton(
-                  text: "Contactos Importantes",
-                  icon: Icons.phone,
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/contacts");
-                  }),
-            )
-          ]),
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Expanded(
+                  child: MenuButton(
+                      text: "Escalas Gerais",
+                      icon: Icons.person,
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/scores");
+                      }),
+                ),
+                Expanded(
+                  child: MenuButton(
+                      text: "Escalas Pediátricas",
+                      icon: Icons.child_care,
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/ped_scores");
+                      }),
+                ),
+                Expanded(
+                  child: MenuButton(
+                      text: "Avaliação Queimado",
+                      icon: Icons.local_fire_department,
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/burn");
+                      }),
+                ),
+                Expanded(
+                  child: MenuButton(
+                      text: "Triagem START",
+                      icon: Icons.groups,
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/start");
+                      }),
+                ),
+                Expanded(
+                  child: MenuButton(
+                      text: "Contactos Importantes",
+                      icon: Icons.phone,
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/contacts");
+                      }),
+                )
+              ]),
         ),
       ),
     );

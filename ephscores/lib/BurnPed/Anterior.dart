@@ -156,12 +156,12 @@ class _AnteriorState extends State<Anterior> {
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
-                              _nextColor(_limbs[2], 9.0, "torso_front");
+                              _nextColor(_limbs[2], 18.0, "torso_front");
                             });
                           },
                           onLongPress: () {
                             setState(() {
-                              _resetColor(_limbs[2], 9.0, "torso_front");
+                              _resetColor(_limbs[2], 18.0, "torso_front");
                             });
                           },
                           child: SvgPicture.asset(

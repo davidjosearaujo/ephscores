@@ -156,12 +156,12 @@ class _PosteriorState extends State<Posterior> {
                         child: GestureDetector(
                           onTap: () {
                             setState(() {
-                              _nextColor(_limbs[2], 9.0, "torso_back");
+                              _nextColor(_limbs[2], 18.0, "torso_back");
                             });
                           },
                           onLongPress: () {
                             setState(() {
-                              _resetColor(_limbs[2], 9.0, "torso_back");
+                              _resetColor(_limbs[2], 18.0, "torso_back");
                             });
                           },
                           child: SvgPicture.asset(

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'components/Contact.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class Contacts extends StatefulWidget {
