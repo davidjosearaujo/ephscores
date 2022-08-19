@@ -6,22 +6,22 @@
         "number":"217162969"
     },
     {
-        "title":"Apoio a Cidadão com Deficiência",
+        "title":"Apoio ao Cidadão com Deficiência",
         "description":"A Linha do Cidadão com Deficiência é uma linha telefónica gratuita especialmente vocacionada para os problemas das pessoas com algum tipo de deficiência, prestando informações sobre os direitos e apoios que assistem a estes cidadãos, nomeadamente em áreas como a saúde, segurança social, habitação, equipamentos e serviços.",
         "number":"800208462"
     },
     {
-        "title":"Apoio a Cidadão Idoso",
+        "title":"Apoio ao Cidadão Idoso",
         "description":"A Linha do Cidadão Idoso é uma linha telefónica gratuita especialmente vocacionada para os problemas da população com uma idade mais avançada, prestando informações sobre os direitos e apoios que assistem aos mais velhos, nomeadamente em áreas como a saúde, segurança social, habitação, equipamentos e serviços.",
         "number":"800203531"
     },
     {
-        "title":"Apoio a Grávidas",
+        "title":"Apoio à Grávida",
         "description":"'Somos uma instituição particular de solidariedade social e já ajudámos mais de 4.000 mulheres a terem os seus filhos e a fortalecerem as suas famílias. Com 20 anos de trabalho no terreno, existimos para dar às mulheres o poder de decidir com liberdade.'",
         "number":"800208090"
     },
     {
-        "title":"Apoio a Jovens",
+        "title":"Apoio ao Jovem",
         "description":"",
         "number":"800208020"
     },
@@ -34,6 +34,11 @@
         "title":"Centro de Informação Antivenenos",
         "description":"O Centro de Informação Antivenenos (CIAV) é um centro médico de consulta telefónica na área da toxicologia, responsável pela prestação, em tempo útil, das informações necessárias e adequadas a profissionais de saúde ou ao público em geral, visando uma abordagem correta e eficaz a vítimas de intoxicação.",
         "number":"800250250"
+    },
+    {
+        "title":"Centro de Orientação de Doentes Urgentes",
+        "description":"Os Centros de Orientação de Doentes Urgentes (CODU) são Centrais de Emergência Médica responsáveis pela medicalização do Número Europeu de Emergência – 112.",
+        "number":"800203264"
     },
     {
         "title":"Comando Distrital de Operações de Socorro",

@@ -31,27 +31,36 @@ class _ContactState extends State<Contact> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.grey.shade300,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(8)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            title: Text(widget.title),
-            subtitle: Text(widget.description),
-            textColor: Color.fromRGBO(44, 73, 108, 1.0),
-            trailing: GestureDetector(
-              child: Icon(
-                Icons.phone,
-                color: Color.fromRGBO(44, 73, 108, 1.0),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        color: Colors.grey.shade300,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(
+                widget.title,
+                style: TextStyle(
+                  fontSize: 26,
+                ),
               ),
-              onTap: _makePhoneCall,
+              subtitle: Text(widget.description),
+              textColor: Color.fromRGBO(44, 73, 108, 1.0),
+              trailing: GestureDetector(
+                child: Icon(
+                  Icons.phone,
+                  color: Color.fromRGBO(44, 73, 108, 1.0),
+                  size: 36
+                ),
+                onTap: _makePhoneCall,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
