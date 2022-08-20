@@ -78,11 +78,33 @@ class _PediatricScoreState extends State<PediatricScore> {
     return true;
   }
 
-  void reset() {
+  Future<void> reset() async {
     widget.tap = List<int>.filled(3, -1);
     widget.pts = List<int>.filled(6, 0);
     widget.apgar = List<int>.filled(5, -1);
     widget.rootvals = [0, 0, 0];
+    widget.prefs1 = await SharedPreferences.getInstance();
+    // TAP
+    widget.prefs1.setInt('s1p.0', -1);
+    widget.prefs1.setInt('s1p.1', -1);
+    widget.prefs1.setInt('s1p.2', -1);
+    // PTS
+    widget.prefs1.setInt('s2p.0', 0);
+    widget.prefs1.setInt('s2p.1', 0);
+    widget.prefs1.setInt('s2p.2', 0);
+    widget.prefs1.setInt('s2p.3', 0);
+    widget.prefs1.setInt('s2p.4', 0);
+    widget.prefs1.setInt('s2p.5', 0);
+    // APGAR
+    widget.prefs1.setInt('s3p.0', -1);
+    widget.prefs1.setInt('s3p.1', -1);
+    widget.prefs1.setInt('s3p.2', -1);
+    widget.prefs1.setInt('s3p.3', -1);
+    widget.prefs1.setInt('s3p.4', -1);
+    // Display values
+    widget.prefs1.setInt("s1p.r", 0);
+    widget.prefs1.setInt("s2p.r", 0);
+    widget.prefs1.setInt("s3p.r", 0);
   }
 
   void tapCallback(List<int> i) {
@@ -141,7 +163,6 @@ class _PediatricScoreState extends State<PediatricScore> {
                   widget.prefs1 = await SharedPreferences.getInstance();
                   setState(() {
                     expanded = List<bool>.filled(3, false);
-                    widget.prefs1.clear();
                     reset();
                   });
                 },

@@ -143,7 +143,7 @@ class _ScoreState extends State<Score> {
     return true;
   }
 
-  void reset() {
+  Future<void> reset() async {
     widget.dir = false;
     widget.cincinnati = List<bool>.filled(3, false);
     widget.ecg = List<int>.filled(3, 0);
@@ -154,6 +154,51 @@ class _ScoreState extends State<Score> {
     widget.race = List<int>.filled(6, -1);
     widget.rts = List<int>.filled(2, -1);
     widget.rootvals = [0, 3, 3, 0, 0, 0, 0];
+    widget.prefs1 = await SharedPreferences.getInstance();
+    // Cincinnati
+    widget.prefs1.setBool("s1.0", false);
+    widget.prefs1.setBool("s1.1", false);
+    widget.prefs1.setBool("s1.2", false);
+    // Glasgow
+    widget.prefs1.setInt('s2.0', 0);
+    widget.prefs1.setInt('s2.1', 0);
+    widget.prefs1.setInt('s2.2', 0);
+    // NEWS
+    widget.prefs1.setInt("s4.0", -1);
+    widget.prefs1.setInt("s4.1", -1);
+    widget.prefs1.setInt("s4.2", -1);
+    widget.prefs1.setInt("s4.3", -1);
+    widget.prefs1.setInt("s4.4", -1);
+    widget.prefs1.setInt("s4.5", -1);
+    widget.prefs1.setInt("s4.6", -1);
+    // MGAP
+    widget.prefs1.setInt('s3.0', -1);
+    widget.prefs1.setInt('s3.1', -1);
+    widget.prefs1.setInt('s3.2', -1);
+    // PROACS
+    widget.prefs1.setInt('s5.0', -1);
+    widget.prefs1.setInt('s5.1', -1);
+    widget.prefs1.setInt('s5.2', -1);
+    widget.prefs1.setInt('s5.3', -1 );
+    // RACE
+    widget.prefs1.setBool('s6.d', false);
+    widget.prefs1.setInt('s6.0', -1);
+    widget.prefs1.setInt('s6.1', -1);
+    widget.prefs1.setInt('s6.2', -1);
+    widget.prefs1.setInt('s6.3', -1);
+    widget.prefs1.setInt('s6.4', -1);
+    widget.prefs1.setInt('s6.5', -1);
+    // RTS
+    widget.prefs1.setInt('s7.0', -1);
+    widget.prefs1.setInt('s7.1', -1);
+    // Display values
+    widget.prefs1.setInt("s1.r", 0);
+    widget.prefs1.setInt("s2.r", 3);
+    widget.prefs1.setInt("s3.r", 3);
+    widget.prefs1.setInt("s4.r", 0);
+    widget.prefs1.setInt("s5.r", 0);
+    widget.prefs1.setInt("s6.r", 0);
+    widget.prefs1.setInt("s7.r", 0);
   }
 
   void cincinattiCallback(List<bool> i) {
@@ -276,7 +321,6 @@ class _ScoreState extends State<Score> {
                   widget.prefs1 = await SharedPreferences.getInstance();
                   setState(() {
                     expanded = List<bool>.filled(8, false);
-                    widget.prefs1.clear();
                     reset();
                   });
                 },

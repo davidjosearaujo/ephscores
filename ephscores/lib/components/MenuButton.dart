@@ -25,7 +25,7 @@ class _MenuButtonState extends State<MenuButton> {
       padding: const EdgeInsets.all(8.0),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(5)),
+          borderRadius: BorderRadius.all(Radius.circular(20)),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.1),
@@ -35,10 +35,10 @@ class _MenuButtonState extends State<MenuButton> {
             ),
           ],
           gradient: LinearGradient(
-              colors: [Color.fromARGB(255, 223, 226, 232), Colors.white],
+              colors: [Color.fromARGB(255, 244, 247, 241), Colors.white],
               begin: const FractionalOffset(0.0, 0.0),
               end: const FractionalOffset(0.9, 0.0),
-              stops: [0.0, 1.0],
+              stops: [0.0, 7.0],
               tileMode: TileMode.clamp),
         ),
         child: Material(
@@ -46,7 +46,7 @@ class _MenuButtonState extends State<MenuButton> {
           child: InkWell(
             onTap: widget.onPressed,
             splashColor: Color.fromRGBO(44, 73, 108, 0.2),
-            borderRadius: BorderRadius.all(Radius.circular(5)),
+            borderRadius: BorderRadius.all(Radius.circular(20)),
             child: Container(
               alignment: Alignment.center,
               child: Padding(
