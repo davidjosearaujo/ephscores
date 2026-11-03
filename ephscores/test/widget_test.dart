@@ -112,7 +112,7 @@ void main() {
     expect(find.text('Ligeiro'), findsOneWidget);
     expect(find.text('O4 V5 M6'), findsOneWidget);
 
-    await tester.pageBack();
+    await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text('Ligeiro'), findsOneWidget);
   });
@@ -217,7 +217,7 @@ void main() {
     expect(copied, startsWith('EPHScores — evolução do doente'));
     expect(copied, contains('Avaliação 2'));
 
-    await tester.pageBack();
+    await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text('Último doente'), findsOneWidget);
   });
@@ -233,6 +233,79 @@ void main() {
     await tester.pumpAndSettle();
     expect(app.patient.startedAt, isNull);
     expect(find.text('Novo doente'), findsOneWidget);
+  });
+
+  testWidgets('info dialog shows the pubspec metadata', (tester) async {
+    await tester.pumpWidget(await buildApp(tester, openPatient: false));
+    await tester.tap(find.byTooltip('Informação'));
+    await tester.pumpAndSettle();
+    expect(find.text('com.davidaraujo.ephscores'), findsOneWidget);
+    expect(find.text('David Araújo'), findsOneWidget);
+    expect(
+      find.text('https://codeberg.org/davidjosearaujo/ephscores'),
+      findsOneWidget,
+    );
+    expect(find.text('Website'), findsNothing); // no homepage set yet
+    expect(
+      find.textContaining(RegExp(r'^\d+\.\d+\.\d+ \(\d+\)$')),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Fechar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Pacote'), findsNothing);
+  });
+
+  testWidgets('long-pressing an evaluation deletes it', (tester) async {
+    final app = await buildApp(tester);
+    seedEvaluations(app);
+    await tester.pumpWidget(app);
+    await tester.tap(find.text('Evolução (3)'));
+    await tester.pumpAndSettle();
+
+    final second = find.textContaining('Avaliação 2 ·');
+    // The page's own vertical list (the trend table scrolls sideways).
+    final page = find
+        .descendant(
+          of: find.byType(EvolutionPage),
+          matching: find.byType(Scrollable),
+        )
+        .first;
+    await tester.scrollUntilVisible(second, 100, scrollable: page);
+    await tester.longPress(second);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Apagar'));
+    await tester.pumpAndSettle();
+
+    expect(app.patient.evaluations, hasLength(2));
+    // Evaluations are renumbered: the old third is now the second.
+    expect(find.textContaining('Avaliação 3 ·'), findsNothing);
+  });
+
+  testWidgets('trend names stay put while the values scroll', (tester) async {
+    final app = await buildApp(tester);
+    for (var i = 0; i < 12; i++) {
+      app.scores.toggle('gcs', gcs.items[0], i.isEven ? 0 : 1);
+      app.patient.register(
+        app.scores.sheet,
+        app.burn.sheet,
+        at: app.patient.startedAt!.add(Duration(minutes: i + 1)),
+      );
+    }
+    await tester.pumpWidget(app);
+    await tester.tap(find.text('Evolução (12)'));
+    await tester.pumpAndSettle();
+
+    final name = find.text('ECG').first;
+    final first = find.text('#1');
+    final nameX = tester.getTopLeft(name).dx;
+    final firstX = tester.getTopLeft(first).dx;
+    // Newest in view first: #1 starts scrolled off to the left.
+    expect(firstX, lessThan(nameX));
+
+    await tester.drag(find.text('#12'), const Offset(2000, 0));
+    await tester.pumpAndSettle();
+    expect(tester.getTopLeft(name).dx, nameX);
+    expect(tester.getTopLeft(first).dx, greaterThan(nameX));
   });
 }
 

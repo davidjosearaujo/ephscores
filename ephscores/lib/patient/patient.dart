@@ -90,10 +90,10 @@ class PatientStore extends PersistedStore {
     return evaluation;
   }
 
-  /// Removes the most recent evaluation (e.g. registered by mistake).
-  void removeLast() {
-    if (!isActive || _evaluations.isEmpty) return;
-    _evaluations.removeLast();
+  /// Deletes the evaluation at [index] (oldest is 0), e.g. one registered
+  /// by mistake. Later evaluations keep their recorded durations.
+  void removeAt(int index) {
+    _evaluations.removeAt(index);
     changed();
   }
 

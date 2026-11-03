@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'burn/burn.dart';
 import 'patient/patient.dart';
@@ -33,6 +34,10 @@ class EPHScoresApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: buildTheme(Brightness.light),
         darkTheme: buildTheme(Brightness.dark),
+        // Portuguese for built-in widgets (licences page, tooltips).
+        locale: const Locale('pt', 'PT'),
+        supportedLocales: const [Locale('pt', 'PT')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
         builder: phoneWidth,
         home: const RootPage(),
       ),

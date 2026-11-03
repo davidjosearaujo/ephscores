@@ -1,8 +1,20 @@
 name: ephscores
-description: "Escalas de emergência pré-hospitalar. Funciona totalmente offline."
+description: "Escalas de emergência pré-hospitalar."
 publish_to: 'none'
 
+# Single source of the app's identity. The version flows into every
+# platform build; the info dialog reads this file at runtime (it is
+# bundled as an asset), and test/manifest_test.dart checks that the
+# Android, iOS and web manifests agree with app_info below.
 version: 2.0.0+9
+# homepage: (the PWA's address, once it is hosted)
+repository: https://codeberg.org/davidjosearaujo/ephscores
+
+app_info:
+  display_name: EPHScores
+  application_id: com.davidaraujo.ephscores
+  developer: David Araújo
+  developer_url: https://www.davidjosearaujo.dev
 
 environment:
   sdk: ^3.13.0
@@ -11,8 +23,11 @@ dependencies:
   flutter:
     sdk: flutter
   shared_preferences: ^2.5.0
+  flutter_localizations:
+    sdk: flutter
   url_launcher: ^6.3.0
   web: ^1.1.0
+  yaml: ^3.1.0
 
 dev_dependencies:
   flutter_test:
@@ -27,6 +42,7 @@ flutter:
     - assets/Contacts.json
     - assets/EPHScores_logo.png
     - assets/fonts/OFL.txt
+    - pubspec.yaml
 
   # Bundled so the web build never fetches fonts from the network.
   fonts:

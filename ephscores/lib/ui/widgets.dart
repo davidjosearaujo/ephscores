@@ -61,31 +61,6 @@ class AppLogo extends StatelessWidget {
   }
 }
 
-/// "Funciona sem rede" note; opens the licences page.
-class OfflineNote extends StatelessWidget {
-  const OfflineNote({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return TextButton.icon(
-      style: TextButton.styleFrom(
-        foregroundColor: theme.colorScheme.outline,
-        textStyle: theme.textTheme.bodySmall,
-      ),
-      onPressed: () => showLicensePage(
-        context: context,
-        applicationName: 'EPHScores',
-        applicationLegalese:
-            'Auxiliar de cálculo. Não substitui a avaliação clínica '
-            'nem os protocolos em vigor.',
-      ),
-      icon: const Icon(Icons.wifi_off, size: 14),
-      label: const Text('Funciona sem rede. Nenhum dado sai do dispositivo.'),
-    );
-  }
-}
-
 /// Section heading used inside pages.
 class SectionLabel extends StatelessWidget {
   const SectionLabel(this.text, {super.key});

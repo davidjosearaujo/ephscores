@@ -72,17 +72,20 @@ void main() {
       expect(patient.hasUnsavedChanges(scores.sheet, burns.sheet), isTrue);
     });
 
-    test('remove last, finish, clear and start again', () {
+    test('delete any evaluation, finish, clear and start again', () {
       gcs15();
       patient
         ..register(scores.sheet, burns.sheet, at: at(1))
-        ..register(scores.sheet, burns.sheet, at: at(2))
-        ..removeLast();
-      expect(patient.evaluations, hasLength(1));
+        ..register(scores.sheet, burns.sheet, at: at(4))
+        ..register(scores.sheet, burns.sheet, at: at(6))
+        ..removeAt(1);
+      expect(patient.evaluations.map((e) => e.registeredAt), [at(1), at(6)]);
+      // The later one keeps the duration it was recorded with.
+      expect(patient.evaluations.last.duration, const Duration(minutes: 2));
 
-      patient.finish(at: at(5));
+      patient.finish(at: at(8));
       expect((patient.isActive, patient.isFinished), (false, true));
-      patient.removeLast(); // finished records are final
+      patient.removeAt(0); // still allowed once finished
       expect(patient.evaluations, hasLength(1));
 
       patient.start(at: at(30));

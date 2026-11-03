@@ -7,6 +7,7 @@ import '../platform/install_hint.dart';
 import '../theme.dart';
 import 'contacts_page.dart';
 import 'evolution_page.dart';
+import 'info_dialog.dart';
 import 'start_page.dart';
 import 'widgets.dart';
 
@@ -66,10 +67,14 @@ class _WelcomePageState extends State<WelcomePage> {
             SliverFillRemaining(
               hasScrollBody: false,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+                padding: const EdgeInsets.fromLTRB(24, 4, 24, 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    const Align(
+                      alignment: Alignment.topRight,
+                      child: InfoButton(),
+                    ),
                     if (_showInstallHint)
                       _InstallHint(onDismiss: _dismissInstallHint),
                     const Spacer(),
@@ -132,8 +137,7 @@ class _WelcomePageState extends State<WelcomePage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    const OfflineNote(),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),

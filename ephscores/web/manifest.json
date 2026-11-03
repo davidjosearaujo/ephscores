@@ -1,7 +1,7 @@
 {
   "name": "EPHScores",
   "short_name": "EPHScores",
-  "description": "Escalas de emergência pré-hospitalar. Funciona sem rede.",
+  "description": "Escalas de emergência pré-hospitalar.",
   "lang": "pt",
   "start_url": ".",
   "scope": ".",

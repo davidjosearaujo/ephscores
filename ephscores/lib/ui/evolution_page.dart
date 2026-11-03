@@ -57,15 +57,20 @@ class EvolutionPage extends StatelessWidget {
                 const SectionLabel('Tendência'),
                 _TrendTable(evaluations: evaluations),
                 const SectionLabel('Avaliações'),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+                  child: Text(
+                    'Mantenha premida uma avaliação para a apagar.',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
                 for (final (i, e) in evaluations.indexed.toList().reversed)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: _EvaluationCard(
-                      number: i + 1,
+                      index: i,
                       evaluation: e,
                       isLatest: i == evaluations.length - 1,
-                      canDelete:
-                          patient.isActive && i == evaluations.length - 1,
                     ),
                   ),
               ],
@@ -354,26 +359,26 @@ class _BurnPill extends StatelessWidget {
 
 class _EvaluationCard extends StatelessWidget {
   const _EvaluationCard({
-    required this.number,
+    required this.index,
     required this.evaluation,
     required this.isLatest,
-    required this.canDelete,
   });
 
-  final int number;
+  /// Position in the timeline, oldest first.
+  final int index;
   final Evaluation evaluation;
   final bool isLatest;
-  final bool canDelete;
 
   Future<void> _delete(BuildContext context) async {
+    HapticFeedback.mediumImpact();
     final patient = AppScope.of(context).patient;
     if (await confirm(
       context,
-      title: 'Apagar avaliação $number?',
+      title: 'Apagar avaliação ${index + 1}?',
       message: 'As respostas atuais no painel não são alteradas.',
       action: 'Apagar',
     )) {
-      patient.removeLast();
+      patient.removeAt(index);
     }
   }
 
@@ -382,46 +387,41 @@ class _EvaluationCard extends StatelessWidget {
     final e = evaluation;
     final scores = e.scores.answered;
     final n = scores.length + (e.burns.hasBurns ? 1 : 0);
-    return Card(
-      child: ExpansionTile(
-        initiallyExpanded: isLatest,
-        shape: const Border(),
-        collapsedShape: const Border(),
-        title: Text(
-          'Avaliação $number · ${formatClock(e.registeredAt)}',
-          style: const TextStyle(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          'Duração ${formatDuration(e.duration)} · '
-          '$n ${n == 1 ? 'registo' : 'registos'}',
-        ),
-        children: [
-          for (final s in scores)
-            _ResultRow(
-              title: s.name,
-              subtitle: _detail(e.scores, s.id),
-              trailing: ResultPill(e.scores.resultFor(s.id), compact: true),
-            ),
-          if (e.burns.hasBurns)
-            _ResultRow(
-              title: 'Queimados',
-              subtitle: burnLine(e.burns).split(' — ').last,
-              trailing: _BurnPill(e.burns.tbsa),
-            ),
-          if (n == 0) const ListTile(dense: true, title: Text('Sem dados')),
-          if (canDelete)
-            Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
-                child: TextButton.icon(
-                  onPressed: () => _delete(context),
-                  icon: const Icon(Icons.delete_outline),
-                  label: const Text('Apagar'),
-                ),
+    return GestureDetector(
+      onLongPress: () => _delete(context),
+      child: Card(
+        child: ExpansionTile(
+          // Keyed by time so expansion state follows the evaluation, not its
+          // position, when another one is deleted.
+          key: PageStorageKey(e.registeredAt),
+          initiallyExpanded: isLatest,
+          shape: const Border(),
+          collapsedShape: const Border(),
+          title: Text(
+            'Avaliação ${index + 1} · ${formatClock(e.registeredAt)}',
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(
+            'Duração ${formatDuration(e.duration)} · '
+            '$n ${n == 1 ? 'registo' : 'registos'}',
+          ),
+          children: [
+            for (final s in scores)
+              _ResultRow(
+                title: s.name,
+                subtitle: _detail(e.scores, s.id),
+                trailing: ResultPill(e.scores.resultFor(s.id), compact: true),
               ),
-            ),
-        ],
+            if (e.burns.hasBurns)
+              _ResultRow(
+                title: 'Queimados',
+                subtitle: burnLine(e.burns).split(' — ').last,
+                trailing: _BurnPill(e.burns.tbsa),
+              ),
+            if (n == 0) const ListTile(dense: true, title: Text('Sem dados')),
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }
