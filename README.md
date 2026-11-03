@@ -72,6 +72,21 @@ flutter run
 Para acrescentar uma escala basta criar um `ScoreDefinition` em
 `lib/scores/adult.dart` ou `pediatric.dart` e juntá-lo à lista.
 
+### Compilar tudo (APK + web)
+
+```sh
+cd ephscores
+scripts/build_all.sh                # analisa, testa e gera o APK e a web (PWA)
+scripts/build_all.sh all            # também gera o app bundle (.aab)
+scripts/build_all.sh --skip-tests --split apk   # só o APK, um por arquitetura
+```
+
+Os ficheiros Android ficam em `ephscores/dist/` (com a versão no nome) e a
+web em `ephscores/build/web`. Precisa do Flutter no `PATH` e, para o Android,
+do Android SDK (`flutter doctor` indica o que falta). No Windows, usar o Git
+Bash ou o WSL. Sem `android/key.properties`, o Android é assinado com a chave
+de debug: serve para testar, mas não atualiza a versão da Google Play.
+
 ### Publicar a versão web (PWA)
 
 ```sh

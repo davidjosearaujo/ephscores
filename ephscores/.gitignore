@@ -49,3 +49,6 @@ app.*.map.json
 
 # Firebase Hosting
 .firebase/
+
+# Release artifacts from scripts/build_all.sh
+dist/
