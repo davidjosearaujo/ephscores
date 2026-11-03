@@ -1,125 +1,41 @@
-import 'dart:async';
-import 'package:ephscores/components/MenuButton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'Burn.dart';
-import 'PediatricScore.dart';
-import 'Start.dart';
-import 'Score.dart';
-import 'Contacts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+import 'app.dart';
+import 'burn/burn.dart';
+import 'scores/score_store.dart';
+import 'start/start.dart';
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  runApp(EPHScores());
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  final prefs = await SharedPreferences.getInstance();
+  await migrateLegacyPrefs(prefs);
+  runApp(
+    EPHScoresApp(
+      scores: ScoreStore(prefs),
+      start: StartStore(prefs),
+      burn: BurnStore(prefs),
+    ),
+  );
 }
 
-class EPHScores extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'EPHScores',
-      initialRoute: '/',
-      routes: {
-        "/": (context) => EPHScoresPage(),
-        "/scores": (context) => Score(),
-        "/burn": (context) => Burn(),
-        "/start": (context) => Start(),
-        "/ped_scores": (context) => PediatricScore(),
-        "/contacts": (context) => Contacts(),
-      },
-      themeMode: ThemeMode.dark,
-    );
+/// Version 1 stored dozens of loose keys ("s4.3", "head_front", ...). Carry
+/// over the START counters and drop everything else.
+Future<void> migrateLegacyPrefs(SharedPreferences prefs) async {
+  final legacy = prefs.getKeys().where((k) => !k.endsWith('.v2')).toList();
+  if (legacy.isEmpty) return;
+  final start = StartStore(prefs);
+  if (start.total == 0) {
+    for (final (i, c) in StartCategory.values.indexed) {
+      final n = prefs.getInt('p${i + 1}') ?? 0;
+      for (var j = 0; j < n; j++) {
+        start.add(c);
+      }
+    }
   }
-}
-
-class EPHScoresPage extends StatefulWidget {
-  EPHScoresPage({Key key, this.title}) : super(key: key);
-  final String title;
-
-  @override
-  _EPHScoresPageState createState() => _EPHScoresPageState();
-}
-
-class _EPHScoresPageState extends State<EPHScoresPage> {
-  var isSelected = [false, false];
-  bool wait = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        actions: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-            child: Image(
-              image: AssetImage("assets/EPHScores_logo.png"),
-            ),
-          ),
-        ],
-        backgroundColor: Colors.white,
-        foregroundColor: Color.fromRGBO(44, 73, 108, 1.0),
-        shadowColor: Colors.transparent,
-        title: Text(
-          "EPHScores",
-          style: TextStyle(
-            fontSize: 30,
-          ),
-        ),
-      ),
-      body: SafeArea(
-        minimum: EdgeInsets.fromLTRB(8, 10, 8, 10),
-        child: Center(
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Expanded(
-                  child: MenuButton(
-                      text: "Escalas Gerais",
-                      icon: Icons.person,
-                      onPressed: () {
-                        Navigator.pushNamed(context, "/scores");
-                      }),
-                ),
-                Expanded(
-                  child: MenuButton(
-                      text: "Escalas Pediátricas",
-                      icon: Icons.child_care,
-                      onPressed: () {
-                        Navigator.pushNamed(context, "/ped_scores");
-                      }),
-                ),
-                Expanded(
-                  child: MenuButton(
-                      text: "Avaliação Queimado",
-                      icon: Icons.local_fire_department,
-                      onPressed: () {
-                        Navigator.pushNamed(context, "/burn");
-                      }),
-                ),
-                Expanded(
-                  child: MenuButton(
-                      text: "Triagem START",
-                      icon: Icons.groups,
-                      onPressed: () {
-                        Navigator.pushNamed(context, "/start");
-                      }),
-                ),
-                Expanded(
-                  child: MenuButton(
-                      text: "Contactos Importantes",
-                      icon: Icons.phone,
-                      onPressed: () {
-                        Navigator.pushNamed(context, "/contacts");
-                      }),
-                )
-              ]),
-        ),
-      ),
-    );
+  for (final k in legacy) {
+    await prefs.remove(k);
   }
 }

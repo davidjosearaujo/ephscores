@@ -2,35 +2,69 @@
 
 ![Banner](UI/Images/App_banner.png)
 
-## **O que é ?**
+## O que é?
 
-### EPHScores é uma aplicação cujo objetivo é ajudar profissionais de saúde a realizar avaliação de vítimas, com base no cálculo de escalas de emergência, de forma rápida e simples !
+EPHScores ajuda profissionais de emergência pré-hospitalar a avaliar vítimas
+de forma rápida e simples, no terreno.
 
-Para além disso ainda oferece a possibilidade de realizar triagem START e guardar o número de vítimas, organizadas por gravidade.
+- **Escalas gerais:** Cincinnati, Glasgow (ECG), MGAP, NEWS2, ProACS, RACE e RTS
+- **Escalas pediátricas:** APGAR, Triângulo de Avaliação Pediátrica (TAP) e PTS
+- **Avaliação do queimado:** regra dos nove para adulto e criança, com grau por região
+- **Triagem START:** algoritmo passo a passo e contagem de vítimas por prioridade
+- **Contactos úteis:** linhas de apoio com chamada direta
 
-## **Construido usando** 
+### Feita para o terreno
+
+- **100 % offline.** A versão de produção não pede permissão de Internet; nada
+  sai do dispositivo.
+- **Botões grandes**, pensados para usar com luvas.
+- **Nada se perde:** as respostas são guardadas a cada toque e sobrevivem ao
+  fecho da aplicação. "Novo doente" limpa tudo de uma vez.
+- **Modo escuro** automático, para turnos noturnos.
+
+> A aplicação é um auxiliar de cálculo. Não substitui a avaliação clínica nem
+> os protocolos em vigor.
+
+## Construída com
+
 [![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev/)
-[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/?gclsrc=ds&gclsrc=ds)
+[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev/)
 
-## **Sistema operativo**
-Uma vez que construido com Flutter, a aplicação estará disponível tanto para Android como para IOS
+Interface em Material 3, com a paleta original (azul-marinho e cores de
+semáforo).
 
-- [x] Google Play
-- [ ] App Store
+[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.davidaraujo.ephscores)
 
-[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.davidaraujo.ephscores) 
-[![IOS](https://img.shields.io/badge/App_Store-0D96F6?style=for-the-badge&logo=app-store&logoColor=white)]()
+## Desenvolvimento
 
-Se esperar não for o teu forte e usares Android, poderás descarregar a APK diretamente do link abaixo
+O projeto Flutter está em [`ephscores/`](ephscores).
 
-[![Android](https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/DavidAraujo98/EPHScores/raw/main/Release/EPHScores.apk)
+```sh
+cd ephscores
+flutter pub get
+flutter test          # testes das escalas, START, queimados e interface
+flutter run
+```
 
+### Estrutura
 
-## **Design**
+| Pasta | Conteúdo |
+|---|---|
+| `lib/scores/` | Definição de cada escala como dados + cálculo (sem dependências de UI) |
+| `lib/start/`, `lib/burn/` | Algoritmo START e regra dos nove |
+| `lib/ui/` | Ecrãs; um único ecrã genérico desenha qualquer escala |
+| `test/` | Testes unitários e de interface |
 
-De forma a que a *user interface* fosse o mais simples possivel e similar entre dispositivos, é utilizado tema e componentes *MATERIAL UI*
+Para acrescentar uma escala basta criar um `ScoreDefinition` em
+`lib/scores/adult.dart` ou `pediatric.dart` e juntá-lo à lista.
 
-[![Material UI](https://img.shields.io/badge/Material--UI-0081CB?style=for-the-badge&logo=material-ui&logoColor=white)](https://material-ui.com/)
+### Publicar
 
-### **README built with**
-[![Markdown](https://img.shields.io/badge/Markdown-000000?style=for-the-badge&logo=markdown&logoColor=white)](https://en.wikipedia.org/wiki/Markdown)
+Criar `ephscores/android/key.properties` (fora do git) com `storeFile`,
+`storePassword`, `keyAlias` e `keyPassword`, e depois:
+
+```sh
+flutter build appbundle
+```
+
+Sem esse ficheiro, a versão de produção é assinada com a chave de debug.
