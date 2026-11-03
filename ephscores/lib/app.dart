@@ -94,6 +94,13 @@ extension PatientFlow on AppScope {
     patient.start();
   }
 
+  /// Forgets the patient and every answer, leaving nothing on the device.
+  void discardPatient() {
+    scores.resetAll();
+    burn.clearAll();
+    patient.clear();
+  }
+
   /// Something has been assessed, so there is something to register.
   bool get canRegister => !scores.isEmpty || !burn.isEmpty;
 

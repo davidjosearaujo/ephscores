@@ -235,6 +235,24 @@ void main() {
     expect(find.text('Novo doente'), findsOneWidget);
   });
 
+  testWidgets('long-pressing "Último doente" deletes it', (tester) async {
+    final app = await buildApp(tester);
+    seedEvaluations(app);
+    app.patient.finish();
+    await tester.pumpWidget(app);
+    expect(find.text('Último doente'), findsOneWidget);
+
+    await tester.longPress(find.text('Último doente'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Apagar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Último doente'), findsNothing);
+    expect(app.patient.startedAt, isNull);
+    // Nothing about the patient is left behind.
+    expect((app.scores.isEmpty, app.burn.isEmpty), (true, true));
+  });
+
   testWidgets('info dialog shows the pubspec metadata', (tester) async {
     await tester.pumpWidget(await buildApp(tester, openPatient: false));
     await tester.tap(find.byTooltip('Informação'));

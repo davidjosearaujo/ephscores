@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app.dart';
@@ -56,93 +57,111 @@ class _WelcomePageState extends State<WelcomePage> {
     scope.startPatient();
   }
 
+  Future<void> _deleteLastPatient() async {
+    HapticFeedback.mediumImpact();
+    final scope = AppScope.of(context);
+    if (await confirm(
+      context,
+      title: 'Apagar último doente?',
+      message: 'Apaga o resumo e todas as avaliações deste doente.',
+      action: 'Apagar',
+    )) {
+      scope.discardPatient();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final patient = AppScope.of(context).patient;
-    return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 4, 24, 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Align(
-                      alignment: Alignment.topRight,
-                      child: InfoButton(),
-                    ),
-                    if (_showInstallHint)
-                      _InstallHint(onDismiss: _dismissInstallHint),
-                    const Spacer(),
-                    const Center(child: AppLogo(size: 152)),
-                    const SizedBox(height: 24),
-                    Text(
-                      'EPHScores',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.displaySmall?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w800,
+    // Rebuilds when the last patient is deleted.
+    return ListenableBuilder(
+      listenable: patient,
+      builder: (context, _) => Scaffold(
+        body: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 4, 24, 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Align(
+                        alignment: Alignment.topRight,
+                        child: InfoButton(),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Escalas de emergência pré-hospitalar',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const Spacer(),
-                    FilledButton.icon(
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size.fromHeight(64),
-                        textStyle: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
+                      if (_showInstallHint)
+                        _InstallHint(onDismiss: _dismissInstallHint),
+                      const Spacer(),
+                      const Center(child: AppLogo(size: 152)),
+                      const SizedBox(height: 24),
+                      Text(
+                        'EPHScores',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.displaySmall?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                      onPressed: _newPatient,
-                      icon: const Icon(Icons.person_add_alt, size: 28),
-                      label: const Text('Novo doente'),
-                    ),
-                    if (patient.isFinished) ...[
-                      const SizedBox(height: 12),
-                      _LastPatientCard(
-                        onTap: () => pushPage(context, const EvolutionPage()),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Escalas de emergência pré-hospitalar',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
-                    ],
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _SecondaryButton(
-                            icon: Icons.groups,
-                            label: 'Triagem START',
-                            onPressed: () =>
-                                pushPage(context, const StartPage()),
+                      const Spacer(),
+                      FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          minimumSize: const Size.fromHeight(64),
+                          textStyle: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _SecondaryButton(
-                            icon: Icons.phone,
-                            label: 'Contactos',
-                            onPressed: () =>
-                                pushPage(context, const ContactsPage()),
-                          ),
+                        onPressed: _newPatient,
+                        icon: const Icon(Icons.person_add_alt, size: 28),
+                        label: const Text('Novo doente'),
+                      ),
+                      if (patient.isFinished) ...[
+                        const SizedBox(height: 12),
+                        _LastPatientCard(
+                          onTap: () => pushPage(context, const EvolutionPage()),
+                          onLongPress: _deleteLastPatient,
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 16),
-                  ],
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _SecondaryButton(
+                              icon: Icons.groups,
+                              label: 'Triagem START',
+                              onPressed: () =>
+                                  pushPage(context, const StartPage()),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _SecondaryButton(
+                              icon: Icons.phone,
+                              label: 'Contactos',
+                              onPressed: () =>
+                                  pushPage(context, const ContactsPage()),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -177,9 +196,12 @@ class _SecondaryButton extends StatelessWidget {
 
 /// Entry to the finished patient's summary, kept until the next patient.
 class _LastPatientCard extends StatelessWidget {
-  const _LastPatientCard({required this.onTap});
+  const _LastPatientCard({required this.onTap, required this.onLongPress});
 
   final VoidCallback onTap;
+
+  /// Deletes the patient (after confirmation).
+  final VoidCallback onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -197,10 +219,13 @@ class _LastPatientCard extends StatelessWidget {
         subtitle: Text(
           '${formatClock(patient.startedAt!)}–'
           '${formatClock(patient.finishedAt!)} · '
-          '$n ${n == 1 ? 'avaliação' : 'avaliações'}',
+          '$n ${n == 1 ? 'avaliação' : 'avaliações'}\n'
+          'Mantenha premido para apagar',
         ),
+        isThreeLine: true,
         trailing: Icon(Icons.chevron_right, color: theme.colorScheme.outline),
         onTap: onTap,
+        onLongPress: onLongPress,
       ),
     );
   }

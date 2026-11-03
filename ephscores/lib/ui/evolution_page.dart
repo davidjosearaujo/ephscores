@@ -162,9 +162,7 @@ class _EmptyState extends StatelessWidget {
       return;
     }
     if (context.mounted) Navigator.pop(context);
-    scope.scores.resetAll();
-    scope.burn.clearAll();
-    scope.patient.clear();
+    scope.discardPatient();
   }
 
   @override
