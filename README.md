@@ -33,7 +33,12 @@ de forma rápida e simples, no terreno.
 Interface em Material 3, com a paleta original (azul-marinho e cores de
 semáforo).
 
-[![Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.davidaraujo.ephscores)
+## Onde instalar
+
+- **Android:** [Google Play](https://play.google.com/store/apps/details?id=com.davidaraujo.ephscores)
+- **iPhone / iPad:** abrir o site no Safari, tocar em *Partilhar* e depois
+  em *Adicionar ao ecrã principal*. A aplicação web (PWA) fica guardada no
+  dispositivo e funciona sem rede a partir da primeira abertura.
 
 ## Desenvolvimento
 
@@ -53,12 +58,25 @@ flutter run
 | `lib/scores/` | Definição de cada escala como dados + cálculo (sem dependências de UI) |
 | `lib/start/`, `lib/burn/` | Algoritmo START e regra dos nove |
 | `lib/ui/` | Ecrãs; um único ecrã genérico desenha qualquer escala |
+| `web/`, `scripts/` | PWA: manifesto, service worker e script de build |
 | `test/` | Testes unitários e de interface |
 
 Para acrescentar uma escala basta criar um `ScoreDefinition` em
 `lib/scores/adult.dart` ou `pediatric.dart` e juntá-lo à lista.
 
-### Publicar
+### Publicar a versão web (PWA)
+
+```sh
+cd ephscores
+scripts/build_web.sh                   # build em build/web, com cache offline (sw.js)
+firebase deploy --only hosting --project <id-do-projeto>
+```
+
+O `firebase.json` já está configurado. A build inclui o motor gráfico e as
+fontes, sem depender de CDNs. Cada build gera uma nova versão da cache, e os
+utilizadores recebem a atualização na abertura seguinte.
+
+### Publicar no Google Play
 
 Criar `ephscores/android/key.properties` (fora do git) com `storeFile`,
 `storePassword`, `keyAlias` e `keyPassword`, e depois:

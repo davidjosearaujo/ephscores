@@ -12,10 +12,12 @@ dependencies:
     sdk: flutter
   shared_preferences: ^2.5.0
   url_launcher: ^6.3.0
+  web: ^1.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  crypto: ^3.0.6
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.0
 
@@ -24,6 +26,21 @@ flutter:
   assets:
     - assets/Contacts.json
     - assets/EPHScores_logo.png
+    - assets/fonts/OFL.txt
+
+  # Bundled so the web build never fetches fonts from the network.
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Roboto-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Roboto-ExtraBold.ttf
+          weight: 800
 
 flutter_launcher_icons:
   android: true

@@ -173,8 +173,13 @@ class _OptionTile extends StatelessWidget {
       selected: selected,
       button: true,
       child: Material(
-        color: selected ? scheme.primary : scheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(14),
+        color: selected ? scheme.primary : scheme.tile,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: selected
+              ? BorderSide.none
+              : BorderSide(color: scheme.tileBorder),
+        ),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(14),
@@ -242,6 +247,7 @@ class _LinkedScoreCard extends StatelessWidget {
       padding: const EdgeInsets.only(top: 16),
       child: Card(
         color: Theme.of(context).colorScheme.secondaryContainer,
+        shape: filledCardShape,
         child: ListTile(
           contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
           title: Text(

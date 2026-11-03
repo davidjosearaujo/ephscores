@@ -25,6 +25,25 @@ abstract final class Palette {
   };
 }
 
+/// Surfaces with enough contrast to tell cards apart from the page outdoors.
+extension AppSurfaces on ColorScheme {
+  bool get _dark => brightness == Brightness.dark;
+
+  /// Page background, slightly tinted so white cards stand out.
+  Color get pageBackground => _dark ? surface : surfaceContainer;
+
+  /// Cards and unselected option tiles.
+  Color get tile => _dark ? surfaceContainerHigh : surfaceContainerLowest;
+
+  Color get tileBorder =>
+      _dark ? outlineVariant : outline.withValues(alpha: 0.35);
+}
+
+const cardRadius = BorderRadius.all(Radius.circular(20));
+
+/// Shape for cards with their own fill colour, which need no outline.
+const filledCardShape = RoundedRectangleBorder(borderRadius: cardRadius);
+
 ThemeData buildTheme(Brightness brightness) {
   final dark = brightness == Brightness.dark;
   var scheme = ColorScheme.fromSeed(
@@ -33,12 +52,12 @@ ThemeData buildTheme(Brightness brightness) {
   );
   if (!dark) scheme = scheme.copyWith(primary: Palette.navy);
 
-  const radius = BorderRadius.all(Radius.circular(20));
   return ThemeData(
     colorScheme: scheme,
-    scaffoldBackgroundColor: scheme.surface,
+    fontFamily: 'Roboto',
+    scaffoldBackgroundColor: scheme.pageBackground,
     appBarTheme: AppBarTheme(
-      backgroundColor: scheme.surface,
+      backgroundColor: scheme.pageBackground,
       foregroundColor: dark ? scheme.onSurface : Palette.navy,
       surfaceTintColor: Colors.transparent,
       centerTitle: false,
@@ -51,8 +70,11 @@ ThemeData buildTheme(Brightness brightness) {
     cardTheme: CardThemeData(
       elevation: 0,
       margin: EdgeInsets.zero,
-      color: scheme.surfaceContainerLow,
-      shape: const RoundedRectangleBorder(borderRadius: radius),
+      color: scheme.tile,
+      shape: RoundedRectangleBorder(
+        borderRadius: cardRadius,
+        side: BorderSide(color: scheme.tileBorder),
+      ),
       clipBehavior: Clip.antiAlias,
     ),
     filledButtonTheme: FilledButtonThemeData(
@@ -67,6 +89,12 @@ ThemeData buildTheme(Brightness brightness) {
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: SegmentedButton.styleFrom(minimumSize: const Size(0, 48)),
     ),
+    searchBarTheme: SearchBarThemeData(
+      elevation: const WidgetStatePropertyAll(0),
+      backgroundColor: WidgetStatePropertyAll(scheme.tile),
+      side: WidgetStatePropertyAll(BorderSide(color: scheme.tileBorder)),
+    ),
+    navigationBarTheme: NavigationBarThemeData(backgroundColor: scheme.tile),
     snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
   );
 }

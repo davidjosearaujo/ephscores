@@ -185,6 +185,7 @@ class _TbsaCard extends StatelessWidget {
         formatPercent(store.percentWhere((x) => x == d));
     return Card(
       color: theme.colorScheme.primaryContainer,
+      shape: filledCardShape,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
         child: Row(
@@ -275,8 +276,13 @@ class _BrushChip extends StatelessWidget {
       selected: selected,
       button: true,
       child: Material(
-        color: selected ? scheme.primary : scheme.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(14),
+        color: selected ? scheme.primary : scheme.tile,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: selected
+              ? BorderSide.none
+              : BorderSide(color: scheme.tileBorder),
+        ),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(14),

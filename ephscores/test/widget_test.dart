@@ -31,6 +31,13 @@ Future<EPHScoresApp> buildApp(WidgetTester tester) async {
 /// The scrollable of the page on top (pages underneath stay mounted).
 final pageScrollable = find.byType(Scrollable).last;
 
+/// Taps a home-screen entry, scrolling to it first on short screens.
+Future<void> openFromHome(WidgetTester tester, String label) async {
+  await tester.ensureVisible(find.text(label));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(label));
+}
+
 void main() {
   group('large text', largeTextTests);
 
@@ -38,7 +45,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(await buildApp(tester));
-    await tester.tap(find.text('Escalas gerais'));
+    await openFromHome(tester, 'Escalas gerais');
     await tester.pumpAndSettle();
     await tester.tap(find.text('ECG'));
     await tester.pumpAndSettle();
@@ -66,7 +73,7 @@ void main() {
   testWidgets('START flow records a victim', (tester) async {
     final app = await buildApp(tester);
     await tester.pumpWidget(app);
-    await tester.tap(find.text('Triagem START'));
+    await openFromHome(tester, 'Triagem START');
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Não')); // walks?
@@ -85,7 +92,7 @@ void main() {
   testWidgets('tapping the body diagram paints a region', (tester) async {
     final app = await buildApp(tester);
     await tester.pumpWidget(app);
-    await tester.tap(find.text('Avaliação do queimado'));
+    await openFromHome(tester, 'Avaliação do queimado');
     await tester.pumpAndSettle();
 
     final diagram = find

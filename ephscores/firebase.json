@@ -1,0 +1,16 @@
+{
+  "hosting": {
+    "public": "build/web",
+    "ignore": ["firebase.json", "**/.*", "**/*.symbols"],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+      },
+      {
+        "source": "**/*.wasm",
+        "headers": [{ "key": "Content-Type", "value": "application/wasm" }]
+      }
+    ]
+  }
+}

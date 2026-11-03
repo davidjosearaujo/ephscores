@@ -67,6 +67,7 @@ class _EmergencyCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: Palette.red,
+      shape: filledCardShape,
       child: ListTile(
         contentPadding: const EdgeInsets.fromLTRB(20, 8, 12, 8),
         title: const Text(

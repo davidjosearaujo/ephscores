@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,6 +11,11 @@ import 'start/start.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  LicenseRegistry.addLicense(() async* {
+    yield LicenseEntryWithLineBreaks([
+      'Roboto',
+    ], await rootBundle.loadString('assets/fonts/OFL.txt'));
+  });
   final prefs = await SharedPreferences.getInstance();
   await migrateLegacyPrefs(prefs);
   runApp(

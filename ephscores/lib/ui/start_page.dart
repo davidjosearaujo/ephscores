@@ -259,6 +259,7 @@ class _ResultView extends StatelessWidget {
     final fg = onCategoryColor(category);
     return Card(
       color: categoryColor(category),
+      shape: filledCardShape,
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -445,6 +446,7 @@ class _CountTile extends StatelessWidget {
     final count = store.count(category);
     return Card(
       color: categoryColor(category),
+      shape: filledCardShape,
       child: Padding(
         padding: const EdgeInsets.all(8),
         child: Column(

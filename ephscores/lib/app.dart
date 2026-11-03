@@ -29,10 +29,24 @@ class EPHScoresApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: buildTheme(Brightness.light),
         darkTheme: buildTheme(Brightness.dark),
+        builder: phoneWidth,
         home: const HomePage(),
       ),
     );
   }
+}
+
+/// Keeps the phone layout on wide screens (desktop browsers, tablets).
+Widget phoneWidth(BuildContext context, Widget? child) {
+  return ColoredBox(
+    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+    child: Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: child,
+      ),
+    ),
+  );
 }
 
 /// Gives every page access to the app's stores.
