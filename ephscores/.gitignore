@@ -52,3 +52,8 @@ app.*.map.json
 
 # Release artifacts from scripts/build_all.sh
 dist/
+
+# Firebase client configs (keys and app IDs); the web app only needs
+# firebase.json and .firebaserc, which hold no secrets.
+**/google-services.json
+**/GoogleService-Info.plist

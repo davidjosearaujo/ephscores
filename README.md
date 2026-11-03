@@ -92,12 +92,16 @@ de debug: serve para testar, mas não atualiza a versão da Google Play.
 ```sh
 cd ephscores
 scripts/build_web.sh                   # build em build/web, com cache offline (sw.js)
-firebase deploy --only hosting --project <id-do-projeto>
+firebase deploy --only hosting
 ```
 
-O `firebase.json` já está configurado. A build inclui o motor gráfico e as
-fontes, sem depender de CDNs. Cada build gera uma nova versão da cache, e os
-utilizadores recebem a atualização na abertura seguinte.
+O `firebase.json` e o `.firebaserc` (projeto `ephscores-7e4eb`) já estão
+configurados; basta ter o Firebase CLI e fazer `firebase login`. O endereço
+por omissão é https://ephscores-7e4eb.web.app.
+
+A build inclui o motor gráfico e as fontes, sem depender de CDNs. Cada build
+gera uma nova versão da cache, e os utilizadores recebem a atualização na
+abertura seguinte.
 
 ### Publicar no Google Play
 
