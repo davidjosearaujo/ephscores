@@ -240,32 +240,43 @@ void main() {
   });
 
   group('ProACS', () {
-    test('bands', () {
-      expect(
-        eval(proacs, {
-          'age': '< 72 anos',
-          'sbp': '≥ 116 mmHg',
-          'killip': 'I',
-          'st': 'Não',
-        }).severity,
-        Severity.ok,
+    // Points from Table 2 of the derivation paper: age >=72 = 2, SBP <116 = 1,
+    // Killip II/III = 1, Killip IV = 3, ST elevation = 1 (maximum 7).
+    Map<String, Object> patient({
+      String age = '< 72 anos',
+      String sbp = '≥ 116 mmHg',
+      String killip = 'I',
+      String st = 'Não',
+    }) => {'age': age, 'sbp': sbp, 'killip': killip, 'st': st};
+
+    test('lowest and highest totals', () {
+      final low = eval(proacs, patient());
+      expect((low.value, low.severity), (0, Severity.ok));
+      final high = eval(
+        proacs,
+        patient(age: '≥ 72 anos', sbp: '< 116 mmHg', killip: 'IV', st: 'Sim'),
       );
+      expect((high.value, high.severity), (7, Severity.danger));
+    });
+
+    test('age counts two points', () {
+      final r = eval(proacs, patient(age: '≥ 72 anos'));
+      expect((r.value, r.severity), (2, Severity.warning));
+    });
+
+    test('1 and 2 are intermediate, 3 is high', () {
+      expect(eval(proacs, patient(st: 'Sim')).severity, Severity.warning);
       expect(
-        eval(proacs, {
-          'age': '≥ 72 anos',
-          'sbp': '< 116 mmHg',
-          'killip': 'I',
-          'st': 'Não',
-        }).severity,
-        Severity.warning,
+        eval(proacs, patient(age: '≥ 72 anos', sbp: '< 116 mmHg')).severity,
+        Severity.danger, // 2 + 1
       );
-      final r = eval(proacs, {
-        'age': '< 72 anos',
-        'sbp': '≥ 116 mmHg',
-        'killip': 'IV',
-        'st': 'Não',
-      });
-      expect((r.value, r.severity), (3, Severity.danger));
+      expect(eval(proacs, patient(killip: 'IV')).severity, Severity.danger);
+    });
+
+    test('labels carry the published mortality ranges', () {
+      expect(eval(proacs, patient()).label, contains('< 1 %'));
+      expect(eval(proacs, patient(st: 'Sim')).label, contains('1–4 %'));
+      expect(eval(proacs, patient(killip: 'IV')).label, contains('> 4 %'));
     });
   });
 

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 
 class Contact {
-  const Contact({
+  Contact({
     required this.title,
     required this.description,
     required this.number,
@@ -24,12 +24,23 @@ class Contact {
       ? '${number.substring(0, 3)} ${number.substring(3, 6)} ${number.substring(6)}'
       : number;
 
-  bool matches(String query) {
-    final q = normalize(query);
-    return normalize(title).contains(q) ||
-        normalize(description).contains(q) ||
-        number.contains(q.replaceAll(' ', ''));
-  }
+  /// Accent-free lower-case text to search in, computed once per contact.
+  late final String _searchText = normalize('$title $description');
+
+  /// Whether this contact matches [query], already passed through [normalize].
+  bool matches(String query) =>
+      _searchText.contains(query) || number.contains(query.replaceAll(' ', ''));
+}
+
+/// Contacts matching [query], ignoring case and accents.
+List<Contact> filterContacts(List<Contact> contacts, String query) {
+  final q = normalize(query);
+  return q.isEmpty
+      ? contacts
+      : [
+          for (final c in contacts)
+            if (c.matches(q)) c,
+        ];
 }
 
 const _accents = {

@@ -33,6 +33,12 @@ final cincinnati = ScoreDefinition(
   ], display: (sum) => '$sum/3'),
 );
 
+final _gcsTotal = additive(const [
+  Band(3, Severity.danger, 'Grave'),
+  Band(9, Severity.warning, 'Moderado'),
+  Band(13, Severity.ok, 'Ligeiro'),
+]);
+
 final gcs = ScoreDefinition(
   id: 'gcs',
   name: 'ECG',
@@ -74,28 +80,19 @@ final gcs = ScoreDefinition(
     ),
   ],
   evaluate: (score, answers, lookup) {
-    final base = additive(const [
-      Band(3, Severity.danger, 'Grave'),
-      Band(9, Severity.warning, 'Moderado'),
-      Band(13, Severity.ok, 'Ligeiro'),
-    ])(score, answers, lookup);
+    final base = _gcsTotal(score, answers, lookup);
     String part(String letter, String id) {
       final i = answers.choice(id);
       final item = score.items.firstWhere((it) => it.id == id);
       return '$letter${i == null ? '–' : item.options[i].points}';
     }
 
-    return ScoreResult(
-      value: base.value,
-      display: base.display,
-      severity: base.severity,
-      label: base.label,
-      answered: base.answered,
-      total: base.total,
-      breakdown: base.answered == 0
-          ? null
-          : '${part('O', 'eyes')} ${part('V', 'verbal')} ${part('M', 'motor')}',
-    );
+    return base.answered == 0
+        ? base
+        : base.copyWith(
+            breakdown:
+                '${part('O', 'eyes')} ${part('V', 'verbal')} ${part('M', 'motor')}',
+          );
   },
 );
 
@@ -204,16 +201,14 @@ ScoreResult withGcs(
   final answered = s.answered + (gcsDone ? 1 : 0);
   final total = s.total + 1;
   final sum = s.sum + (gcsDone ? gcsPoints(gcsResult.value!) : 0);
-  final band = answered >= total ? bandFor(sum, bands) : null;
-  return ScoreResult(
-    value: answered == 0 ? null : sum,
-    display: answered == 0 ? '–' : '$sum',
-    severity: band?.severity ?? Severity.incomplete,
-    label: band?.label ?? '',
-    answered: answered,
-    total: total,
-  );
+  return interpretSum(sum, answered, total, bands);
 }
+
+final _news2Total = additive(const [
+  Band(0, Severity.ok, 'Risco baixo'),
+  Band(5, Severity.warning, 'Risco médio'),
+  Band(7, Severity.danger, 'Risco alto'),
+]);
 
 final news2 = ScoreDefinition(
   id: 'news2',
@@ -318,11 +313,7 @@ final news2 = ScoreDefinition(
     ),
   ],
   evaluate: (score, answers, lookup) {
-    final base = additive(const [
-      Band(0, Severity.ok, 'Risco baixo'),
-      Band(5, Severity.warning, 'Risco médio'),
-      Band(7, Severity.danger, 'Risco alto'),
-    ])(score, answers, lookup);
+    final base = _news2Total(score, answers, lookup);
     // A single parameter scoring 3 raises a low aggregate to low-medium.
     final redFlag = score
         .visibleItems(answers)
@@ -330,13 +321,9 @@ final news2 = ScoreDefinition(
           (item) => answers.of(item.id).any((i) => item.options[i].points == 3),
         );
     if (base.complete && base.severity == Severity.ok && redFlag) {
-      return ScoreResult(
-        value: base.value,
-        display: base.display,
+      return base.copyWith(
         severity: Severity.warning,
         label: 'Risco baixo-médio (parâmetro com 3)',
-        answered: base.answered,
-        total: base.total,
       );
     }
     return base;
@@ -347,12 +334,12 @@ final proacs = ScoreDefinition(
   id: 'proacs',
   name: 'ProACS',
   fullName: 'Score de risco ProACS',
-  description: 'Risco de mortalidade na síndrome coronária aguda.',
+  description: 'Mortalidade intra-hospitalar na síndrome coronária aguda.',
   items: const [
     ScoreItem(
       id: 'age',
       label: 'Idade',
-      options: [ScoreOption('< 72 anos', 0), ScoreOption('≥ 72 anos', 1)],
+      options: [ScoreOption('< 72 anos', 0), ScoreOption('≥ 72 anos', 2)],
     ),
     ScoreItem(
       id: 'sbp',
@@ -375,9 +362,10 @@ final proacs = ScoreDefinition(
     ),
   ],
   evaluate: additive(const [
-    Band(0, Severity.ok, 'Risco baixo'),
-    Band(1, Severity.warning, 'Risco intermédio'),
-    Band(3, Severity.danger, 'Risco alto'),
+    // In-hospital mortality <1 %, 1–4 %, >4 % (Timóteo et al., Rev Port Cardiol 2017).
+    Band(0, Severity.ok, 'Risco baixo (< 1 %)'),
+    Band(1, Severity.warning, 'Risco intermédio (1–4 %)'),
+    Band(3, Severity.danger, 'Risco alto (> 4 %)'),
   ]),
 );
 

@@ -59,8 +59,6 @@ class ScoreItem {
 class Answers {
   const Answers(this._picks);
 
-  static const empty = Answers({});
-
   final Map<String, Set<int>> _picks;
 
   Set<int> of(String itemId) => _picks[itemId] ?? const {};
@@ -72,8 +70,6 @@ class Answers {
   }
 
   bool has(String itemId) => of(itemId).isNotEmpty;
-
-  Map<String, Set<int>> toMap() => _picks;
 }
 
 class ScoreResult {
@@ -103,6 +99,20 @@ class ScoreResult {
   final String? breakdown;
 
   bool get complete => answered >= total;
+
+  ScoreResult copyWith({
+    Severity? severity,
+    String? label,
+    String? breakdown,
+  }) => ScoreResult(
+    value: value,
+    display: display,
+    severity: severity ?? this.severity,
+    label: label ?? this.label,
+    answered: answered,
+    total: total,
+    breakdown: breakdown ?? this.breakdown,
+  );
 }
 
 /// Lets a score read the result of another score (e.g. MGAP uses GCS).
@@ -173,27 +183,41 @@ class Band {
   return (sum: sum, answered: answered, total: total);
 }
 
-/// Picks the band with the highest `min` not above [value]. Bands may be in
-/// any order.
+/// Picks the band with the highest `min` not above [value]. [bands] must be
+/// in ascending order of `min`; values below the first band use the first.
 Band bandFor(int value, List<Band> bands) {
-  final sorted = [...bands]..sort((a, b) => b.min.compareTo(a.min));
-  return sorted.firstWhere((b) => value >= b.min, orElse: () => sorted.last);
+  assert(
+    bands.indexed.every((e) => e.$1 == 0 || bands[e.$1 - 1].min < e.$2.min),
+    'Bands must be in ascending order',
+  );
+  return bands.lastWhere((b) => value >= b.min, orElse: () => bands.first);
+}
+
+/// Builds the result for a [sum]: it is interpreted with [bands] only once
+/// every required item is answered, and shows "–" while nothing is.
+ScoreResult interpretSum(
+  int sum,
+  int answered,
+  int total,
+  List<Band> bands, {
+  String Function(int sum)? display,
+}) {
+  final band = answered >= total ? bandFor(sum, bands) : null;
+  return ScoreResult(
+    value: answered == 0 ? null : sum,
+    display: answered == 0 ? '–' : (display?.call(sum) ?? '$sum'),
+    severity: band?.severity ?? Severity.incomplete,
+    label: band?.label ?? '',
+    answered: answered,
+    total: total,
+  );
 }
 
 /// Standard evaluation for additive scores: sum the points and interpret the
-/// total with [bands] once every required item is answered.
+/// total with [bands].
 Evaluator additive(List<Band> bands, {String Function(int sum)? display}) {
   return (score, answers, _) {
     final s = sumPoints(score, answers);
-    final complete = s.answered >= s.total;
-    final band = complete ? bandFor(s.sum, bands) : null;
-    return ScoreResult(
-      value: s.answered == 0 ? null : s.sum,
-      display: s.answered == 0 ? '–' : (display?.call(s.sum) ?? '${s.sum}'),
-      severity: band?.severity ?? Severity.incomplete,
-      label: band?.label ?? '',
-      answered: s.answered,
-      total: s.total,
-    );
+    return interpretSum(s.sum, s.answered, s.total, bands, display: display);
   };
 }

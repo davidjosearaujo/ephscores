@@ -85,7 +85,18 @@ Path _shape(BurnPatient patient, BodyPart part) {
   return path;
 }
 
-Path _regionPath(BurnPatient patient, BodyRegion region) {
+final _pathCache = <(BurnPatient, BodyView, BodyPart), Path>{};
+
+/// Path of [region], cached since the geometry never changes. Callers must
+/// not mutate it.
+Path _regionPath(BurnPatient patient, BodyRegion region) =>
+    _pathCache.putIfAbsent((
+      patient,
+      region.view,
+      region.part,
+    ), () => _buildRegionPath(patient, region));
+
+Path _buildRegionPath(BurnPatient patient, BodyRegion region) {
   final path = _shape(patient, region.part);
   if (region.view == BodyView.front) return path;
   // Column-major 4x4: x' = width - x.
@@ -194,12 +205,9 @@ class _BodyPainter extends CustomPainter {
       canvas.drawPath(path, Paint()..color = colors[i]);
       canvas.drawPath(path, outline);
 
-      final label = region.percent == region.percent.roundToDouble()
-          ? '${region.percent.toInt()}'
-          : region.percent.toString().replaceAll('.', ',');
       final text = TextPainter(
         text: TextSpan(
-          text: label,
+          text: formatNumber(region.percent),
           style: TextStyle(
             fontSize: region.part == BodyPart.genitals ? 10 : 13,
             fontWeight: FontWeight.w700,

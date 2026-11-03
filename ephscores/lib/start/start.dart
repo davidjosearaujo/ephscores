@@ -1,7 +1,8 @@
-import 'dart:convert';
+import 'dart:collection';
 
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../persistence.dart';
 
 /// START triage categories.
 enum StartCategory {
@@ -77,17 +78,15 @@ class TriageRecord {
 }
 
 /// Log of triaged victims for the current incident.
-class StartStore extends ChangeNotifier {
-  StartStore(this._prefs) {
-    _load();
+class StartStore extends PersistedStore {
+  StartStore(SharedPreferences prefs) : super(prefs, 'start.v2') {
+    load();
   }
 
-  static const _key = 'start.v2';
-
-  final SharedPreferences _prefs;
   final List<TriageRecord> _records = [];
 
-  List<TriageRecord> get records => List.unmodifiable(_records);
+  /// Read-only view, oldest first; no copy is made.
+  List<TriageRecord> get records => UnmodifiableListView(_records);
 
   int count(StartCategory c) => _records.where((r) => r.category == c).length;
 
@@ -95,7 +94,7 @@ class StartStore extends ChangeNotifier {
 
   void add(StartCategory c, {DateTime? at}) {
     _records.add(TriageRecord(c, at ?? DateTime.now()));
-    _changed();
+    changed();
   }
 
   /// Removes the most recent victim of category [c], if any.
@@ -103,29 +102,22 @@ class StartStore extends ChangeNotifier {
     final i = _records.lastIndexWhere((r) => r.category == c);
     if (i == -1) return;
     _records.removeAt(i);
-    _changed();
+    changed();
   }
 
   void clear() {
     _records.clear();
-    _changed();
+    changed();
   }
 
-  void _changed() {
-    notifyListeners();
-    _prefs.setString(_key, jsonEncode([for (final r in _records) r.toJson()]));
-  }
+  @override
+  Object toJson() => [for (final r in _records) r.toJson()];
 
-  void _load() {
-    final raw = _prefs.getString(_key);
-    if (raw == null) return;
-    try {
-      _records.addAll([
-        for (final r in jsonDecode(raw) as List)
-          TriageRecord.fromJson(r as Map<String, dynamic>),
-      ]);
-    } on Object catch (e) {
-      debugPrint('Discarding saved triage: $e');
-    }
+  @override
+  void restore(Object? json) {
+    _records.addAll([
+      for (final r in json as List)
+        TriageRecord.fromJson(r as Map<String, dynamic>),
+    ]);
   }
 }

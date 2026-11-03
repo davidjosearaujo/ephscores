@@ -1,8 +1,6 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../persistence.dart';
 import 'adult.dart';
 import 'model.dart';
 import 'pediatric.dart';
@@ -13,14 +11,11 @@ final allScores = {
 
 /// Answers for every score of the current patient, saved on every change so
 /// nothing is lost if the app is killed mid-assessment.
-class ScoreStore extends ChangeNotifier {
-  ScoreStore(this._prefs) {
-    _load();
+class ScoreStore extends PersistedStore {
+  ScoreStore(SharedPreferences prefs) : super(prefs, 'scores.v2') {
+    load();
   }
 
-  static const _key = 'scores.v2';
-
-  final SharedPreferences _prefs;
   final Map<String, Map<String, Set<int>>> _answers = {};
 
   Answers answersFor(String scoreId) => Answers(_answers[scoreId] ?? const {});
@@ -52,54 +47,43 @@ class ScoreStore extends ChangeNotifier {
     } else {
       score[item.id] = current;
     }
-    _changed();
+    changed();
   }
 
   void reset(String scoreId) {
     _answers.remove(scoreId);
-    _changed();
+    changed();
   }
 
   void resetAll() {
     _answers.clear();
-    _changed();
+    changed();
   }
 
-  void _changed() {
-    notifyListeners();
-    _prefs.setString(
-      _key,
-      jsonEncode({
-        for (final MapEntry(key: id, value: items) in _answers.entries)
-          id: {for (final e in items.entries) e.key: e.value.toList()},
-      }),
-    );
-  }
+  @override
+  Object toJson() => {
+    for (final MapEntry(key: id, value: items) in _answers.entries)
+      id: {for (final e in items.entries) e.key: e.value.toList()},
+  };
 
-  void _load() {
-    final raw = _prefs.getString(_key);
-    if (raw == null) return;
-    try {
-      final data = jsonDecode(raw) as Map<String, dynamic>;
-      for (final MapEntry(key: id, value: items) in data.entries) {
-        final score = allScores[id];
-        if (score == null) continue;
-        final parsed = <String, Set<int>>{};
-        for (final MapEntry(key: itemId, value: picks)
-            in (items as Map).entries) {
-          final item = score.items.where((it) => it.id == itemId).firstOrNull;
-          if (item == null) continue;
-          final valid = (picks as List)
-              .cast<int>()
-              .where((i) => i >= 0 && i < item.options.length)
-              .toSet();
-          if (valid.isNotEmpty) parsed[itemId as String] = valid;
-        }
-        _answers[id] = parsed;
+  @override
+  void restore(Object? json) {
+    for (final MapEntry(key: id, value: items)
+        in (json as Map<String, dynamic>).entries) {
+      final score = allScores[id];
+      if (score == null) continue;
+      final parsed = <String, Set<int>>{};
+      for (final MapEntry(key: itemId, value: picks)
+          in (items as Map).entries) {
+        final item = score.items.where((it) => it.id == itemId).firstOrNull;
+        if (item == null) continue;
+        final valid = (picks as List)
+            .cast<int>()
+            .where((i) => i >= 0 && i < item.options.length)
+            .toSet();
+        if (valid.isNotEmpty) parsed[itemId as String] = valid;
       }
-    } on Object catch (e) {
-      // Corrupt or outdated data: start clean rather than crash.
-      debugPrint('Discarding saved scores: $e');
+      _answers[id] = parsed;
     }
   }
 }

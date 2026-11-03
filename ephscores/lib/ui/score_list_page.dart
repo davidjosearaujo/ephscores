@@ -51,12 +51,7 @@ class ScoreListPage extends StatelessWidget {
               final theme = Theme.of(context);
               return Card(
                 child: InkWell(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (_) => ScorePage(score: score),
-                    ),
-                  ),
+                  onTap: () => pushPage(context, ScorePage(score: score)),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(18, 14, 14, 14),
                     child: Row(

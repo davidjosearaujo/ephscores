@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app.dart';
+import '../burn/burn.dart';
 import '../platform/install_hint.dart';
 import '../scores/adult.dart';
 import '../scores/model.dart';
@@ -47,8 +48,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final scope = AppScope.of(context);
 
-    void open(Widget page) =>
-        Navigator.push(context, MaterialPageRoute<void>(builder: (_) => page));
+    void open(Widget page) => pushPage(context, page);
 
     String? inProgress(List<ScoreDefinition> scores) {
       final n = scores.where((s) => scope.scores.hasAnswers(s.id)).length;

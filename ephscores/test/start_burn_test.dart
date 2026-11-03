@@ -127,8 +127,8 @@ void main() {
       'head_front': 1,
     });
     final prefs = await SharedPreferences.getInstance();
-    await migrateLegacyPrefs(prefs);
     final store = StartStore(prefs);
+    await migrateLegacyPrefs(prefs, store);
     expect(
       (store.count(StartCategory.p1), store.count(StartCategory.p3)),
       (2, 1),

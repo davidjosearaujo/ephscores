@@ -166,69 +166,48 @@ class _OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final fg = selected ? scheme.onPrimary : scheme.onSurface;
     final points = option.points > 0 ? '+${option.points}' : '${option.points}';
-    return Semantics(
+    return SelectableTile(
       selected: selected,
-      button: true,
-      child: Material(
-        color: selected ? scheme.primary : scheme.tile,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: selected
-              ? BorderSide.none
-              : BorderSide(color: scheme.tileBorder),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 56),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          option.label,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: fg,
-                          ),
-                        ),
-                        if (option.detail != null)
-                          Text(
-                            option.detail!,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: fg.withValues(alpha: 0.75),
-                            ),
-                          ),
-                      ],
+      onTap: onTap,
+      builder: (fg) => Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  option.label,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: fg,
+                  ),
+                ),
+                if (option.detail != null)
+                  Text(
+                    option.detail!,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: fg.withValues(alpha: 0.75),
                     ),
                   ),
-                  if (showPoints)
-                    Text(
-                      points,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: fg.withValues(alpha: selected ? 1 : 0.6),
-                      ),
-                    )
-                  else if (selected)
-                    Icon(Icons.check, color: fg, size: 20),
-                ],
-              ),
+              ],
             ),
           ),
-        ),
+          if (showPoints)
+            Text(
+              points,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: fg.withValues(alpha: selected ? 1 : 0.6),
+              ),
+            )
+          else if (selected)
+            Icon(Icons.check, color: fg, size: 20),
+        ],
       ),
     );
   }
@@ -260,10 +239,7 @@ class _LinkedScoreCard extends StatelessWidget {
                 : 'Por preencher — toque para avaliar',
           ),
           trailing: ResultPill(result),
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute<void>(builder: (_) => ScorePage(score: score)),
-          ),
+          onTap: () => pushPage(context, ScorePage(score: score)),
         ),
       ),
     );

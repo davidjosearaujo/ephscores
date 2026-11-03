@@ -1,7 +1,6 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../persistence.dart';
 
 enum BurnPatient { adult, child }
 
@@ -33,6 +32,13 @@ enum BodyPart {
   rightLeg,
   leftLeg,
 }
+
+/// "4,5" or "9": Portuguese decimal comma, no trailing ",0".
+String formatNumber(double v) =>
+    (v == v.roundToDouble() ? v.toInt().toString() : v.toStringAsFixed(1))
+        .replaceAll('.', ',');
+
+String formatPercent(double v) => '${formatNumber(v)}%';
 
 class BodyRegion {
   const BodyRegion(this.view, this.part, this.label, this.percent);
@@ -125,14 +131,11 @@ const Map<BurnPatient, List<BodyRegion>> bodyRegions = {
   ],
 };
 
-class BurnStore extends ChangeNotifier {
-  BurnStore(this._prefs) {
-    _load();
+class BurnStore extends PersistedStore {
+  BurnStore(SharedPreferences prefs) : super(prefs, 'burn.v2') {
+    load();
   }
 
-  static const _key = 'burn.v2';
-
-  final SharedPreferences _prefs;
   BurnPatient _patient = BurnPatient.adult;
   final Map<BurnPatient, Map<String, BurnDegree>> _degrees = {
     for (final p in BurnPatient.values) p: {},
@@ -142,7 +145,7 @@ class BurnStore extends ChangeNotifier {
 
   set patient(BurnPatient value) {
     _patient = value;
-    _changed();
+    changed();
   }
 
   List<BodyRegion> get regions => bodyRegions[_patient]!;
@@ -158,7 +161,7 @@ class BurnStore extends ChangeNotifier {
     } else {
       map[region.id] = degree;
     }
-    _changed();
+    changed();
   }
 
   double percentWhere(bool Function(BurnDegree d) test) => [
@@ -174,47 +177,37 @@ class BurnStore extends ChangeNotifier {
   /// Clears the current patient type only.
   void clear() {
     _degrees[_patient]!.clear();
-    _changed();
+    changed();
   }
 
   void clearAll() {
     for (final m in _degrees.values) {
       m.clear();
     }
-    _changed();
+    changed();
   }
 
-  void _changed() {
-    notifyListeners();
-    _prefs.setString(
-      _key,
-      jsonEncode({
-        'patient': _patient.name,
-        for (final MapEntry(key: p, value: m) in _degrees.entries)
-          p.name: {for (final e in m.entries) e.key: e.value.name},
-      }),
-    );
-  }
+  @override
+  Object toJson() => {
+    'patient': _patient.name,
+    for (final MapEntry(key: p, value: m) in _degrees.entries)
+      p.name: {for (final e in m.entries) e.key: e.value.name},
+  };
 
-  void _load() {
-    final raw = _prefs.getString(_key);
-    if (raw == null) return;
-    try {
-      final data = jsonDecode(raw) as Map<String, dynamic>;
-      _patient = BurnPatient.values.byName(data['patient'] as String);
-      for (final p in BurnPatient.values) {
-        final ids = {for (final r in bodyRegions[p]!) r.id};
-        for (final MapEntry(:key, :value)
-            in ((data[p.name] ?? {}) as Map).entries) {
-          if (ids.contains(key)) {
-            _degrees[p]![key as String] = BurnDegree.values.byName(
-              value as String,
-            );
-          }
+  @override
+  void restore(Object? json) {
+    final data = json as Map<String, dynamic>;
+    _patient = BurnPatient.values.byName(data['patient'] as String);
+    for (final p in BurnPatient.values) {
+      final ids = {for (final r in bodyRegions[p]!) r.id};
+      for (final MapEntry(:key, :value)
+          in ((data[p.name] ?? {}) as Map).entries) {
+        if (ids.contains(key)) {
+          _degrees[p]![key as String] = BurnDegree.values.byName(
+            value as String,
+          );
         }
       }
-    } on Object catch (e) {
-      debugPrint('Discarding saved burns: $e');
     }
   }
 }

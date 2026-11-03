@@ -31,9 +31,7 @@ class _ContactsPageState extends State<ContactsPage> {
         future: _contacts,
         builder: (context, snapshot) {
           final all = snapshot.data ?? const <Contact>[];
-          final shown = _query.isEmpty
-              ? all
-              : all.where((c) => c.matches(_query)).toList();
+          final shown = filterContacts(all, _query);
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
             children: [

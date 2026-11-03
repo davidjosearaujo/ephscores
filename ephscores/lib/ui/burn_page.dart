@@ -19,13 +19,6 @@ Color degreeColor(BurnDegree d, ColorScheme scheme) => switch (d) {
   BurnDegree.third => Palette.red,
 };
 
-String formatPercent(double v) {
-  final s = v == v.roundToDouble()
-      ? v.toInt().toString()
-      : v.toStringAsFixed(1);
-  return '${s.replaceAll('.', ',')}%';
-}
-
 class BurnPage extends StatefulWidget {
   const BurnPage({super.key});
 
@@ -271,60 +264,37 @@ class _BrushChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Semantics(
+    return SelectableTile(
       selected: selected,
-      button: true,
-      child: Material(
-        color: selected ? scheme.primary : scheme.tile,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: selected
-              ? BorderSide.none
-              : BorderSide(color: scheme.tileBorder),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(14),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 56),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  color == null
-                      ? Icon(
-                          Icons.backspace_outlined,
-                          size: 18,
-                          color: selected ? scheme.onPrimary : scheme.onSurface,
-                        )
-                      : Container(
-                          width: 18,
-                          height: 18,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
-                          ),
-                        ),
-                  const SizedBox(height: 4),
-                  FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: selected ? scheme.onPrimary : scheme.onSurface,
-                      ),
-                    ),
+      onTap: onTap,
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      builder: (fg) => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          color == null
+              ? Icon(Icons.backspace_outlined, size: 18, color: fg)
+              : Container(
+                  width: 18,
+                  height: 18,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
                   ),
-                ],
+                ),
+          const SizedBox(height: 4),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: fg,
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

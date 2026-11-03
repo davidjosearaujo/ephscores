@@ -95,3 +95,54 @@ void showToast(BuildContext context, String message) {
       SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
     );
 }
+
+/// Opens [page] on top of the current one.
+Future<void> pushPage(BuildContext context, Widget page) =>
+    Navigator.push(context, MaterialPageRoute<void>(builder: (_) => page));
+
+/// Tappable tile used for every choice: filled when selected, outlined
+/// otherwise. [builder] receives the foreground colour to draw with.
+class SelectableTile extends StatelessWidget {
+  const SelectableTile({
+    super.key,
+    required this.selected,
+    required this.onTap,
+    required this.builder,
+    this.padding = const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+  });
+
+  final bool selected;
+  final VoidCallback onTap;
+  final Widget Function(Color foreground) builder;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final radius = BorderRadius.circular(14);
+    return Semantics(
+      selected: selected,
+      button: true,
+      child: Material(
+        color: selected ? scheme.primary : scheme.tile,
+        shape: RoundedRectangleBorder(
+          borderRadius: radius,
+          side: selected
+              ? BorderSide.none
+              : BorderSide(color: scheme.tileBorder),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 56),
+            child: Padding(
+              padding: padding,
+              child: builder(selected ? scheme.onPrimary : scheme.onSurface),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
