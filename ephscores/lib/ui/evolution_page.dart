@@ -5,6 +5,7 @@ import '../app.dart';
 import '../format.dart';
 import '../patient/patient.dart';
 import '../patient/summary.dart';
+import '../scores/model.dart';
 import '../scores/score_store.dart';
 import '../theme.dart';
 import 'widgets.dart';
@@ -18,7 +19,7 @@ class EvolutionPage extends StatelessWidget {
     final scope = AppScope.of(context);
     final patient = scope.patient;
     return ListenableBuilder(
-      listenable: Listenable.merge([patient, scope.scores, scope.burn]),
+      listenable: scope.patientState,
       builder: (context, _) {
         if (patient.startedAt == null) {
           return Scaffold(
@@ -199,6 +200,9 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
+Widget _resultCell(ScoreResult? result, Widget empty) =>
+    result == null ? empty : ResultPill(result, compact: true);
+
 /// Scores as rows, evaluations as columns. The names stay put while the
 /// values scroll; the newest evaluation is shown first.
 class _TrendTable extends StatelessWidget {
@@ -213,10 +217,7 @@ class _TrendTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final ids = {
-      for (final e in evaluations)
-        for (final s in e.scores.answered) s.id,
-    };
+    final ids = {for (final e in evaluations) ...e.results.keys};
     final scores = [
       for (final s in allScores.values)
         if (ids.contains(s.id)) s,
@@ -296,18 +297,11 @@ class _TrendTable extends StatelessWidget {
                               ),
                             ),
                             for (final s in scores)
-                              cell(
-                                e.scores.hasAnswers(s.id)
-                                    ? ResultPill(
-                                        e.scores.resultFor(s.id),
-                                        compact: true,
-                                      )
-                                    : dash,
-                              ),
+                              cell(_resultCell(e.results[s.id], dash)),
                             if (burns)
                               cell(
                                 e.burns.hasBurns
-                                    ? _BurnPill(e.burns.tbsa)
+                                    ? BurnPill(e.burns.tbsa, compact: true)
                                     : dash,
                               ),
                           ],
@@ -318,37 +312,6 @@ class _TrendTable extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BurnPill extends StatelessWidget {
-  const _BurnPill(this.tbsa);
-
-  final double tbsa;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      constraints: const BoxConstraints(minWidth: 48),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-      decoration: BoxDecoration(
-        color: scheme.secondaryContainer,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          formatPercent(tbsa),
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: scheme.onSecondaryContainer,
-          ),
         ),
       ),
     );
@@ -368,13 +331,11 @@ class _EvaluationCard extends StatelessWidget {
   final bool isLatest;
 
   Future<void> _delete(BuildContext context) async {
-    HapticFeedback.mediumImpact();
     final patient = AppScope.of(context).patient;
-    if (await confirm(
+    if (await confirmDelete(
       context,
       title: 'Apagar avaliação ${index + 1}?',
       message: 'As respostas atuais no painel não são alteradas.',
-      action: 'Apagar',
     )) {
       patient.removeAt(index);
     }
@@ -383,8 +344,7 @@ class _EvaluationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final e = evaluation;
-    final scores = e.scores.answered;
-    final n = scores.length + (e.burns.hasBurns ? 1 : 0);
+    final n = e.results.length + (e.burns.hasBurns ? 1 : 0);
     return GestureDetector(
       onLongPress: () => _delete(context),
       child: Card(
@@ -404,17 +364,17 @@ class _EvaluationCard extends StatelessWidget {
             '$n ${n == 1 ? 'registo' : 'registos'}',
           ),
           children: [
-            for (final s in scores)
+            for (final MapEntry(key: id, value: r) in e.results.entries)
               _ResultRow(
-                title: s.name,
-                subtitle: _detail(e.scores, s.id),
-                trailing: ResultPill(e.scores.resultFor(s.id), compact: true),
+                title: allScores[id]!.name,
+                subtitle: _detail(r),
+                trailing: ResultPill(r, compact: true),
               ),
             if (e.burns.hasBurns)
               _ResultRow(
                 title: 'Queimados',
-                subtitle: burnLine(e.burns).split(' — ').last,
-                trailing: _BurnPill(e.burns.tbsa),
+                subtitle: burnDetail(e.burns),
+                trailing: BurnPill(e.burns.tbsa, compact: true),
               ),
             if (n == 0) const ListTile(dense: true, title: Text('Sem dados')),
             const SizedBox(height: 8),
@@ -424,8 +384,7 @@ class _EvaluationCard extends StatelessWidget {
     );
   }
 
-  static String _detail(ScoreSheet sheet, String id) {
-    final r = sheet.resultFor(id);
+  static String _detail(ScoreResult r) {
     if (!r.complete) return 'Incompleto (${r.answered}/${r.total})';
     return [r.label, ?r.breakdown].join(' · ');
   }

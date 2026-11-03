@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app.dart';
@@ -58,13 +57,11 @@ class _WelcomePageState extends State<WelcomePage> {
   }
 
   Future<void> _deleteLastPatient() async {
-    HapticFeedback.mediumImpact();
     final scope = AppScope.of(context);
-    if (await confirm(
+    if (await confirmDelete(
       context,
       title: 'Apagar último doente?',
       message: 'Apaga o resumo e todas as avaliações deste doente.',
-      action: 'Apagar',
     )) {
       scope.discardPatient();
     }

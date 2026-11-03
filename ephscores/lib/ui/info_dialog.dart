@@ -54,7 +54,7 @@ class _InfoDialog extends StatelessWidget {
             const SizedBox(height: 16),
             _Field('Versão', info.fullVersion),
             _Field('Pacote', info.applicationId),
-            _Field('Programador', info.developer, url: info.developerUrl),
+            _Field('Autor', info.developer, url: info.developerUrl),
             if (info.homepage != null)
               _Field('Website', info.homepage!, url: info.homepage),
             if (info.repository != null)

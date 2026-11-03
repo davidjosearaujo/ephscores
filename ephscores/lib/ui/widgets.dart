@@ -1,10 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import '../format.dart';
 import '../scores/model.dart';
 import '../theme.dart';
 
-/// Rounded, colour-coded pill showing a score value. [compact] is the
-/// smaller size used in the evolution table.
+/// Small rounded value chip. [compact] is the size used in the evolution
+/// table; text that is still too wide scales down to fit.
+class Pill extends StatelessWidget {
+  const Pill(
+    this.text, {
+    super.key,
+    required this.color,
+    required this.onColor,
+    this.compact = false,
+  });
+
+  final String text;
+  final Color color;
+  final Color onColor;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      constraints: BoxConstraints(minWidth: compact ? 48 : 64),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 8 : 12,
+        vertical: compact ? 4 : 6,
+      ),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(compact ? 10 : 14),
+      ),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: compact ? 16 : 22,
+            fontWeight: FontWeight.w700,
+            color: onColor,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A [Pill] showing a score value, coloured by its severity.
 class ResultPill extends StatelessWidget {
   const ResultPill(this.result, {super.key, this.compact = false});
 
@@ -14,27 +61,30 @@ class ResultPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      constraints: BoxConstraints(minWidth: compact ? 48 : 64),
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? 8 : 12,
-        vertical: compact ? 4 : 6,
-      ),
-      decoration: BoxDecoration(
-        color: Palette.severity(result.severity, scheme),
-        borderRadius: BorderRadius.circular(compact ? 10 : 14),
-      ),
-      child: Text(
-        result.display,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize: compact ? 16 : 22,
-          fontWeight: FontWeight.w700,
-          color: Palette.onSeverity(result.severity, scheme),
-          fontFeatures: const [FontFeature.tabularFigures()],
-        ),
-      ),
+    return Pill(
+      result.display,
+      color: Palette.severity(result.severity, scheme),
+      onColor: Palette.onSeverity(result.severity, scheme),
+      compact: compact,
+    );
+  }
+}
+
+/// A [Pill] showing a burned surface area.
+class BurnPill extends StatelessWidget {
+  const BurnPill(this.tbsa, {super.key, this.compact = false});
+
+  final double tbsa;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Pill(
+      formatPercent(tbsa),
+      color: scheme.secondaryContainer,
+      onColor: scheme.onSecondaryContainer,
+      compact: compact,
     );
   }
 }
@@ -109,6 +159,16 @@ Future<bool> confirm(
     ),
   );
   return ok ?? false;
+}
+
+/// Confirms a delete started by a long press, with a haptic tap first.
+Future<bool> confirmDelete(
+  BuildContext context, {
+  required String title,
+  required String message,
+}) {
+  HapticFeedback.mediumImpact();
+  return confirm(context, title: title, message: message, action: 'Apagar');
 }
 
 void showToast(BuildContext context, String message) {

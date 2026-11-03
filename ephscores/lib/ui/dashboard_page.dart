@@ -36,7 +36,7 @@ class DashboardPage extends StatelessWidget {
       // Light status bar icons over the navy header.
       value: SystemUiOverlayStyle.light,
       child: ListenableBuilder(
-        listenable: Listenable.merge([scope.scores, scope.burn, scope.patient]),
+        listenable: scope.patientState,
         builder: (context, _) {
           if (!scope.patient.isActive) return const SizedBox.shrink();
           final entries = [
@@ -235,7 +235,7 @@ class _PatientBar extends StatelessWidget {
     final scope = AppScope.of(context);
     // Listens itself: as a const child it is not rebuilt with the page.
     return ListenableBuilder(
-      listenable: Listenable.merge([scope.scores, scope.burn, scope.patient]),
+      listenable: scope.patientState,
       builder: (context, _) => _buildBar(context, scope),
     );
   }

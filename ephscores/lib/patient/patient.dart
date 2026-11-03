@@ -4,11 +4,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../burn/burn.dart';
 import '../persistence.dart';
+import '../scores/model.dart';
 import '../scores/score_store.dart';
 
 /// One registered evaluation: a snapshot of every score and the burn map.
 class Evaluation {
-  const Evaluation({
+  Evaluation({
     required this.startedAt,
     required this.registeredAt,
     required this.scores,
@@ -28,6 +29,12 @@ class Evaluation {
   final DateTime registeredAt;
   final ScoreSheet scores;
   final BurnSheet burns;
+
+  /// Result of every answered score, in display order. A registered
+  /// evaluation never changes, so this is computed once, not on each rebuild.
+  late final Map<String, ScoreResult> results = {
+    for (final s in scores.answered) s.id: scores.resultFor(s.id),
+  };
 
   Duration get duration => registeredAt.difference(startedAt);
 

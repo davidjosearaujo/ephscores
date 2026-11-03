@@ -60,7 +60,7 @@ Widget phoneWidth(BuildContext context, Widget? child) {
 
 /// Gives every page access to the app's stores.
 class AppScope extends InheritedWidget {
-  const AppScope({
+  AppScope({
     super.key,
     required this.scores,
     required this.start,
@@ -73,6 +73,14 @@ class AppScope extends InheritedWidget {
   final StartStore start;
   final BurnStore burn;
   final PatientStore patient;
+
+  /// Fires on any change to the patient, the live answers or the burn map.
+  /// Created once, so builders listening to it don't re-subscribe each build.
+  late final Listenable patientState = Listenable.merge([
+    scores,
+    burn,
+    patient,
+  ]);
 
   static AppScope of(BuildContext context) =>
       context.getInheritedWidgetOfExactType<AppScope>()!;
