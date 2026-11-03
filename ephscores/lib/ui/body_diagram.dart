@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 import '../burn/burn.dart';
+import '../format.dart';
 
 /// Diagram canvas size; shapes are laid out in these units and scaled to fit.
 const _canvas = Size(200, 440);

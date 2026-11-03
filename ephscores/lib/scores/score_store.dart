@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../persistence.dart';
@@ -9,14 +11,37 @@ final allScores = {
   for (final s in [...adultScores, ...pediatricScores]) s.id: s,
 };
 
-/// Answers for every score of the current patient, saved on every change so
-/// nothing is lost if the app is killed mid-assessment.
-class ScoreStore extends PersistedStore {
-  ScoreStore(SharedPreferences prefs) : super(prefs, 'scores.v2') {
-    load();
+/// The answers to every score at one moment, and their results. The store
+/// keeps the live sheet; each registered evaluation keeps a [copy].
+class ScoreSheet {
+  ScoreSheet() : _answers = {};
+
+  ScoreSheet._(this._answers);
+
+  /// Parses [toJson] output, dropping unknown scores, items and options.
+  factory ScoreSheet.fromJson(Object? json) {
+    final answers = <String, Map<String, Set<int>>>{};
+    for (final MapEntry(key: id, value: items)
+        in (json as Map<String, dynamic>).entries) {
+      final score = allScores[id];
+      if (score == null) continue;
+      final parsed = <String, Set<int>>{};
+      for (final MapEntry(key: itemId, value: picks)
+          in (items as Map).entries) {
+        final item = score.items.where((it) => it.id == itemId).firstOrNull;
+        if (item == null) continue;
+        final valid = (picks as List)
+            .cast<int>()
+            .where((i) => i >= 0 && i < item.options.length)
+            .toSet();
+        if (valid.isNotEmpty) parsed[itemId as String] = valid;
+      }
+      if (parsed.isNotEmpty) answers[id] = parsed;
+    }
+    return ScoreSheet._(answers);
   }
 
-  final Map<String, Map<String, Set<int>>> _answers = {};
+  final Map<String, Map<String, Set<int>>> _answers;
 
   Answers answersFor(String scoreId) => Answers(_answers[scoreId] ?? const {});
 
@@ -27,9 +52,57 @@ class ScoreStore extends PersistedStore {
 
   bool hasAnswers(String scoreId) => _answers[scoreId]?.isNotEmpty ?? false;
 
+  /// Scores with at least one answer, in display order.
+  List<ScoreDefinition> get answered => [
+    for (final s in allScores.values)
+      if (hasAnswers(s.id)) s,
+  ];
+
+  /// Deep copy: later changes to this sheet don't affect it.
+  ScoreSheet copy() => ScoreSheet._({
+    for (final MapEntry(key: id, value: items) in _answers.entries)
+      id: {
+        for (final e in items.entries) e.key: {...e.value},
+      },
+  });
+
+  /// Sorted, so equal sheets always encode to the same string.
+  Map<String, Object> toJson() => {
+    for (final id in _answers.keys.toList()..sort())
+      if (_answers[id]!.isNotEmpty)
+        id: {
+          for (final item in _answers[id]!.keys.toList()..sort())
+            item: _answers[id]![item]!.toList()..sort(),
+        },
+  };
+
+  bool sameAs(ScoreSheet other) =>
+      jsonEncode(toJson()) == jsonEncode(other.toJson());
+}
+
+/// Answers for every score of the current patient, saved on every change so
+/// nothing is lost if the app is killed mid-assessment.
+class ScoreStore extends PersistedStore {
+  ScoreStore(SharedPreferences prefs) : super(prefs, 'scores.v2') {
+    load();
+  }
+
+  ScoreSheet _sheet = ScoreSheet();
+
+  /// The live answers. Take a [ScoreSheet.copy] to keep a snapshot.
+  ScoreSheet get sheet => _sheet;
+
+  Answers answersFor(String scoreId) => _sheet.answersFor(scoreId);
+
+  ScoreResult resultFor(String scoreId) => _sheet.resultFor(scoreId);
+
+  bool get isEmpty => _sheet.isEmpty;
+
+  bool hasAnswers(String scoreId) => _sheet.hasAnswers(scoreId);
+
   /// Selects or deselects an option, honouring single/multi/exclusive rules.
   void toggle(String scoreId, ScoreItem item, int index) {
-    final score = _answers.putIfAbsent(scoreId, () => {});
+    final score = _sheet._answers.putIfAbsent(scoreId, () => {});
     final current = {...?score[item.id]};
     if (current.contains(index)) {
       current.remove(index);
@@ -51,39 +124,18 @@ class ScoreStore extends PersistedStore {
   }
 
   void reset(String scoreId) {
-    _answers.remove(scoreId);
+    _sheet._answers.remove(scoreId);
     changed();
   }
 
   void resetAll() {
-    _answers.clear();
+    _sheet._answers.clear();
     changed();
   }
 
   @override
-  Object toJson() => {
-    for (final MapEntry(key: id, value: items) in _answers.entries)
-      id: {for (final e in items.entries) e.key: e.value.toList()},
-  };
+  Object toJson() => _sheet.toJson();
 
   @override
-  void restore(Object? json) {
-    for (final MapEntry(key: id, value: items)
-        in (json as Map<String, dynamic>).entries) {
-      final score = allScores[id];
-      if (score == null) continue;
-      final parsed = <String, Set<int>>{};
-      for (final MapEntry(key: itemId, value: picks)
-          in (items as Map).entries) {
-        final item = score.items.where((it) => it.id == itemId).firstOrNull;
-        if (item == null) continue;
-        final valid = (picks as List)
-            .cast<int>()
-            .where((i) => i >= 0 && i < item.options.length)
-            .toSet();
-        if (valid.isNotEmpty) parsed[itemId as String] = valid;
-      }
-      _answers[id] = parsed;
-    }
-  }
+  void restore(Object? json) => _sheet = ScoreSheet.fromJson(json);
 }

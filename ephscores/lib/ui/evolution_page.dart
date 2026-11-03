@@ -1,0 +1,456 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../app.dart';
+import '../format.dart';
+import '../patient/patient.dart';
+import '../patient/summary.dart';
+import '../scores/score_store.dart';
+import '../theme.dart';
+import 'widgets.dart';
+
+/// Timeline of the patient's registered evaluations.
+class EvolutionPage extends StatelessWidget {
+  const EvolutionPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = AppScope.of(context);
+    final patient = scope.patient;
+    return ListenableBuilder(
+      listenable: Listenable.merge([patient, scope.scores, scope.burn]),
+      builder: (context, _) {
+        if (patient.startedAt == null) {
+          return Scaffold(
+            appBar: AppBar(title: const Text('Evolução')),
+            body: const Center(child: Text('Sem doente')),
+          );
+        }
+        final evaluations = patient.evaluations;
+        return Scaffold(
+          appBar: AppBar(title: const Text('Evolução')),
+          body: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            children: [
+              _SummaryCard(
+                patient: patient,
+                unsaved: patient.isActive && scope.hasUnsavedChanges,
+              ),
+              if (evaluations.isEmpty)
+                _EmptyState(patient: patient)
+              else ...[
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(48),
+                    backgroundColor: Theme.of(context).colorScheme.tile,
+                  ),
+                  onPressed: () async {
+                    await Clipboard.setData(
+                      ClipboardData(text: patientSummary(patient)),
+                    );
+                    if (context.mounted) showToast(context, 'Resumo copiado');
+                  },
+                  icon: const Icon(Icons.copy),
+                  label: const Text('Copiar resumo'),
+                ),
+                const SectionLabel('Tendência'),
+                _TrendTable(evaluations: evaluations),
+                const SectionLabel('Avaliações'),
+                for (final (i, e) in evaluations.indexed.toList().reversed)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _EvaluationCard(
+                      number: i + 1,
+                      evaluation: e,
+                      isLatest: i == evaluations.length - 1,
+                      canDelete:
+                          patient.isActive && i == evaluations.length - 1,
+                    ),
+                  ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  const _SummaryCard({required this.patient, required this.unsaved});
+
+  final PatientStore patient;
+  final bool unsaved;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final fg = theme.colorScheme.onPrimaryContainer;
+    final start = patient.startedAt!;
+    final end = patient.finishedAt;
+    final n = patient.evaluations.length;
+    final body = theme.textTheme.bodyMedium?.copyWith(color: fg);
+    return Card(
+      color: theme.colorScheme.primaryContainer,
+      shape: filledCardShape,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              end == null ? 'Em curso' : 'Finalizado',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: fg,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Início: ${formatDate(start)} ${formatClock(start)}',
+              style: body,
+            ),
+            Text(
+              end == null
+                  ? 'Há ${formatDuration(DateTime.now().difference(start))}'
+                  : 'Fim: ${formatClock(end)} · '
+                        'duração ${formatDuration(end.difference(start))}',
+              style: body,
+            ),
+            Text('$n ${n == 1 ? 'avaliação' : 'avaliações'}', style: body),
+            if (unsaved) ...[
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(Icons.edit_note, size: 18, color: fg),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Há alterações por registar no painel.',
+                      style: body?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({required this.patient});
+
+  final PatientStore patient;
+
+  Future<void> _cancelPatient(BuildContext context) async {
+    final scope = AppScope.of(context);
+    if (!await confirm(
+      context,
+      title: 'Cancelar doente?',
+      message: 'Descarta o doente e todas as respostas, sem guardar nada.',
+      action: 'Cancelar doente',
+    )) {
+      return;
+    }
+    if (context.mounted) Navigator.pop(context);
+    scope.scores.resetAll();
+    scope.burn.clearAll();
+    scope.patient.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 40),
+      child: Column(
+        children: [
+          Icon(Icons.timeline, size: 48, color: theme.colorScheme.outline),
+          const SizedBox(height: 12),
+          Text(
+            'Ainda sem avaliações registadas.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleMedium,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'No painel, use "Registar" para guardar a avaliação atual.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium,
+          ),
+          if (patient.isActive) ...[
+            const SizedBox(height: 24),
+            OutlinedButton.icon(
+              onPressed: () => _cancelPatient(context),
+              icon: const Icon(Icons.close),
+              label: const Text('Cancelar doente'),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Scores as rows, evaluations as columns. The names stay put while the
+/// values scroll; the newest evaluation is shown first.
+class _TrendTable extends StatelessWidget {
+  const _TrendTable({required this.evaluations});
+
+  final List<Evaluation> evaluations;
+
+  static const _headerHeight = 44.0;
+  static const _rowHeight = 44.0;
+  static const _cellWidth = 64.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final ids = {
+      for (final e in evaluations)
+        for (final s in e.scores.answered) s.id,
+    };
+    final scores = [
+      for (final s in allScores.values)
+        if (ids.contains(s.id)) s,
+    ];
+    final burns = evaluations.any((e) => e.burns.hasBurns);
+    final dash = Text('–', style: TextStyle(color: theme.colorScheme.outline));
+
+    Widget cell(Widget child) => SizedBox(
+      height: _rowHeight,
+      child: Center(child: child),
+    );
+    Widget name(String text) => SizedBox(
+      height: _rowHeight,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            text,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 4, 8, 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: 72,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: _headerHeight),
+                  for (final s in scores) name(s.name),
+                  if (burns) name('SCQ'),
+                ],
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                reverse: true,
+                child: Row(
+                  children: [
+                    for (final (i, e) in evaluations.indexed)
+                      SizedBox(
+                        width: _cellWidth,
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: _headerHeight,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      '#${i + 1}',
+                                      style: theme.textTheme.labelMedium
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                    Text(
+                                      formatClock(e.registeredAt),
+                                      style: theme.textTheme.labelSmall,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            for (final s in scores)
+                              cell(
+                                e.scores.hasAnswers(s.id)
+                                    ? ResultPill(
+                                        e.scores.resultFor(s.id),
+                                        compact: true,
+                                      )
+                                    : dash,
+                              ),
+                            if (burns)
+                              cell(
+                                e.burns.hasBurns
+                                    ? _BurnPill(e.burns.tbsa)
+                                    : dash,
+                              ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BurnPill extends StatelessWidget {
+  const _BurnPill(this.tbsa);
+
+  final double tbsa;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      constraints: const BoxConstraints(minWidth: 48),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+      decoration: BoxDecoration(
+        color: scheme.secondaryContainer,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          formatPercent(tbsa),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: scheme.onSecondaryContainer,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EvaluationCard extends StatelessWidget {
+  const _EvaluationCard({
+    required this.number,
+    required this.evaluation,
+    required this.isLatest,
+    required this.canDelete,
+  });
+
+  final int number;
+  final Evaluation evaluation;
+  final bool isLatest;
+  final bool canDelete;
+
+  Future<void> _delete(BuildContext context) async {
+    final patient = AppScope.of(context).patient;
+    if (await confirm(
+      context,
+      title: 'Apagar avaliação $number?',
+      message: 'As respostas atuais no painel não são alteradas.',
+      action: 'Apagar',
+    )) {
+      patient.removeLast();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final e = evaluation;
+    final scores = e.scores.answered;
+    final n = scores.length + (e.burns.hasBurns ? 1 : 0);
+    return Card(
+      child: ExpansionTile(
+        initiallyExpanded: isLatest,
+        shape: const Border(),
+        collapsedShape: const Border(),
+        title: Text(
+          'Avaliação $number · ${formatClock(e.registeredAt)}',
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Text(
+          'Duração ${formatDuration(e.duration)} · '
+          '$n ${n == 1 ? 'registo' : 'registos'}',
+        ),
+        children: [
+          for (final s in scores)
+            _ResultRow(
+              title: s.name,
+              subtitle: _detail(e.scores, s.id),
+              trailing: ResultPill(e.scores.resultFor(s.id), compact: true),
+            ),
+          if (e.burns.hasBurns)
+            _ResultRow(
+              title: 'Queimados',
+              subtitle: burnLine(e.burns).split(' — ').last,
+              trailing: _BurnPill(e.burns.tbsa),
+            ),
+          if (n == 0) const ListTile(dense: true, title: Text('Sem dados')),
+          if (canDelete)
+            Align(
+              alignment: Alignment.centerRight,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+                child: TextButton.icon(
+                  onPressed: () => _delete(context),
+                  icon: const Icon(Icons.delete_outline),
+                  label: const Text('Apagar'),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  static String _detail(ScoreSheet sheet, String id) {
+    final r = sheet.resultFor(id);
+    if (!r.complete) return 'Incompleto (${r.answered}/${r.total})';
+    return [r.label, ?r.breakdown].join(' · ');
+  }
+}
+
+class _ResultRow extends StatelessWidget {
+  const _ResultRow({
+    required this.title,
+    required this.subtitle,
+    required this.trailing,
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      dense: true,
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+      subtitle: Text(subtitle),
+      trailing: trailing,
+    );
+  }
+}

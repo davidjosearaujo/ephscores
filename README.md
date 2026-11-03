@@ -7,10 +7,15 @@
 EPHScores ajuda profissionais de emergência pré-hospitalar a avaliar vítimas
 de forma rápida e simples, no terreno.
 
+- **Evolução do doente:** cada avaliação é registada com hora e duração;
+  as respostas ficam como referência para a seguinte, e a página
+  *Evolução* mostra a tendência de cada escala e permite copiar um resumo
+  em texto
 - **Escalas gerais:** Cincinnati, Glasgow (ECG), MGAP, NEWS2, ProACS, RACE e RTS
 - **Escalas pediátricas:** APGAR, Triângulo de Avaliação Pediátrica (TAP) e PTS
 - **Avaliação do queimado:** regra dos nove para adulto e criança, com grau por região
-- **Triagem START:** algoritmo passo a passo e contagem de vítimas por prioridade
+- **Triagem START:** algoritmo passo a passo e contagem de vítimas por
+  prioridade, separada do doente
 - **Contactos úteis:** linhas de apoio com chamada direta
 
 ### Feita para o terreno
@@ -18,8 +23,10 @@ de forma rápida e simples, no terreno.
 - **100 % offline.** A versão de produção não pede permissão de Internet; nada
   sai do dispositivo.
 - **Botões grandes**, pensados para usar com luvas.
-- **Nada se perde:** as respostas são guardadas a cada toque e sobrevivem ao
-  fecho da aplicação. "Novo doente" limpa tudo de uma vez.
+- **Nada se perde:** as respostas e as avaliações são guardadas a cada toque
+  e sobrevivem ao fecho da aplicação.
+- **Sem dados pessoais:** não há campos de identificação, e só o último
+  doente é mantido. "Novo doente" apaga o anterior.
 - **Modo escuro** automático, para turnos noturnos.
 
 > A aplicação é um auxiliar de cálculo. Não substitui a avaliação clínica nem
@@ -56,6 +63,7 @@ flutter run
 | Pasta | Conteúdo |
 |---|---|
 | `lib/scores/` | Definição de cada escala como dados + cálculo (sem dependências de UI) |
+| `lib/patient/` | Doente, avaliações registadas e resumo em texto |
 | `lib/start/`, `lib/burn/` | Algoritmo START e regra dos nove |
 | `lib/ui/` | Ecrãs; um único ecrã genérico desenha qualquer escala |
 | `web/`, `scripts/` | PWA: manifesto, service worker e script de build |

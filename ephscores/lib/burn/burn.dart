@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../persistence.dart';
@@ -32,13 +34,6 @@ enum BodyPart {
   rightLeg,
   leftLeg,
 }
-
-/// "4,5" or "9": Portuguese decimal comma, no trailing ",0".
-String formatNumber(double v) =>
-    (v == v.roundToDouble() ? v.toInt().toString() : v.toStringAsFixed(1))
-        .replaceAll('.', ',');
-
-String formatPercent(double v) => '${formatNumber(v)}%';
 
 class BodyRegion {
   const BodyRegion(this.view, this.part, this.label, this.percent);
@@ -131,38 +126,42 @@ const Map<BurnPatient, List<BodyRegion>> bodyRegions = {
   ],
 };
 
-class BurnStore extends PersistedStore {
-  BurnStore(SharedPreferences prefs) : super(prefs, 'burn.v2') {
-    load();
+/// Burn degrees painted on the body map at one moment, for both patient
+/// types. The store keeps the live sheet; evaluations keep a [copy].
+class BurnSheet {
+  BurnSheet()
+    : this._(BurnPatient.adult, {for (final p in BurnPatient.values) p: {}});
+
+  BurnSheet._(this._patient, this._degrees);
+
+  /// Parses [toJson] output, dropping unknown regions.
+  factory BurnSheet.fromJson(Object? json) {
+    final data = json as Map<String, dynamic>;
+    final sheet = BurnSheet()
+      .._patient = BurnPatient.values.byName(data['patient'] as String);
+    for (final p in BurnPatient.values) {
+      final ids = {for (final r in bodyRegions[p]!) r.id};
+      for (final MapEntry(:key, :value)
+          in ((data[p.name] ?? {}) as Map).entries) {
+        if (ids.contains(key)) {
+          sheet._degrees[p]![key as String] = BurnDegree.values.byName(
+            value as String,
+          );
+        }
+      }
+    }
+    return sheet;
   }
 
-  BurnPatient _patient = BurnPatient.adult;
-  final Map<BurnPatient, Map<String, BurnDegree>> _degrees = {
-    for (final p in BurnPatient.values) p: {},
-  };
+  BurnPatient _patient;
+  final Map<BurnPatient, Map<String, BurnDegree>> _degrees;
 
   BurnPatient get patient => _patient;
-
-  set patient(BurnPatient value) {
-    _patient = value;
-    changed();
-  }
 
   List<BodyRegion> get regions => bodyRegions[_patient]!;
 
   BurnDegree degreeOf(BodyRegion region) =>
       _degrees[_patient]![region.id] ?? BurnDegree.none;
-
-  /// Paints [region] with [degree], or clears it if it already has that degree.
-  void paint(BodyRegion region, BurnDegree degree) {
-    final map = _degrees[_patient]!;
-    if (degree == BurnDegree.none || map[region.id] == degree) {
-      map.remove(region.id);
-    } else {
-      map[region.id] = degree;
-    }
-    changed();
-  }
 
   double percentWhere(bool Function(BurnDegree d) test) => [
     for (final r in regions)
@@ -174,40 +173,79 @@ class BurnStore extends PersistedStore {
 
   bool get isEmpty => _degrees.values.every((m) => m.isEmpty);
 
+  /// Whether the selected patient type has any region painted.
+  bool get hasBurns => _degrees[_patient]!.isNotEmpty;
+
+  BurnSheet copy() => BurnSheet._(_patient, {
+    for (final MapEntry(key: p, value: m) in _degrees.entries) p: {...m},
+  });
+
+  /// Sorted, so equal sheets always encode to the same string.
+  Map<String, Object> toJson() => {
+    'patient': _patient.name,
+    for (final MapEntry(key: p, value: m) in _degrees.entries)
+      p.name: {for (final id in m.keys.toList()..sort()) id: m[id]!.name},
+  };
+
+  bool sameAs(BurnSheet other) =>
+      jsonEncode(toJson()) == jsonEncode(other.toJson());
+}
+
+class BurnStore extends PersistedStore {
+  BurnStore(SharedPreferences prefs) : super(prefs, 'burn.v2') {
+    load();
+  }
+
+  BurnSheet _sheet = BurnSheet();
+
+  /// The live burn map. Take a [BurnSheet.copy] to keep a snapshot.
+  BurnSheet get sheet => _sheet;
+
+  BurnPatient get patient => _sheet.patient;
+
+  set patient(BurnPatient value) {
+    _sheet._patient = value;
+    changed();
+  }
+
+  List<BodyRegion> get regions => _sheet.regions;
+
+  BurnDegree degreeOf(BodyRegion region) => _sheet.degreeOf(region);
+
+  /// Paints [region] with [degree], or clears it if it already has that degree.
+  void paint(BodyRegion region, BurnDegree degree) {
+    final map = _sheet._degrees[_sheet.patient]!;
+    if (degree == BurnDegree.none || map[region.id] == degree) {
+      map.remove(region.id);
+    } else {
+      map[region.id] = degree;
+    }
+    changed();
+  }
+
+  double percentWhere(bool Function(BurnDegree d) test) =>
+      _sheet.percentWhere(test);
+
+  double get tbsa => _sheet.tbsa;
+
+  bool get isEmpty => _sheet.isEmpty;
+
   /// Clears the current patient type only.
   void clear() {
-    _degrees[_patient]!.clear();
+    _sheet._degrees[_sheet.patient]!.clear();
     changed();
   }
 
   void clearAll() {
-    for (final m in _degrees.values) {
+    for (final m in _sheet._degrees.values) {
       m.clear();
     }
     changed();
   }
 
   @override
-  Object toJson() => {
-    'patient': _patient.name,
-    for (final MapEntry(key: p, value: m) in _degrees.entries)
-      p.name: {for (final e in m.entries) e.key: e.value.name},
-  };
+  Object toJson() => _sheet.toJson();
 
   @override
-  void restore(Object? json) {
-    final data = json as Map<String, dynamic>;
-    _patient = BurnPatient.values.byName(data['patient'] as String);
-    for (final p in BurnPatient.values) {
-      final ids = {for (final r in bodyRegions[p]!) r.id};
-      for (final MapEntry(:key, :value)
-          in ((data[p.name] ?? {}) as Map).entries) {
-        if (ids.contains(key)) {
-          _degrees[p]![key as String] = BurnDegree.values.byName(
-            value as String,
-          );
-        }
-      }
-    }
-  }
+  void restore(Object? json) => _sheet = BurnSheet.fromJson(json);
 }

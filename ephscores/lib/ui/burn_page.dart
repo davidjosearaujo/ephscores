@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../burn/burn.dart';
+import '../format.dart';
 import '../theme.dart';
 import 'body_diagram.dart';
 import 'widgets.dart';

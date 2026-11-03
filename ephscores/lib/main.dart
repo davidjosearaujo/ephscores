@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
 import 'burn/burn.dart';
+import 'patient/patient.dart';
 import 'scores/score_store.dart';
 import 'start/start.dart';
 
@@ -24,6 +25,7 @@ Future<void> main() async {
       scores: ScoreStore(prefs),
       start: start,
       burn: BurnStore(prefs),
+      patient: PatientStore(prefs),
     ),
   );
 }

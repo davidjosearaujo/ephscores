@@ -3,37 +3,85 @@ import 'package:flutter/material.dart';
 import '../scores/model.dart';
 import '../theme.dart';
 
-/// Rounded, colour-coded pill showing a score value.
+/// Rounded, colour-coded pill showing a score value. [compact] is the
+/// smaller size used in the evolution table.
 class ResultPill extends StatelessWidget {
-  const ResultPill(this.result, {super.key, this.large = false});
+  const ResultPill(this.result, {super.key, this.compact = false});
 
   final ScoreResult result;
-  final bool large;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      constraints: BoxConstraints(minWidth: large ? 88 : 64),
+      constraints: BoxConstraints(minWidth: compact ? 48 : 64),
       padding: EdgeInsets.symmetric(
-        horizontal: large ? 18 : 12,
-        vertical: large ? 10 : 6,
+        horizontal: compact ? 8 : 12,
+        vertical: compact ? 4 : 6,
       ),
       decoration: BoxDecoration(
         color: Palette.severity(result.severity, scheme),
-        borderRadius: BorderRadius.circular(large ? 20 : 14),
+        borderRadius: BorderRadius.circular(compact ? 10 : 14),
       ),
       child: Text(
         result.display,
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: large ? 36 : 22,
+          fontSize: compact ? 16 : 22,
           fontWeight: FontWeight.w700,
           color: Palette.onSeverity(result.severity, scheme),
           fontFeatures: const [FontFeature.tabularFigures()],
         ),
       ),
+    );
+  }
+}
+
+/// The EPHScores logo in a white circle.
+class AppLogo extends StatelessWidget {
+  const AppLogo({super.key, this.size = 80});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: size,
+      height: size,
+      padding: EdgeInsets.all(size * 0.11),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        border: Border.all(color: Theme.of(context).colorScheme.tileBorder),
+      ),
+      child: Image.asset('assets/EPHScores_logo.png'),
+    );
+  }
+}
+
+/// "Funciona sem rede" note; opens the licences page.
+class OfflineNote extends StatelessWidget {
+  const OfflineNote({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return TextButton.icon(
+      style: TextButton.styleFrom(
+        foregroundColor: theme.colorScheme.outline,
+        textStyle: theme.textTheme.bodySmall,
+      ),
+      onPressed: () => showLicensePage(
+        context: context,
+        applicationName: 'EPHScores',
+        applicationLegalese:
+            'Auxiliar de cálculo. Não substitui a avaliação clínica '
+            'nem os protocolos em vigor.',
+      ),
+      icon: const Icon(Icons.wifi_off, size: 14),
+      label: const Text('Funciona sem rede. Nenhum dado sai do dispositivo.'),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app.dart';
+import '../format.dart';
 import '../start/start.dart';
 import '../theme.dart';
 import 'widgets.dart';
@@ -400,7 +401,7 @@ class _Summary extends StatelessWidget {
                           ),
                         ),
                         title: Text('${r.category.code} · ${r.category.label}'),
-                        trailing: Text(_time(r.time)),
+                        trailing: Text(formatClock(r.time)),
                       ),
                   ],
                 ),
@@ -429,9 +430,6 @@ class _Summary extends StatelessWidget {
       },
     );
   }
-
-  static String _time(DateTime t) =>
-      '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
 }
 
 class _CountTile extends StatelessWidget {
