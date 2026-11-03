@@ -117,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _Header(scope: scope),
+                      const _Header(),
                       if (_showInstallHint)
                         Padding(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -139,8 +139,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       SafeArea(
                         top: false,
-                        minimum: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                        child: const _Footer(),
+                        minimum: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                        child: _Footer(scope: scope),
                       ),
                     ],
                   ),
@@ -155,28 +155,11 @@ class _HomePageState extends State<HomePage> {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.scope});
-
-  final AppScope scope;
-
-  Future<void> _newPatient(BuildContext context) async {
-    if (await confirm(
-      context,
-      title: 'Novo doente?',
-      message:
-          'Apaga todas as escalas e a avaliação do queimado. '
-          'A contagem da triagem START mantém-se.',
-      action: 'Novo doente',
-    )) {
-      scope.scores.resetAll();
-      scope.burn.clearAll();
-    }
-  }
+  const _Header();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hasPatient = !scope.scores.isEmpty || !scope.burn.isEmpty;
     return Container(
       decoration: const BoxDecoration(
         color: Palette.navy,
@@ -185,7 +168,7 @@ class _Header extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 12, 24),
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
           child: Row(
             children: [
               Container(
@@ -212,7 +195,7 @@ class _Header extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Escalas de emergência\npré-hospitalar',
+                      'Escalas de emergência pré-hospitalar',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.white.withValues(alpha: 0.8),
                       ),
@@ -220,12 +203,6 @@ class _Header extends StatelessWidget {
                   ],
                 ),
               ),
-              if (hasPatient)
-                _HeaderAction(
-                  icon: Icons.person_add_alt,
-                  label: 'Novo doente',
-                  onTap: () => _newPatient(context),
-                ),
             ],
           ),
         ),
@@ -234,73 +211,60 @@ class _Header extends StatelessWidget {
   }
 }
 
-/// Compact white-on-navy button for the header.
-class _HeaderAction extends StatelessWidget {
-  const _HeaderAction({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white.withValues(alpha: 0.14),
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: SizedBox(
-          width: 76,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Column(
-              children: [
-                Icon(icon, color: Colors.white),
-                const SizedBox(height: 4),
-                Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    height: 1.1,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _Footer extends StatelessWidget {
-  const _Footer();
+  const _Footer({required this.scope});
+
+  final AppScope scope;
+
+  Future<void> _newPatient(BuildContext context) async {
+    if (await confirm(
+      context,
+      title: 'Novo doente?',
+      message:
+          'Apaga todas as escalas e a avaliação do queimado. '
+          'A contagem da triagem START mantém-se.',
+      action: 'Novo doente',
+    )) {
+      scope.scores.resetAll();
+      scope.burn.clearAll();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return TextButton.icon(
-      style: TextButton.styleFrom(
-        foregroundColor: theme.colorScheme.outline,
-        textStyle: theme.textTheme.bodySmall,
-      ),
-      onPressed: () => showLicensePage(
-        context: context,
-        applicationName: 'EPHScores',
-        applicationLegalese:
-            'Auxiliar de cálculo. Não substitui a avaliação clínica '
-            'nem os protocolos em vigor.',
-      ),
-      icon: const Icon(Icons.wifi_off, size: 14),
-      label: const Text('Funciona sem rede. Nenhum dado sai do dispositivo.'),
+    final hasPatient = !scope.scores.isEmpty || !scope.burn.isEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size.fromHeight(52),
+            backgroundColor: theme.colorScheme.tile,
+          ),
+          onPressed: hasPatient ? () => _newPatient(context) : null,
+          icon: const Icon(Icons.person_add_alt),
+          label: const Text('Novo doente'),
+        ),
+        const SizedBox(height: 4),
+        TextButton.icon(
+          style: TextButton.styleFrom(
+            foregroundColor: theme.colorScheme.outline,
+            textStyle: theme.textTheme.bodySmall,
+          ),
+          onPressed: () => showLicensePage(
+            context: context,
+            applicationName: 'EPHScores',
+            applicationLegalese:
+                'Auxiliar de cálculo. Não substitui a avaliação clínica '
+                'nem os protocolos em vigor.',
+          ),
+          icon: const Icon(Icons.wifi_off, size: 14),
+          label: const Text(
+            'Funciona sem rede. Nenhum dado sai do dispositivo.',
+          ),
+        ),
+      ],
     );
   }
 }
