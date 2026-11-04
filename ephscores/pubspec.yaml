@@ -25,6 +25,7 @@ dependencies:
   shared_preferences: ^2.5.0
   flutter_localizations:
     sdk: flutter
+  flutter_svg: ^2.2.0
   url_launcher: ^6.3.0
   web: ^1.1.0
   yaml: ^3.1.0
@@ -40,7 +41,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/Contacts.json
-    - assets/EPHScores_logo.png
+    - assets/brand/logo.svg
     - assets/fonts/OFL.txt
     - pubspec.yaml
 
@@ -65,3 +66,4 @@ flutter_launcher_icons:
   remove_alpha_ios: true
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+  adaptive_icon_monochrome: "assets/icon/app_icon_monochrome.png"

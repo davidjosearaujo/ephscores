@@ -89,28 +89,6 @@ class BurnPill extends StatelessWidget {
   }
 }
 
-/// The EPHScores logo in a white circle.
-class AppLogo extends StatelessWidget {
-  const AppLogo({super.key, this.size = 80});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: size,
-      height: size,
-      padding: EdgeInsets.all(size * 0.11),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        border: Border.all(color: Theme.of(context).colorScheme.tileBorder),
-      ),
-      child: Image.asset('assets/EPHScores_logo.png'),
-    );
-  }
-}
-
 /// Section heading used inside pages.
 class SectionLabel extends StatelessWidget {
   const SectionLabel(this.text, {super.key});

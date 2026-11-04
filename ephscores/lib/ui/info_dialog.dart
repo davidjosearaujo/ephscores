@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../app_info.dart';
-import 'widgets.dart';
+import 'brand.dart';
 
 /// Small grey "i" that opens [showAppInfo].
 class InfoButton extends StatelessWidget {
@@ -40,9 +40,9 @@ class _InfoDialog extends StatelessWidget {
     return AlertDialog(
       title: Row(
         children: [
-          const AppLogo(size: 48),
+          const AppLogo(size: 44),
           const SizedBox(width: 12),
-          Expanded(child: Text(info.name)),
+          Expanded(child: Wordmark(style: theme.textTheme.titleLarge)),
         ],
       ),
       content: SingleChildScrollView(

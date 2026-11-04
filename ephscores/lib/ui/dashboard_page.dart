@@ -10,6 +10,7 @@ import '../scores/adult.dart';
 import '../scores/model.dart';
 import '../scores/pediatric.dart';
 import '../theme.dart';
+import 'brand.dart';
 import 'burn_page.dart';
 import 'contacts_page.dart';
 import 'evolution_page.dart';

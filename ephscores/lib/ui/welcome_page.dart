@@ -5,6 +5,7 @@ import '../app.dart';
 import '../format.dart';
 import '../platform/install_hint.dart';
 import '../theme.dart';
+import 'brand.dart';
 import 'contacts_page.dart';
 import 'evolution_page.dart';
 import 'info_dialog.dart';
@@ -92,14 +93,12 @@ class _WelcomePageState extends State<WelcomePage> {
                       if (_showInstallHint)
                         _InstallHint(onDismiss: _dismissInstallHint),
                       const Spacer(),
-                      const Center(child: AppLogo(size: 152)),
+                      const Center(child: LogoReveal(size: 168)),
                       const SizedBox(height: 24),
-                      Text(
-                        'EPHScores',
+                      Wordmark(
                         textAlign: TextAlign.center,
                         style: theme.textTheme.displaySmall?.copyWith(
                           color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w800,
                         ),
                       ),
                       const SizedBox(height: 4),

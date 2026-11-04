@@ -57,3 +57,6 @@ dist/
 # firebase.json and .firebaserc, which hold no secrets.
 **/google-services.json
 **/GoogleService-Info.plist
+
+# Icon generator dependencies (scripts/icons)
+node_modules/

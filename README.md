@@ -72,6 +72,23 @@ flutter run
 Para acrescentar uma escala basta criar um `ScoreDefinition` em
 `lib/scores/adult.dart` ou `pediatric.dart` e juntá-lo à lista.
 
+### Logótipo e ícones
+
+Há uma única fonte: `ephscores/assets/brand/logo.svg` (um emblema hexagonal
+azul-marinho com a estrela da vida, cujos três braços superiores são verde,
+amarelo e vermelho, as cores das escalas). A aplicação desenha o logótipo
+a partir desse ficheiro, e todos os ícones (Android, iPhone/PWA, favicon,
+loja) são gerados dele:
+
+```sh
+cd ephscores/scripts/icons && npm install && npm run generate
+cd ../.. && dart run flutter_launcher_icons
+```
+
+Uma pré-visualização está em `UI/Images/logo-preview.png`. As cores do SVG
+são procuradas por valor (`Palette` em `lib/theme.dart`); um teste garante
+que continuam iguais.
+
 ### Compilar tudo (APK + web)
 
 ```sh
