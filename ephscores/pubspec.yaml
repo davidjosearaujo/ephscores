@@ -7,7 +7,7 @@ publish_to: 'none'
 # bundled as an asset), and test/manifest_test.dart checks that the
 # Android, iOS and web manifests agree with app_info below.
 version: 2.0.0+9
-# homepage: (the PWA's address, once it is hosted)
+homepage: https://ephscores-7e4eb.web.app
 repository: https://codeberg.org/davidjosearaujo/ephscores
 
 app_info:

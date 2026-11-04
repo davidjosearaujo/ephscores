@@ -263,7 +263,8 @@ void main() {
       find.text('https://codeberg.org/davidjosearaujo/ephscores'),
       findsOneWidget,
     );
-    expect(find.text('Website'), findsNothing); // no homepage set yet
+    expect(find.text('Website'), findsOneWidget);
+    expect(find.text('https://ephscores-7e4eb.web.app'), findsOneWidget);
     expect(
       find.textContaining(RegExp(r'^\d+\.\d+\.\d+ \(\d+\)$')),
       findsOneWidget,

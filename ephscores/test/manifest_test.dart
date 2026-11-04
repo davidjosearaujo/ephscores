@@ -17,6 +17,7 @@ void main() {
     expect(info.developer, 'David Araújo');
     expect(info.developerUrl, startsWith('https://'));
     expect(info.repository, startsWith('https://codeberg.org/'));
+    expect(info.homepage, 'https://ephscores-7e4eb.web.app');
   });
 
   test('version without a build number', () {
