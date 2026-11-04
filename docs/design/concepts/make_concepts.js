@@ -76,5 +76,4 @@ concepts.forEach((c, i) => {
   body += place(c, themes.dark, 1160, y + 160, 40) + place(c, themes.dark, 1160 + 58, y + 160, 32);
 });
 const sheet = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${body}</svg>`;
-fs.writeFileSync(path.join(OUT, 'contact-sheet.svg'), sheet);
 sharp(Buffer.from(sheet), { density: 72 }).png().toFile(path.join(OUT, 'contact-sheet.png')).then(() => console.log('ok', W, H));

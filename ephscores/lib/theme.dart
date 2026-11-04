@@ -41,6 +41,9 @@ extension AppSurfaces on ColorScheme {
 
 const cardRadius = BorderRadius.all(Radius.circular(20));
 
+/// Padding of the scrolling pages (side margins, room below the last item).
+const listPadding = EdgeInsets.fromLTRB(16, 0, 16, 24);
+
 /// Shape for cards with their own fill colour, which need no outline.
 const filledCardShape = RoundedRectangleBorder(borderRadius: cardRadius);
 
@@ -88,6 +91,10 @@ ThemeData buildTheme(Brightness brightness) {
     ),
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: SegmentedButton.styleFrom(minimumSize: const Size(0, 48)),
+    ),
+    // Outlined buttons sit on the page background, so they get the tile fill.
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(backgroundColor: scheme.tile),
     ),
     searchBarTheme: SearchBarThemeData(
       elevation: const WidgetStatePropertyAll(0),

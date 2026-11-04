@@ -43,7 +43,7 @@ class ScorePage extends StatelessWidget {
             ],
           ),
           body: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            padding: listPadding,
             children: [
               Text(
                 score.description,

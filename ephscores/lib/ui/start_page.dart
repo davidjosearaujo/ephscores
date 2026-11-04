@@ -315,9 +315,7 @@ class _BigButton extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (icon != null) ...[Icon(icon, size: 28), const SizedBox(width: 8)],
-        Flexible(
-          child: FittedBox(fit: BoxFit.scaleDown, child: Text(label)),
-        ),
+        Flexible(child: FitText(label)),
       ],
     );
     return filled

@@ -177,15 +177,11 @@ class _SecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return OutlinedButton.icon(
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size.fromHeight(52),
-        backgroundColor: scheme.tile,
-      ),
+      style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52)),
       onPressed: onPressed,
       icon: Icon(icon),
-      label: FittedBox(fit: BoxFit.scaleDown, child: Text(label)),
+      label: FitText(label),
     );
   }
 }

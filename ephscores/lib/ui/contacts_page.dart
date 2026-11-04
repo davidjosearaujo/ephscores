@@ -33,7 +33,7 @@ class _ContactsPageState extends State<ContactsPage> {
           final all = snapshot.data ?? const <Contact>[];
           final shown = filterContacts(all, _query);
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            padding: listPadding,
             children: [
               SearchBar(
                 hintText: 'Procurar nome, assunto ou número',

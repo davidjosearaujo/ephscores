@@ -1,6 +1,6 @@
 # EPHScores
 
-![Banner](UI/Images/App_banner.png)
+![EPHScores](docs/design/banner.png)
 
 ## O que é?
 
@@ -68,7 +68,8 @@ flutter run
 | `lib/ui/` | Ecrãs; um único ecrã genérico desenha qualquer escala |
 | `web/`, `scripts/` | PWA: manifesto, service worker e script de build |
 | `test/` | Testes unitários e de interface |
-| `docs/design/` | Identidade visual: logótipo, cores, regras e conceitos |
+| `docs/design/` | Identidade visual: logótipo, cores, regras, conceitos e material antigo |
+| `docs/reference/` | Material de referência clínica |
 
 Para acrescentar uma escala basta criar um `ScoreDefinition` em
 `lib/scores/adult.dart` ou `pediatric.dart` e juntá-lo à lista.
@@ -82,7 +83,7 @@ a partir desse ficheiro, e todos os ícones (Android, iPhone/PWA, favicon,
 loja) são gerados dele:
 
 ```sh
-cd ephscores/scripts/icons && npm install && npm run generate && npm run preview
+cd ephscores/scripts/icons && npm install && npm run generate && npm run docs
 cd ../.. && dart run flutter_launcher_icons
 ```
 

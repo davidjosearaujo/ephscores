@@ -31,7 +31,7 @@ class EvolutionPage extends StatelessWidget {
         return Scaffold(
           appBar: AppBar(title: const Text('Evolução')),
           body: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            padding: listPadding,
             children: [
               _SummaryCard(
                 patient: patient,
@@ -44,7 +44,6 @@ class EvolutionPage extends StatelessWidget {
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size.fromHeight(48),
-                    backgroundColor: Theme.of(context).colorScheme.tile,
                   ),
                   onPressed: () async {
                     await Clipboard.setData(
@@ -233,14 +232,11 @@ class _TrendTable extends StatelessWidget {
       height: _rowHeight,
       child: Align(
         alignment: Alignment.centerLeft,
-        child: FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Text(
-            text,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: theme.colorScheme.primary,
-            ),
+        child: FitText(
+          text,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: theme.colorScheme.primary,
           ),
         ),
       ),

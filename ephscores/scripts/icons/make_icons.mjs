@@ -7,19 +7,12 @@
 // The Android themed (monochrome) icon must be a single colour, so it is the
 // badge with the star cut out; the three coloured arms exist only in the
 // full-colour versions.
-import { mkdirSync, readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import sharp from 'sharp';
+import { P as out, master, render, renderLogo } from './common.mjs';
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
-const master = readFileSync(join(root, 'assets/brand/logo.svg'), 'utf8');
-const out = (p) => join(root, p);
 const BLACK = '#000000';
-
-/** Renders SVG text at exactly px x px (vector-sharp, no resampling). */
-const render = (svg, px) =>
-  sharp(Buffer.from(svg), { density: (72 * px) / 512 }).resize(px, px).png().toBuffer();
 
 /** The badge only, in black, with the star cut out (transparent). */
 async function badgeWithStarCutOut(px) {
@@ -46,7 +39,7 @@ async function badgeWithStarCutOut(px) {
  */
 async function icon(file, size, { scale, bg = null, radius = 0, mono = false }) {
   const px = Math.round(size * scale);
-  const logo = mono ? await badgeWithStarCutOut(px) : await render(master, px);
+  const logo = mono ? await badgeWithStarCutOut(px) : await renderLogo(px);
   let img = sharp({
     create: { width: size, height: size, channels: 4, background: bg ?? { r: 0, g: 0, b: 0, alpha: 0 } },
   }).composite([{ input: logo, gravity: 'center' }]);

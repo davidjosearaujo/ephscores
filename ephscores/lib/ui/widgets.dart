@@ -5,6 +5,24 @@ import '../format.dart';
 import '../scores/model.dart';
 import '../theme.dart';
 
+/// Text that shrinks to fit the space it is given, instead of wrapping or
+/// overflowing (labels on buttons and chips, large system fonts). It has no
+/// maxLines on purpose: inside a FittedBox it can't wrap anyway, and setting
+/// it changes the intrinsic height that pages like the start screen rely on.
+class FitText extends StatelessWidget {
+  const FitText(this.text, {super.key, this.style, this.textAlign});
+
+  final String text;
+  final TextStyle? style;
+  final TextAlign? textAlign;
+
+  @override
+  Widget build(BuildContext context) => FittedBox(
+    fit: BoxFit.scaleDown,
+    child: Text(text, style: style, textAlign: textAlign),
+  );
+}
+
 /// Small rounded value chip. [compact] is the size used in the evolution
 /// table; text that is still too wide scales down to fit.
 class Pill extends StatelessWidget {
@@ -34,17 +52,14 @@ class Pill extends StatelessWidget {
         color: color,
         borderRadius: BorderRadius.circular(compact ? 10 : 14),
       ),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: compact ? 16 : 22,
-            fontWeight: FontWeight.w700,
-            color: onColor,
-            fontFeatures: const [FontFeature.tabularFigures()],
-          ),
+      child: FitText(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: compact ? 16 : 22,
+          fontWeight: FontWeight.w700,
+          color: onColor,
+          fontFeatures: const [FontFeature.tabularFigures()],
         ),
       ),
     );

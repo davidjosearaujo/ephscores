@@ -37,6 +37,7 @@ gerados dele; nunca se editam à mão.
 | `ephscores/web/icons/Icon-maskable-*.png` | PWA, versão para máscaras do sistema |
 | `ephscores/web/icons/apple-touch-icon.png` (180) | Ícone no ecrã principal do iPhone (opaco: o iOS pinta de preto o que for transparente) |
 | `ephscores/web/favicon.png` (64) | Separador do browser |
+| `docs/design/banner.png` (1024×500) | Banner do README |
 
 Dentro da aplicação, o logótipo aparece no ecrã inicial, no cabeçalho do painel
 e na janela de informação.
@@ -107,7 +108,8 @@ braços de cima. Os esboços em SVG e o gerador estão em
 itálico e «Scores» pequeno, num PNG com sombra incorporada. Foi substituído
 porque o texto era ilegível em tamanhos pequenos, a sombra ficava visível em
 fundos diferentes, a imagem tinha de ser ampliada (ficava desfocada) e não
-havia versão de uma só cor.
+havia versão de uma só cor. Os ficheiros antigos estão arquivados em
+[`legacy/`](legacy/).
 
 ## Atualizar a identidade
 
@@ -118,7 +120,7 @@ havia versão de uma só cor.
    cd ephscores/scripts/icons
    npm install
    npm run generate     # todos os ícones
-   npm run preview      # docs/design/logo-preview.png
+   npm run docs         # logo-preview.png e banner.png desta pasta
    cd ../.. && dart run flutter_launcher_icons
    flutter test         # confirma que o SVG e a paleta coincidem
    ```

@@ -247,13 +247,10 @@ class _PatientBar extends StatelessWidget {
     final count = scope.patient.evaluations.length;
     const height = Size.fromHeight(52);
     const text = TextStyle(fontSize: 16, fontWeight: FontWeight.w700);
-    Widget label(String s) =>
-        FittedBox(fit: BoxFit.scaleDown, child: Text(s, maxLines: 1));
     final outlined = OutlinedButton.styleFrom(
       minimumSize: height,
       textStyle: text,
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      backgroundColor: scheme.tile,
     );
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -274,7 +271,7 @@ class _PatientBar extends StatelessWidget {
                     child: OutlinedButton(
                       style: outlined,
                       onPressed: () => pushPage(context, const EvolutionPage()),
-                      child: label(
+                      child: FitText(
                         count == 0 ? 'Evolução' : 'Evolução ($count)',
                       ),
                     ),
@@ -292,7 +289,7 @@ class _PatientBar extends StatelessWidget {
                           ? () => _register(context)
                           : null,
                       icon: const Icon(Icons.save_alt),
-                      label: label('Registar'),
+                      label: FitText('Registar'),
                     ),
                   ),
                   if (count > 0) ...[
@@ -302,7 +299,7 @@ class _PatientBar extends StatelessWidget {
                       child: OutlinedButton(
                         style: outlined,
                         onPressed: () => _finish(context),
-                        child: label('Finalizar'),
+                        child: FitText('Finalizar'),
                       ),
                     ),
                   ],

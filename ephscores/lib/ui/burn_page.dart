@@ -52,7 +52,7 @@ class _BurnPageState extends State<BurnPage> {
             ],
           ),
           body: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+            padding: listPadding,
             children: [
               SegmentedButton<BurnPatient>(
                 segments: const [
@@ -284,15 +284,12 @@ class _BrushChip extends StatelessWidget {
                   ),
                 ),
           const SizedBox(height: 4),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: fg,
-              ),
+          FitText(
+            label,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: fg,
             ),
           ),
         ],
