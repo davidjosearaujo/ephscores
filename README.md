@@ -68,6 +68,7 @@ flutter run
 | `lib/ui/` | Ecrãs; um único ecrã genérico desenha qualquer escala |
 | `web/`, `scripts/` | PWA: manifesto, service worker e script de build |
 | `test/` | Testes unitários e de interface |
+| `docs/design/` | Identidade visual: logótipo, cores, regras e conceitos |
 
 Para acrescentar uma escala basta criar um `ScoreDefinition` em
 `lib/scores/adult.dart` ou `pediatric.dart` e juntá-lo à lista.
@@ -81,13 +82,14 @@ a partir desse ficheiro, e todos os ícones (Android, iPhone/PWA, favicon,
 loja) são gerados dele:
 
 ```sh
-cd ephscores/scripts/icons && npm install && npm run generate
+cd ephscores/scripts/icons && npm install && npm run generate && npm run preview
 cd ../.. && dart run flutter_launcher_icons
 ```
 
-Uma pré-visualização está em `UI/Images/logo-preview.png`. As cores do SVG
-são procuradas por valor (`Palette` em `lib/theme.dart`); um teste garante
-que continuam iguais.
+O logótipo, as cores, a tipografia e as regras de utilização estão descritos
+em [`docs/design/identidade.md`](docs/design/identidade.md), com a
+pré-visualização de cada ícone. As cores do SVG são procuradas por valor
+(`Palette` em `lib/theme.dart`); um teste garante que continuam iguais.
 
 ### Compilar tudo (APK + web)
 
