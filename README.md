@@ -79,7 +79,12 @@ cd ephscores
 scripts/build_all.sh                # analisa, testa e gera o APK e a web (PWA)
 scripts/build_all.sh all            # também gera o app bundle (.aab)
 scripts/build_all.sh --skip-tests --split apk   # só o APK, um por arquitetura
+scripts/build_all.sh --deploy       # APK + web e publica a web (iPhone) no Firebase
 ```
+
+Com `--deploy`, a versão web é publicada no Firebase Hosting depois de
+compilada, e uma só chamada lança as duas versões (Android e iPhone). Precisa
+do Firebase CLI (`npm install -g firebase-tools` e `firebase login`).
 
 Os ficheiros Android ficam em `ephscores/dist/` (com a versão no nome) e a
 web em `ephscores/build/web`. Precisa do Flutter no `PATH` e, para o Android,
@@ -91,6 +96,8 @@ de debug: serve para testar, mas não atualiza a versão da Google Play.
 
 ```sh
 cd ephscores
+scripts/build_all.sh web --deploy      # testa, compila e publica
+# ou, passo a passo:
 scripts/build_web.sh                   # build em build/web, com cache offline (sw.js)
 firebase deploy --only hosting
 ```

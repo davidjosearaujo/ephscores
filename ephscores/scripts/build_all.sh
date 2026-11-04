@@ -7,9 +7,16 @@
 #   scripts/build_all.sh all             # APK + app bundle + web
 #   scripts/build_all.sh --skip-tests    # don't run flutter analyze/test first
 #   scripts/build_all.sh --split apk     # one smaller APK per CPU architecture
+#   scripts/build_all.sh --deploy        # APK + web, then publish the web app
+#   scripts/build_all.sh web --deploy    # just build and publish the web app
+#
+# --deploy publishes the web app (the one iPhone users install) to Firebase
+# Hosting, after it has been built, so one command releases both versions.
 #
 # Needs Flutter on the PATH, plus the Android SDK for apk/aab (run
-# `flutter doctor` to check). On Windows, use Git Bash or WSL.
+# `flutter doctor` to check) and, for --deploy, the Firebase CLI
+# (`npm install -g firebase-tools`, then `firebase login`). On Windows, use
+# Git Bash or WSL.
 set -euo pipefail
 
 usage() {
@@ -19,18 +26,22 @@ usage() {
 targets=""
 run_tests=1
 split=0
+deploy=0
 for arg in "$@"; do
   case "$arg" in
     apk | aab | web) targets="$targets $arg" ;;
     all) targets="$targets apk aab web" ;;
     --skip-tests) run_tests=0 ;;
     --split) split=1 ;;
+    --deploy) deploy=1 ;;
     -h | --help) usage; exit 0 ;;
     *) echo "Unknown argument: $arg" >&2; usage >&2; exit 2 ;;
   esac
 done
 [ -n "$targets" ] || targets="apk web"
 wants() { case " $targets " in *" $1 "*) return 0 ;; *) return 1 ;; esac; }
+# There is nothing to deploy unless the web app is built.
+if [ "$deploy" -eq 1 ] && ! wants web; then targets="$targets web"; fi
 
 cd "$(dirname "$0")/.."
 
@@ -38,6 +49,12 @@ command -v flutter >/dev/null 2>&1 || {
   echo "flutter was not found on the PATH. Install it from https://flutter.dev" >&2
   exit 1
 }
+
+# Fail now rather than after a long build.
+if [ "$deploy" -eq 1 ] && ! command -v firebase >/dev/null 2>&1; then
+  echo "--deploy needs the Firebase CLI: npm install -g firebase-tools, then firebase login" >&2
+  exit 1
+fi
 
 version=$(sed -n 's/^version: *//p' pubspec.yaml | head -n 1)
 echo "== EPHScores $version"
@@ -102,11 +119,18 @@ if wants web; then
   scripts/build_web.sh
 fi
 
+if [ "$deploy" -eq 1 ]; then
+  echo "== Deploy web app (Firebase Hosting)"
+  firebase deploy --only hosting -m "EPHScores $version"
+fi
+
 echo
 echo "== Done"
 for f in $built; do
   printf '  %-40s %s\n' "$f" "$(du -h "$f" | cut -f1)"
 done
-if wants web; then
-  echo "  build/web                                (deploy: firebase deploy --only hosting)"
+if [ "$deploy" -eq 1 ]; then
+  echo "  build/web                                (deployed to Firebase Hosting)"
+elif wants web; then
+  echo "  build/web                                (publish with --deploy, or firebase deploy --only hosting)"
 fi
