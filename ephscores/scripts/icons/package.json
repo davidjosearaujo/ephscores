@@ -1,0 +1,13 @@
+{
+  "name": "ephscores-icons",
+  "private": true,
+  "type": "module",
+  "description": "Generates every launcher/web icon from assets/brand/logo.svg",
+  "scripts": {
+    "generate": "node make_icons.mjs",
+    "docs": "node make_preview.mjs && node make_banner.mjs"
+  },
+  "dependencies": {
+    "sharp": "^0.34.0"
+  }
+}

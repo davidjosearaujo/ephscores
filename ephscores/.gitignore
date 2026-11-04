@@ -5,9 +5,12 @@
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
+migrate_working_dir/
 
 # IntelliJ related
 *.iml
@@ -24,15 +27,11 @@
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
-.flutter-plugins
 .flutter-plugins-dependencies
-.packages
 .pub-cache/
 .pub/
 /build/
-
-# Web related
-lib/generated_plugin_registrant.dart
+/coverage/
 
 # Symbolication related
 app.*.symbols
@@ -44,4 +43,20 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-/android/app/google-services.json
+
+# Widget Preview related
+.widget_preview/
+
+# Firebase Hosting
+.firebase/
+
+# Release artifacts from scripts/build_all.sh
+dist/
+
+# Firebase client configs (keys and app IDs); the web app only needs
+# firebase.json and .firebaserc, which hold no secrets.
+**/google-services.json
+**/GoogleService-Info.plist
+
+# Icon generator dependencies (scripts/icons)
+node_modules/
