@@ -26,7 +26,10 @@ self.addEventListener('activate', (event) => {
 // per browser) are cached the first time they load.
 self.addEventListener('fetch', (event) => {
   const request = event.request;
-  if (request.method !== 'GET' || new URL(request.url).origin !== self.location.origin) return;
+  const url = new URL(request.url);
+  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+  // The privacy policy is a plain page, not part of the app shell.
+  if (url.pathname.endsWith('/privacy.html')) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE);
     if (request.mode === 'navigate') {
