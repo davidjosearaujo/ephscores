@@ -104,7 +104,8 @@ class _OnsetCardState extends State<_OnsetCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final fg = theme.colorScheme.onPrimaryContainer;
+    final scheme = theme.colorScheme;
+    final fg = scheme.onPrimaryContainer;
     final patient = widget.patient;
     final onset = patient.onset;
     final now = DateTime.now();
@@ -157,6 +158,14 @@ class _OnsetCardState extends State<_OnsetCard> {
                 ],
                 selected: {onset.lastSeenWell},
                 showSelectedIcon: false,
+                // Solid colours: the default tints vanish on the blue card.
+                style: SegmentedButton.styleFrom(
+                  backgroundColor: scheme.tile,
+                  foregroundColor: scheme.onSurface,
+                  selectedBackgroundColor: scheme.primary,
+                  selectedForegroundColor: scheme.onPrimary,
+                  side: BorderSide(color: scheme.outline),
+                ),
                 onSelectionChanged: (s) =>
                     patient.onset = Onset(onset.at, lastSeenWell: s.first),
               ),
@@ -175,7 +184,18 @@ class _OnsetCardState extends State<_OnsetCard> {
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: FilledButton.tonal(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(64, 56),
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      side: BorderSide(color: scheme.outline),
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(16)),
+                      ),
+                    ),
                     onPressed: _pick,
                     child: FitText(onset == null ? 'Escolher hora' : 'Alterar'),
                   ),

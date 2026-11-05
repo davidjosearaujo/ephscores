@@ -12,7 +12,8 @@ de forma rápida e simples, no terreno.
   *Evolução* mostra a tendência de cada escala e permite copiar um resumo
   em texto
 - **Sinais vitais:** os campos do verbete nacional (AVDS, FR, SpO₂, O₂, FC,
-  PA, temperatura, dor e glicemia), registados uma vez e usados por todas as
+  PA, temperatura, dor por escala numérica ou de faces, e glicemia),
+  registados uma vez e usados por todas as
   escalas que deles precisam; a NEWS2 fica calculada sem mais toques, com o
   índice de choque ao lado
 - **Vias Verdes:** hora de início dos sintomas e critérios das Vias Verdes

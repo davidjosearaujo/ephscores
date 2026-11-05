@@ -268,6 +268,29 @@ void main() {
     });
   });
 
+  group('faces scale', () {
+    test('records the pain and how it was rated', () {
+      store.setPainFaces(6);
+      expect(store.vitals[Vital.pain], 6);
+      expect(store.vitals.painFaces, isTrue);
+      expect(store.vitals.format(Vital.pain), '6/10 (faces)');
+      final back = ScoreSheet.fromJson(store.sheet.toJson());
+      expect(back.vitals.painFaces, isTrue);
+    });
+    test('typing a number replaces the faces rating', () {
+      store.setPainFaces(8);
+      store.setVital(Vital.pain, 5);
+      expect(store.vitals.painFaces, isFalse);
+      expect(store.vitals.format(Vital.pain), '5/10');
+    });
+    test('clearing the pain drops the faces flag', () {
+      store.setPainFaces(2);
+      store.setVital(Vital.pain, null);
+      expect(store.vitals.painFaces, isFalse);
+      expect(store.vitals.toJson(), isEmpty);
+    });
+  });
+
   group('FLACC', () {
     ScoreResult flaccWith(List<int> picks) {
       for (final (i, item) in flacc.items.indexed) {

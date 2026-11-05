@@ -374,6 +374,53 @@ void main() {
     expect(app.scores.resultFor('news2').answered, 1);
   });
 
+  testWidgets('"next" on the keyboard goes to the next number field', (
+    tester,
+  ) async {
+    final app = await buildApp(tester);
+    await tester.pumpWidget(app);
+    await openFromHome(tester, 'Sinais vitais');
+    await tester.pumpAndSettle();
+    final fields = find.byType(EditableText);
+    await tester.tap(fields.at(0)); // Idade
+    await tester.enterText(fields.at(0), '70');
+    await tester.testTextInput.receiveAction(TextInputAction.next);
+    await tester.pumpAndSettle();
+    // Skips the AVDS tiles: the respiratory rate field has the focus.
+    expect(
+      tester.widget<EditableText>(fields.at(1)).focusNode.hasFocus,
+      isTrue,
+    );
+    expect(app.scores.vitals[Vital.avds], isNull);
+  });
+
+  testWidgets('tapping a face records the pain', (tester) async {
+    final app = await buildApp(tester);
+    await tester.pumpWidget(app);
+    await openFromHome(tester, 'Sinais vitais');
+    await tester.pumpAndSettle();
+    final face = find.bySemanticsLabel('6, Bastante dor');
+    await tester.scrollUntilVisible(
+      face,
+      100,
+      scrollable: find
+          .descendant(
+            of: find.byType(VitalsPage),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.ensureVisible(face);
+    await tester.pumpAndSettle();
+    await tester.tap(face);
+    await tester.pump();
+    expect(app.scores.vitals[Vital.pain], 6);
+    expect(app.scores.vitals.painFaces, isTrue);
+    expect(find.text('Bastante dor'), findsOneWidget);
+    // The number field shows it too.
+    expect(find.widgetWithText(TextField, '6'), findsOneWidget);
+  });
+
   testWidgets('Vias Verdes: onset now and a ticked criterion', (tester) async {
     final app = await buildApp(tester);
     await tester.pumpWidget(app);

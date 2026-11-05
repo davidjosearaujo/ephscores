@@ -240,8 +240,8 @@ void main() {
   });
 
   group('ProACS', () {
-    // Points from Table 2 of the derivation paper: age >=72 = 2, SBP <116 = 1,
-    // Killip II/III = 1, Killip IV = 3, ST elevation = 1 (maximum 7).
+    // Points from INEM's national form: age >=72 = 1, SBP <116 = 1,
+    // Killip II/III = 1, Killip IV = 3, ST elevation = 1 (maximum 6).
     Map<String, Object> patient({
       String age = '< 72 anos',
       String sbp = '≥ 116 mmHg',
@@ -256,27 +256,33 @@ void main() {
         proacs,
         patient(age: '≥ 72 anos', sbp: '< 116 mmHg', killip: 'IV', st: 'Sim'),
       );
-      expect((high.value, high.severity), (7, Severity.danger));
+      expect((high.value, high.severity), (6, Severity.danger));
     });
 
-    test('age counts two points', () {
+    test('age counts one point', () {
       final r = eval(proacs, patient(age: '≥ 72 anos'));
-      expect((r.value, r.severity), (2, Severity.warning));
+      expect((r.value, r.severity), (1, Severity.warning));
     });
 
     test('1 and 2 are intermediate, 3 is high', () {
       expect(eval(proacs, patient(st: 'Sim')).severity, Severity.warning);
       expect(
         eval(proacs, patient(age: '≥ 72 anos', sbp: '< 116 mmHg')).severity,
-        Severity.danger, // 2 + 1
+        Severity.warning, // 1 + 1
+      );
+      expect(
+        eval(
+          proacs,
+          patient(age: '≥ 72 anos', sbp: '< 116 mmHg', st: 'Sim'),
+        ).severity,
+        Severity.danger, // 1 + 1 + 1
       );
       expect(eval(proacs, patient(killip: 'IV')).severity, Severity.danger);
     });
 
-    test('labels carry the published mortality ranges', () {
-      expect(eval(proacs, patient()).label, contains('< 1 %'));
-      expect(eval(proacs, patient(st: 'Sim')).label, contains('1–4 %'));
-      expect(eval(proacs, patient(killip: 'IV')).label, contains('> 4 %'));
+    test('high risk from 3, as on the national form', () {
+      expect(eval(proacs, patient()).label, 'Risco baixo');
+      expect(eval(proacs, patient(killip: 'IV')).label, 'Risco elevado (≥ 3)');
     });
   });
 

@@ -4,9 +4,12 @@ import 'package:flutter/services.dart';
 import '../app.dart';
 import '../format.dart';
 import '../scores/model.dart';
+import '../scores/pediatric.dart';
 import '../scores/score_store.dart';
 import '../theme.dart';
 import '../vitals/vitals.dart';
+import 'pain_faces.dart';
+import 'score_page.dart';
 import 'widgets.dart';
 
 /// Names of the scores filled from [vital] ("NEWS2 · RTS").
@@ -90,8 +93,22 @@ class VitalsPage extends StatelessWidget {
               field(
                 Vital.pain,
                 hint:
-                    'Escala numérica, a partir dos 6 anos. Abaixo dos 4 anos '
-                    'ou sem verbalizar: FLACC (escalas pediátricas).',
+                    'Escala numérica a partir dos 6 anos, ou de faces a '
+                    'partir dos 3. Abaixo dos 4 anos ou sem verbalizar: FLACC.',
+                below: FocusTraversalGroup(
+                  descendantsAreTraversable: false,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 12),
+                      PainFaces(
+                        selected: v.painFaces ? v[Vital.pain]?.toInt() : null,
+                        onTap: store.setPainFaces,
+                      ),
+                      _FlaccLink(store.resultFor(flacc.id)),
+                    ],
+                  ),
+                ),
               ),
               field(
                 Vital.glucose,
@@ -170,8 +187,13 @@ class _VitalFieldState extends State<_VitalField> {
   @override
   void initState() {
     super.initState();
-    // The range error only shows once the field is left.
-    _focus.addListener(() => setState(() {}));
+    // On leaving the field: show the range error, or tidy a valid value
+    // ("38.6" becomes "38,6").
+    _focus.addListener(() {
+      final v = widget.vital.parse(_controller.text);
+      if (!_focus.hasFocus && v != null) _controller.text = _text(v);
+      setState(() {});
+    });
   }
 
   @override
@@ -221,12 +243,14 @@ class _VitalFieldState extends State<_VitalField> {
               RegExp(vital.decimals ? r'[0-9.,]' : r'[0-9]'),
             ),
           ],
-          textInputAction: TextInputAction.next,
+          textInputAction: vital == Vital.values.last
+              ? TextInputAction.done
+              : TextInputAction.next,
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
             suffixText: vital.unit,
             hintText: range,
-            errorText: invalid ? 'Valor entre $range ${vital.unit}' : null,
+            errorText: invalid ? 'Valor de $range ${vital.unit}'.trim() : null,
             filled: true,
             fillColor: Theme.of(context).colorScheme.tile,
             border: const OutlineInputBorder(
@@ -259,87 +283,122 @@ class _AvdsField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _FieldHeader(
-          title: Vital.avds.label,
-          subtitle: 'Preenche: ${usedBy(Vital.avds)} · Vias Verdes',
-        ),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            const gap = 8.0;
-            final width = (constraints.maxWidth - gap) / 2;
-            return Wrap(
-              spacing: gap,
-              runSpacing: gap,
-              children: [
-                for (final (i, (letter, name)) in avdsLevels.indexed)
-                  SizedBox(
-                    width: width,
-                    child: SelectableTile(
-                      selected: level == i,
-                      onTap: () => onLevel(level == i ? null : i),
-                      builder: (fg) => Row(
-                        children: [
-                          Text(
-                            letter,
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w800,
-                              color: fg,
+    // The keyboard's "next" goes from one number field to the next, so
+    // the tiles stay out of the focus order.
+    return FocusTraversalGroup(
+      descendantsAreTraversable: false,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _FieldHeader(
+            title: Vital.avds.label,
+            subtitle: 'Preenche: ${usedBy(Vital.avds)} · Vias Verdes',
+          ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const gap = 8.0;
+              final width = (constraints.maxWidth - gap) / 2;
+              return Wrap(
+                spacing: gap,
+                runSpacing: gap,
+                children: [
+                  for (final (i, (letter, name)) in avdsLevels.indexed)
+                    SizedBox(
+                      width: width,
+                      child: SelectableTile(
+                        selected: level == i,
+                        onTap: () => onLevel(level == i ? null : i),
+                        builder: (fg) => Row(
+                          children: [
+                            Text(
+                              letter,
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                color: fg,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              name,
-                              style: TextStyle(fontSize: 15, color: fg),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                name,
+                                style: TextStyle(fontSize: 15, color: fg),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-              ],
-            );
-          },
-        ),
-        if (level == 0) ...[
-          const SizedBox(height: 8),
-          SelectableTile(
-            selected: newConfusion,
-            onTap: () => onConfusion(!newConfusion),
-            builder: (fg) => Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Confusão recente',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: fg,
-                        ),
-                      ),
-                      Text(
-                        'Na NEWS2 pontua como V, D ou S',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: fg.withValues(alpha: 0.75),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (newConfusion) Icon(Icons.check, color: fg, size: 20),
-              ],
-            ),
+                ],
+              );
+            },
           ),
+          if (level == 0) ...[
+            const SizedBox(height: 8),
+            SelectableTile(
+              selected: newConfusion,
+              onTap: () => onConfusion(!newConfusion),
+              builder: (fg) => Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Confusão recente',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: fg,
+                          ),
+                        ),
+                        Text(
+                          'Na NEWS2 pontua como V, D ou S',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: fg.withValues(alpha: 0.75),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (newConfusion) Icon(Icons.check, color: fg, size: 20),
+                ],
+              ),
+            ),
+          ],
         ],
-      ],
+      ),
+    );
+  }
+}
+
+/// Opens FLACC, the observational pain scale, from the pain field.
+class _FlaccLink extends StatelessWidget {
+  const _FlaccLink(this.result);
+
+  final ScoreResult result;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: Card(
+        child: ListTile(
+          contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
+          title: const Text(
+            'FLACC',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text(
+            result.complete
+                ? result.label
+                : 'Dor observada: < 4 anos ou sem verbalizar',
+          ),
+          trailing: ResultPill(result),
+          onTap: () => pushPage(context, ScorePage(score: flacc)),
+        ),
+      ),
     );
   }
 }

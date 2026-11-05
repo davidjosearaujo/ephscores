@@ -191,10 +191,28 @@ void main() {
       scores
         ..setVital(Vital.rr, 35)
         ..setVital(Vital.sbp, 80);
-      final c = check(viaVerdeTrauma);
+      var c = check(viaVerdeTrauma);
       expect(c.reasons['rts'], 'RTS 10');
       expect(c.met('rr'), isTrue);
+      // Not until it is marked as a trauma.
+      expect(c.result.severity, Severity.incomplete);
+      expect(c.result.label, 'Assinalar se é vítima de trauma');
+      patient.toggleCheck('trauma.trauma');
+      c = check(viaVerdeTrauma);
       expect(c.result.severity, Severity.danger);
+    });
+
+    test('vital signs alone are not a trauma', () {
+      scores.setVital(Vital.sbp, 85);
+      expect(check(viaVerdeTrauma).result.display, '–');
+      patient.register(scores.sheet, burns.sheet, at: now);
+      expect(viaVerdeLines(patient), everyElement(isNot(contains('Trauma'))));
+    });
+
+    test('a mechanism is enough context', () {
+      scores.setVital(Vital.sbp, 85);
+      patient.toggleCheck('trauma.fall');
+      expect(check(viaVerdeTrauma).result.severity, Severity.danger);
     });
 
     test('mechanism ticked by hand', () {

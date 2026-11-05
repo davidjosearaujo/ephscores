@@ -347,13 +347,17 @@ final proacs = ScoreDefinition(
   id: 'proacs',
   name: 'ProACS',
   fullName: 'Score de risco ProACS',
-  description: 'Mortalidade intra-hospitalar na síndrome coronária aguda.',
+  description:
+      'Mortalidade intra-hospitalar na síndrome coronária aguda. Pontuação '
+      'do verbete nacional do INEM.',
+  // Points as on INEM's national form (verbete): age ≥ 72 = 1, PAS < 116 =
+  // 1, Killip II or III = 1, Killip IV = 3, ST elevation = 1 (maximum 6).
   items: const [
     ScoreItem(
       id: 'age',
       label: 'Idade',
       vital: VitalBinding([Vital.age], _proacsAge),
-      options: [ScoreOption('< 72 anos', 0), ScoreOption('≥ 72 anos', 2)],
+      options: [ScoreOption('< 72 anos', 0), ScoreOption('≥ 72 anos', 1)],
     ),
     ScoreItem(
       id: 'sbp',
@@ -377,10 +381,10 @@ final proacs = ScoreDefinition(
     ),
   ],
   evaluate: additive(const [
-    // In-hospital mortality <1 %, 1–4 %, >4 % (Timóteo et al., Rev Port Cardiol 2017).
-    Band(0, Severity.ok, 'Risco baixo (< 1 %)'),
-    Band(1, Severity.warning, 'Risco intermédio (1–4 %)'),
-    Band(3, Severity.danger, 'Risco alto (> 4 %)'),
+    // The national form: high risk of mortality from 3.
+    Band(0, Severity.ok, 'Risco baixo'),
+    Band(1, Severity.warning, 'Risco intermédio'),
+    Band(3, Severity.danger, 'Risco elevado (≥ 3)'),
   ]),
 );
 

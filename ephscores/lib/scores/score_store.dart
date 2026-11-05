@@ -154,6 +154,11 @@ class ScoreStore extends PersistedStore {
     changed();
   }
 
+  void setPainFaces(int value) {
+    _sheet.vitals.setPainFaces(value);
+    changed();
+  }
+
   void clearVitals() {
     _sheet.vitals.clear();
     changed();

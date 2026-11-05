@@ -447,6 +447,15 @@ final viaVerdeTrauma = ViaVerde(
   scope: 'Adulto',
   source: 'DGS, Norma 012/2022 (Anexo II); INEM, Verbete Nacional de Socorro',
   groups: [
+    // Vital signs and scores alone don't make a trauma: a septic patient
+    // with PAS < 90 must not light up this pathway.
+    const CriteriaGroup('Contexto', [
+      Criterion(
+        'trauma',
+        'Vítima de trauma',
+        detail: 'Ou assinalar uma lesão ou mecanismo abaixo',
+      ),
+    ]),
     CriteriaGroup('Repercussões fisiológicas', [
       Criterion(
         'rr',
@@ -555,8 +564,21 @@ final viaVerdeTrauma = ViaVerde(
     'Completar a avaliação inicial ABCDE nos primeiros 20 minutos.',
   ],
   evaluate: (c) {
-    final n = c.reasons.length;
-    if (n == 0) return _none;
+    final [context, physiology, anatomy, mechanism, scales] = c.pathway.groups;
+    final trauma =
+        c.groupMet(context) || c.groupMet(anatomy) || c.groupMet(mechanism);
+    final criteria = [physiology, anatomy, mechanism, scales].any(c.groupMet);
+    if (!trauma) {
+      return criteria
+          ? _status(
+              Severity.incomplete,
+              '–',
+              'Assinalar se é vítima de trauma',
+              complete: false,
+            )
+          : _none;
+    }
+    if (!criteria) return _none;
     return _status(Severity.danger, '✓', 'Critérios cumpridos: contactar CODU');
   },
 );

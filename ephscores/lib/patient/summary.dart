@@ -88,7 +88,8 @@ List<String> viaVerdeLines(PatientStore patient) {
   );
   return [
     for (final p in viasVerdes)
-      if (p.check(state) case final c when c.reasons.isNotEmpty)
+      if (p.check(state) case final c
+          when c.reasons.isNotEmpty && c.result.display != '–')
         '- ${p.fullName}: ${c.result.label} — ${c.metLabels.join('; ')}',
   ];
 }

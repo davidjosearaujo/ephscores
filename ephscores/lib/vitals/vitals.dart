@@ -26,7 +26,7 @@ enum Vital {
   sbp('Pressão arterial sistólica', 'PAS', 'mmHg', 0, 300),
   dbp('Pressão arterial diastólica', 'PAD', 'mmHg', 0, 200),
   temp('Temperatura', 'Temp.', '°C', 25, 45, decimals: true),
-  pain('Dor', 'Dor', '0 a 10', 0, 10),
+  pain('Dor', 'Dor', '/10', 0, 10),
   glucose('Glicemia capilar', 'Glic.', 'mg/dL', 10, 1000);
 
   const Vital(
@@ -65,9 +65,9 @@ enum Vital {
 /// The vital signs of one moment. The live copy is edited through
 /// `ScoreStore`; registered evaluations keep a [copy].
 class VitalSigns {
-  VitalSigns() : _values = {}, _newConfusion = false;
+  VitalSigns() : _values = {}, _newConfusion = false, _painFaces = false;
 
-  VitalSigns._(this._values, this._newConfusion);
+  VitalSigns._(this._values, this._newConfusion, this._painFaces);
 
   /// Parses [toJson] output, dropping unknown or out-of-range values.
   factory VitalSigns.fromJson(Object? json) {
@@ -79,21 +79,27 @@ class VitalSigns {
         values[vital] = vital.decimals ? v.toDouble() : v.toInt();
       }
     }
-    return VitalSigns._(values, map['confusion'] == true);
+    return VitalSigns._(values, map['confusion'] == true, map['faces'] == true);
   }
 
   final Map<Vital, num> _values;
   bool _newConfusion;
+  bool _painFaces;
 
   num? operator [](Vital vital) => _values[vital];
 
   /// Alert (AVDS "A") but newly confused, which NEWS2 scores like V, D or S.
   bool get newConfusion => _newConfusion && _values[Vital.avds] == 0;
 
+  /// The pain was rated on the faces scale rather than typed as a number.
+  bool get painFaces => _painFaces && _values[Vital.pain] != null;
+
   bool get isEmpty => _values.isEmpty;
 
   /// Sets or, with null, clears a value. Out-of-range values are ignored.
+  /// A pain value set here counts as typed; see [setPainFaces].
   void set(Vital vital, num? value) {
+    if (vital == Vital.pain) _painFaces = false;
     if (value == null) {
       _values.remove(vital);
     } else if (vital.accepts(value)) {
@@ -104,12 +110,19 @@ class VitalSigns {
 
   set newConfusion(bool value) => _newConfusion = value;
 
+  /// Pain rated on the faces scale (0, 2, 4, 6, 8 or 10).
+  void setPainFaces(int value) {
+    set(Vital.pain, value);
+    _painFaces = true;
+  }
+
   void clear() {
     _values.clear();
     _newConfusion = false;
+    _painFaces = false;
   }
 
-  VitalSigns copy() => VitalSigns._({..._values}, _newConfusion);
+  VitalSigns copy() => VitalSigns._({..._values}, _newConfusion, _painFaces);
 
   /// Heart rate over systolic pressure, when both are known.
   double? get shockIndex {
@@ -125,7 +138,7 @@ class VitalSigns {
     return switch (vital) {
       Vital.avds =>
         avdsLevels[v.toInt()].$1 + (newConfusion ? ' (confuso)' : ''),
-      Vital.pain => '${v.toInt()}/10',
+      Vital.pain => '${v.toInt()}/10${painFaces ? ' (faces)' : ''}',
       Vital.o2 when v == 0 => 'ar ambiente',
       Vital.spo2 => '${v.toInt()}%',
       _ => '${formatNumber(v.toDouble())} ${vital.unit}',
@@ -172,6 +185,7 @@ class VitalSigns {
     for (final vital in Vital.values)
       if (_values[vital] != null) vital.name: _values[vital]!,
     if (newConfusion) 'confusion': true,
+    if (painFaces) 'faces': true,
   };
 }
 
