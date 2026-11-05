@@ -101,31 +101,44 @@ class DashboardPage extends StatelessWidget {
             ),
           ];
           return Scaffold(
-            body: CustomScrollView(
-              slivers: [
-                // Fills the screen when everything fits; scrolls otherwise.
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _Header(patient: scope.patient),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              for (final (i, entry) in entries.indexed) ...[
-                                if (i > 0) const SizedBox(height: 12),
-                                Expanded(child: entry),
-                              ],
-                            ],
+            body: Stack(
+              children: [
+                CustomScrollView(
+                  slivers: [
+                    // Fills the screen when everything fits; scrolls otherwise.
+                    SliverFillRemaining(
+                      hasScrollBody: false,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _Header(patient: scope.patient),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  for (final (i, entry) in entries.indexed) ...[
+                                    if (i > 0) const SizedBox(height: 12),
+                                    Expanded(child: entry),
+                                  ],
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
+                // Keeps the status bar navy when the cards scroll under it
+                // (short screens), so its light icons stay readable.
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: MediaQuery.paddingOf(context).top,
+                  child: const ColoredBox(color: Palette.navy),
                 ),
               ],
             ),
