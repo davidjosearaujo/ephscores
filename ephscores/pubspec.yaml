@@ -6,7 +6,7 @@ publish_to: 'none'
 # platform build; the info dialog reads this file at runtime (it is
 # bundled as an asset), and test/manifest_test.dart checks that the
 # Android, iOS and web manifests agree with app_info below.
-version: 2.1.0+10
+version: 2.0.0+10
 homepage: https://ephscores-7e4eb.web.app
 repository: https://codeberg.org/davidjosearaujo/ephscores
 
