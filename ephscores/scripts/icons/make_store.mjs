@@ -20,20 +20,21 @@ const CORNER = 56;
 // One entry per raw capture, in file order: [title, subtitle].
 const captions = {
   pt: [
-    ['Tudo num só painel', 'Escalas, queimado e contactos'],
-    ['Resultado imediato', 'Cor de gravidade em cada escala'],
-    ['Regra dos nove', 'Grau por região e SCQ em tempo real'],
+    ['Tudo num só painel', 'Sinais vitais, escalas e Vias Verdes'],
+    ['Sinais vitais', 'Registados uma vez, como no verbete'],
+    ['Escalas automáticas', 'NEWS2 preenchida pelos sinais vitais'],
+    ['Vias Verdes', 'AVC, Coronária, Sépsis e Trauma'],
+    ['Avaliação da dor', 'Faces, FLACC e índice de choque'],
     ['Evolução do doente', 'Tendência e resumo para copiar'],
+    ['Regra dos nove', 'Grau por região e SCQ em tempo real'],
     ['Triagem START', 'Prioridade, passo a passo'],
-    ['Contagem de vítimas', 'Por prioridade, separada do doente'],
-    ['Sete escalas gerais', 'Cincinnati, Glasgow, MGAP, NEWS2…'],
   ],
 };
 
 const banner = {
   pt: {
     tagline: 'Escalas de emergência pré-hospitalar',
-    chips: [['Escalas gerais', 'Queimaduras'], ['Triagem START', 'Evolução do doente']],
+    chips: [['Sinais vitais', 'Vias Verdes'], ['Escalas', 'Evolução do doente']],
   },
 };
 
