@@ -43,8 +43,8 @@ semáforo).
 ## Onde instalar
 
 - **Android:** [Google Play](https://play.google.com/store/apps/details?id=com.davidaraujo.ephscores)
-- **iPhone / iPad:** abrir o site no Safari, tocar em *Partilhar* e depois
-  em *Adicionar ao ecrã principal*. A aplicação web (PWA) fica guardada no
+- **iPhone / iPad:** abrir <https://ephscores-7e4eb.web.app> no Safari,
+  tocar em *Partilhar* e depois em *Adicionar ao ecrã principal*. A aplicação web (PWA) fica guardada no
   dispositivo e funciona sem rede a partir da primeira abertura.
 
 ## Código-fonte
