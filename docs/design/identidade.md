@@ -90,8 +90,6 @@ menos movimento, fica estático desde o início.
 Foram desenhados cinco conceitos, todos na mesma paleta, e comparados em
 fundo claro, escuro, numa só cor e em tamanhos reais.
 
-![Os cinco conceitos](concepts/contact-sheet.png)
-
 | # | Conceito | Resultado |
 |---|---|---|
 | 1 | Estrela limpa | Legível em todos os tamanhos, mas sem identidade própria |
@@ -101,8 +99,7 @@ fundo claro, escuro, numa só cor e em tamanhos reais.
 | 5 | Estrela dentro de um indicador | Gostou-se da cor, mas o indicador some-se a pequeno; **as cores foram para os braços do 4** |
 
 O logótipo final junta o emblema do 4 com as cores do 5, aplicadas aos três
-braços de cima. Os esboços em SVG e o gerador estão em
-[`concepts/`](concepts/).
+braços de cima.
 
 **Logótipo anterior (antes da versão 2.0):** a estrela azul-marinho com «EPH» em
 itálico e «Scores» pequeno, num PNG com sombra incorporada. Foi substituído
