@@ -8,6 +8,7 @@ import '../patient/summary.dart';
 import '../scores/model.dart';
 import '../scores/score_store.dart';
 import '../theme.dart';
+import '../vitals/vitals.dart';
 import 'widgets.dart';
 
 /// Timeline of the patient's registered evaluations.
@@ -124,6 +125,12 @@ class _SummaryCard extends StatelessWidget {
               style: body,
             ),
             Text('$n ${n == 1 ? 'avaliação' : 'avaliações'}', style: body),
+            if (patient.onset case final onset?)
+              Text(
+                '${onset.label}: ${formatClock(onset.at)} '
+                '(há ${formatDuration((end ?? DateTime.now()).difference(onset.at))})',
+                style: body,
+              ),
             if (unsaved) ...[
               const SizedBox(height: 8),
               Row(
@@ -223,6 +230,32 @@ class _TrendTable extends StatelessWidget {
     ];
     final burns = evaluations.any((e) => e.burns.hasBurns);
     final dash = Text('–', style: TextStyle(color: theme.colorScheme.outline));
+    // Vital signs first, as on the national form; age doesn't trend, and
+    // the two pressures share a row.
+    final vitals = [
+      for (final v in Vital.values)
+        if (v != Vital.age &&
+            v != Vital.dbp &&
+            evaluations.any(
+              (e) => v == Vital.sbp
+                  ? e.scores.vitals.bloodPressure != null
+                  : e.scores.vitals[v] != null,
+            ))
+          v,
+    ];
+    final shock = evaluations.any((e) => e.scores.vitals.shockIndex != null);
+    Widget vitalCell(VitalSigns v, Vital vital) {
+      final text = vital == Vital.sbp ? v.bloodPressure : v.cell(vital);
+      return text == null
+          ? dash
+          : FitText(
+              text,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            );
+    }
 
     Widget cell(Widget child) => SizedBox(
       height: _rowHeight,
@@ -254,6 +287,8 @@ class _TrendTable extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: _headerHeight),
+                  for (final v in vitals) name(v == Vital.sbp ? 'PA' : v.short),
+                  if (shock) name('IC'),
                   for (final s in scores) name(s.name),
                   if (burns) name('SCQ'),
                 ],
@@ -292,6 +327,19 @@ class _TrendTable extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            for (final v in vitals)
+                              cell(vitalCell(e.scores.vitals, v)),
+                            if (shock)
+                              cell(
+                                e.scores.vitals.shockIndex == null
+                                    ? dash
+                                    : ResultPill(
+                                        shockIndexResult(
+                                          e.scores.vitals.shockIndex!,
+                                        ),
+                                        compact: true,
+                                      ),
+                              ),
                             for (final s in scores)
                               cell(_resultCell(e.results[s.id], dash)),
                             if (burns)
@@ -340,7 +388,12 @@ class _EvaluationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final e = evaluation;
-    final n = e.results.length + (e.burns.hasBurns ? 1 : 0);
+    final vitals = e.scores.vitals;
+    final si = vitals.shockIndex;
+    final n =
+        e.results.length +
+        (e.burns.hasBurns ? 1 : 0) +
+        (vitals.isEmpty ? 0 : 1);
     return GestureDetector(
       onLongPress: () => _delete(context),
       child: Card(
@@ -360,6 +413,14 @@ class _EvaluationCard extends StatelessWidget {
             '$n ${n == 1 ? 'registo' : 'registos'}',
           ),
           children: [
+            if (!vitals.isEmpty)
+              _ResultRow(
+                title: 'Sinais vitais',
+                subtitle: vitals.summary(),
+                trailing: si == null
+                    ? null
+                    : ResultPill(shockIndexResult(si), compact: true),
+              ),
             for (final MapEntry(key: id, value: r) in e.results.entries)
               _ResultRow(
                 title: allScores[id]!.name,
@@ -390,12 +451,12 @@ class _ResultRow extends StatelessWidget {
   const _ResultRow({
     required this.title,
     required this.subtitle,
-    required this.trailing,
+    this.trailing,
   });
 
   final String title;
   final String subtitle;
-  final Widget trailing;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {

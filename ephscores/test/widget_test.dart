@@ -11,7 +11,11 @@ import 'package:ephscores/ui/evolution_page.dart';
 import 'package:ephscores/ui/score_list_page.dart';
 import 'package:ephscores/ui/score_page.dart';
 import 'package:ephscores/ui/start_page.dart';
+import 'package:ephscores/ui/via_verde_page.dart';
+import 'package:ephscores/ui/vitals_page.dart';
 import 'package:ephscores/ui/welcome_page.dart';
+import 'package:ephscores/viaverde/via_verde.dart';
+import 'package:ephscores/vitals/vitals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -39,7 +43,8 @@ Future<EPHScoresApp> buildApp(
   );
 }
 
-/// Three evaluations: GCS 15, then 14 with a burn, then 9.
+/// Three evaluations: GCS 15, then 14 with a burn, then 9, with vital
+/// signs and a symptom onset.
 void seedEvaluations(EPHScoresApp app) {
   void pick(int eyes, int verbal, int motor) {
     for (final (item, i) in [
@@ -54,6 +59,23 @@ void seedEvaluations(EPHScoresApp app) {
   }
 
   final base = app.patient.startedAt!;
+  app.patient.onset = Onset(base.subtract(const Duration(minutes: 20)));
+  for (final (v, n) in [
+    (Vital.age, 64),
+    (Vital.avds, 0),
+    (Vital.rr, 24),
+    (Vital.spo2, 93),
+    (Vital.o2, 0),
+    (Vital.hr, 118),
+    (Vital.sbp, 98),
+    (Vital.dbp, 61),
+    (Vital.temp, 38.6),
+    (Vital.pain, 7),
+    (Vital.glucose, 54),
+  ]) {
+    app.scores.setVital(v, n);
+  }
+  app.patient.toggleCheck('sepsis.urinary');
   pick(0, 0, 0);
   app.patient.register(
     app.scores.sheet,
@@ -290,6 +312,8 @@ void main() {
         )
         .first;
     await tester.scrollUntilVisible(second, 100, scrollable: page);
+    await tester.ensureVisible(second);
+    await tester.pumpAndSettle();
     await tester.longPress(second);
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Apagar'));
@@ -298,6 +322,105 @@ void main() {
     expect(app.patient.evaluations, hasLength(2));
     // Evaluations are renumbered: the old third is now the second.
     expect(find.textContaining('Avaliação 3 ·'), findsNothing);
+  });
+
+  testWidgets('a vital sign typed once fills NEWS2', (tester) async {
+    final app = await buildApp(tester);
+    await tester.pumpWidget(app);
+    await openFromHome(tester, 'Sinais vitais');
+    await tester.pumpAndSettle();
+    final vitalsList = find
+        .descendant(
+          of: find.byType(VitalsPage),
+          matching: find.byType(Scrollable),
+        )
+        .first;
+
+    final hr = find.ancestor(
+      of: find.text('bpm'),
+      matching: find.byType(TextField),
+    );
+    await tester.scrollUntilVisible(hr, 100, scrollable: vitalsList);
+    await tester.ensureVisible(hr);
+    await tester.pumpAndSettle();
+    await tester.enterText(hr, '135');
+    await tester.pump();
+    expect(app.scores.vitals[Vital.hr], 135);
+
+    // Out of range: not stored, and flagged once the field is left.
+    await tester.enterText(hr, '999');
+    await tester.pump();
+    expect(app.scores.vitals[Vital.hr], isNull);
+    await tester.enterText(hr, '135');
+    await tester.pump();
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.text('1 registado'), findsOneWidget);
+    await openFromHome(tester, 'Escalas gerais');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('NEWS2'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Dos sinais vitais: FC 135 bpm'),
+      100,
+      scrollable: find
+          .descendant(
+            of: find.byType(ScorePage),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    expect(app.scores.resultFor('news2').answered, 1);
+  });
+
+  testWidgets('Vias Verdes: onset now and a ticked criterion', (tester) async {
+    final app = await buildApp(tester);
+    await tester.pumpWidget(app);
+    await openFromHome(tester, 'Vias Verdes');
+    await tester.pumpAndSettle();
+    final list = find
+        .descendant(
+          of: find.byType(ViaVerdePage),
+          matching: find.byType(Scrollable),
+        )
+        .first;
+    Future<void> show(String text) async {
+      await tester.scrollUntilVisible(find.text(text), 100, scrollable: list);
+      await tester.ensureVisible(find.text(text));
+      await tester.pumpAndSettle();
+    }
+
+    await tester.tap(find.text('Agora'));
+    await tester.pumpAndSettle();
+    expect(app.patient.onset, isNotNull);
+    expect(find.text('Hora exata'), findsOneWidget);
+
+    await show('Via Verde Trauma');
+    await tester.tap(find.text('Via Verde Trauma'));
+    await tester.pumpAndSettle();
+    await show('Queda superior a 6 metros');
+    await tester.tap(find.text('Queda superior a 6 metros'));
+    await tester.pumpAndSettle();
+    expect(app.patient.checks, {'trauma.fall'});
+    expect(
+      viaVerdeTrauma
+          .check(
+            ClinicalState(
+              scores: app.scores.sheet,
+              burns: app.burn.sheet,
+              checks: app.patient.checks,
+              now: DateTime.now(),
+            ),
+          )
+          .result
+          .label,
+      'Critérios cumpridos: contactar CODU',
+    );
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.text('Critérios: Trauma'), findsOneWidget);
   });
 
   testWidgets('trend names stay put while the values scroll', (tester) async {
@@ -341,6 +464,8 @@ void largeTextTests() {
     'burn': () => const BurnPage(),
     'start': () => const StartPage(),
     'contacts': () => const ContactsPage(),
+    'vitals': () => const VitalsPage(),
+    'vias verdes': () => const ViaVerdePage(),
   };
   for (final MapEntry(key: name, value: page) in pages.entries) {
     testWidgets('$name fits at 1.6x text', (tester) async {

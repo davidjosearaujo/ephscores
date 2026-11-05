@@ -1,3 +1,4 @@
+import '../vitals/vitals.dart';
 import 'model.dart';
 
 const _yesNo = [ScoreOption('Normal', 0), ScoreOption('Alterado', 1)];
@@ -111,11 +112,13 @@ final mgap = ScoreDefinition(
     ScoreItem(
       id: 'age',
       label: 'Idade',
+      vital: VitalBinding([Vital.age], _mgapAge),
       options: [ScoreOption('< 60 anos', 5), ScoreOption('≥ 60 anos', 0)],
     ),
     ScoreItem(
       id: 'sbp',
       label: 'Pressão arterial sistólica',
+      vital: VitalBinding([Vital.sbp], _mgapSbp),
       options: [
         ScoreOption('> 120 mmHg', 5),
         ScoreOption('60 – 120 mmHg', 3),
@@ -155,6 +158,7 @@ final rts = ScoreDefinition(
     ScoreItem(
       id: 'rr',
       label: 'Frequência respiratória',
+      vital: VitalBinding([Vital.rr], _rtsRr),
       options: [
         ScoreOption('10 – 29 cpm', 4),
         ScoreOption('> 29 cpm', 3),
@@ -166,6 +170,7 @@ final rts = ScoreDefinition(
     ScoreItem(
       id: 'sbp',
       label: 'Pressão arterial sistólica',
+      vital: VitalBinding([Vital.sbp], _rtsSbp),
       options: [
         ScoreOption('> 89 mmHg', 4),
         ScoreOption('76 – 89 mmHg', 3),
@@ -219,6 +224,7 @@ final news2 = ScoreDefinition(
     const ScoreItem(
       id: 'rr',
       label: 'Frequência respiratória',
+      vital: VitalBinding([Vital.rr], _newsRr),
       options: [
         ScoreOption('≤ 8', 3),
         ScoreOption('9 – 11', 1),
@@ -240,6 +246,7 @@ final news2 = ScoreDefinition(
       id: 'spo2',
       label: 'SpO₂ (%)',
       visibleWhen: (a) => a.choice('scale') != 1,
+      vital: const VitalBinding([Vital.spo2], _newsSpo2),
       options: const [
         ScoreOption('≤ 91', 3),
         ScoreOption('92 – 93', 2),
@@ -251,6 +258,7 @@ final news2 = ScoreDefinition(
       id: 'spo2_2',
       label: 'SpO₂ (%) — escala 2',
       visibleWhen: (a) => a.choice('scale') == 1,
+      vital: const VitalBinding([Vital.spo2, Vital.o2], _newsSpo2Scale2),
       options: const [
         ScoreOption('≤ 83', 3),
         ScoreOption('84 – 85', 2),
@@ -264,6 +272,7 @@ final news2 = ScoreDefinition(
     const ScoreItem(
       id: 'o2',
       label: 'Ar ou oxigénio',
+      vital: VitalBinding([Vital.o2], _newsO2),
       options: [
         ScoreOption('Ar ambiente', 0),
         ScoreOption('Oxigénio suplementar', 2),
@@ -272,6 +281,7 @@ final news2 = ScoreDefinition(
     const ScoreItem(
       id: 'sbp',
       label: 'Pressão arterial sistólica (mmHg)',
+      vital: VitalBinding([Vital.sbp], _newsSbp),
       options: [
         ScoreOption('≤ 90', 3),
         ScoreOption('91 – 100', 2),
@@ -283,6 +293,7 @@ final news2 = ScoreDefinition(
     const ScoreItem(
       id: 'hr',
       label: 'Frequência cardíaca (bpm)',
+      vital: VitalBinding([Vital.hr], _newsHr),
       options: [
         ScoreOption('≤ 40', 3),
         ScoreOption('41 – 50', 1),
@@ -295,6 +306,7 @@ final news2 = ScoreDefinition(
     const ScoreItem(
       id: 'avds',
       label: 'Consciência',
+      vital: VitalBinding([Vital.avds], _newsAvds),
       options: [
         ScoreOption('Alerta', 0),
         ScoreOption('Confusão recente, V, D ou S', 3),
@@ -303,6 +315,7 @@ final news2 = ScoreDefinition(
     const ScoreItem(
       id: 'temp',
       label: 'Temperatura (°C)',
+      vital: VitalBinding([Vital.temp], _newsTemp),
       options: [
         ScoreOption('≤ 35,0', 3),
         ScoreOption('35,1 – 36,0', 1),
@@ -339,11 +352,13 @@ final proacs = ScoreDefinition(
     ScoreItem(
       id: 'age',
       label: 'Idade',
+      vital: VitalBinding([Vital.age], _proacsAge),
       options: [ScoreOption('< 72 anos', 0), ScoreOption('≥ 72 anos', 2)],
     ),
     ScoreItem(
       id: 'sbp',
       label: 'Pressão arterial sistólica',
+      vital: VitalBinding([Vital.sbp], _proacsSbp),
       options: [ScoreOption('≥ 116 mmHg', 0), ScoreOption('< 116 mmHg', 1)],
     ),
     ScoreItem(
@@ -446,3 +461,99 @@ final race = ScoreDefinition(
 );
 
 final adultScores = [cincinnati, gcs, mgap, news2, proacs, race, rts];
+
+// Vital sign bindings: each returns the index of the option the recorded
+// value selects, in the order the options are listed above.
+
+/// Index of the first of [upper] bounds that [v] doesn't exceed; values
+/// above every bound get the last option.
+int _upTo(num v, List<num> upper) {
+  final i = upper.indexWhere((u) => v <= u);
+  return i < 0 ? upper.length : i;
+}
+
+int? _mgapAge(VitalSigns v, Answers _) =>
+    v[Vital.age] == null ? null : (v[Vital.age]! < 60 ? 0 : 1);
+
+int? _mgapSbp(VitalSigns v, Answers _) {
+  final sbp = v[Vital.sbp];
+  if (sbp == null) return null;
+  return sbp > 120 ? 0 : (sbp >= 60 ? 1 : 2);
+}
+
+int? _rtsRr(VitalSigns v, Answers _) => switch (v[Vital.rr]) {
+  null => null,
+  0 => 4,
+  <= 5 => 3,
+  <= 9 => 2,
+  <= 29 => 0,
+  _ => 1,
+};
+
+int? _rtsSbp(VitalSigns v, Answers _) => switch (v[Vital.sbp]) {
+  null => null,
+  0 => 4,
+  < 50 => 3,
+  <= 75 => 2,
+  <= 89 => 1,
+  _ => 0,
+};
+
+/// NEWS2 is for non-pregnant patients aged 16 or more (national form), so
+/// a recorded younger age leaves it to be answered by hand.
+num? _news(VitalSigns v, Vital vital) =>
+    (v[Vital.age] ?? 16) < 16 ? null : v[vital];
+
+int? _newsRr(VitalSigns v, Answers _) {
+  final rr = _news(v, Vital.rr);
+  return rr == null ? null : _upTo(rr, [8, 11, 20, 24]);
+}
+
+int? _newsSpo2(VitalSigns v, Answers own) {
+  final spo2 = _news(v, Vital.spo2);
+  if (spo2 == null || own.choice('scale') == 1) return null;
+  return _upTo(spo2, [91, 93, 95]);
+}
+
+int? _newsSpo2Scale2(VitalSigns v, Answers own) {
+  final spo2 = _news(v, Vital.spo2);
+  if (spo2 == null || own.choice('scale') != 1) return null;
+  if (spo2 <= 92) return _upTo(spo2, [83, 85, 87]);
+  // 93 or more depends on the oxygen: 0 points on air, rising on oxygen.
+  final o2 = v[Vital.o2];
+  if (o2 == null) return null;
+  if (o2 == 0) return 3;
+  return 4 + _upTo(spo2, [94, 96]);
+}
+
+int? _newsO2(VitalSigns v, Answers _) {
+  final o2 = _news(v, Vital.o2);
+  return o2 == null ? null : (o2 > 0 ? 1 : 0);
+}
+
+int? _newsSbp(VitalSigns v, Answers _) {
+  final sbp = _news(v, Vital.sbp);
+  return sbp == null ? null : _upTo(sbp, [90, 100, 110, 219]);
+}
+
+int? _newsHr(VitalSigns v, Answers _) {
+  final hr = _news(v, Vital.hr);
+  return hr == null ? null : _upTo(hr, [40, 50, 90, 110, 130]);
+}
+
+int? _newsAvds(VitalSigns v, Answers _) {
+  final avds = _news(v, Vital.avds);
+  if (avds == null) return null;
+  return avds > 0 || v.newConfusion ? 1 : 0;
+}
+
+int? _newsTemp(VitalSigns v, Answers _) {
+  final t = _news(v, Vital.temp);
+  return t == null ? null : _upTo(t, [35.0, 36.0, 38.0, 39.0]);
+}
+
+int? _proacsAge(VitalSigns v, Answers _) =>
+    v[Vital.age] == null ? null : (v[Vital.age]! < 72 ? 0 : 1);
+
+int? _proacsSbp(VitalSigns v, Answers _) =>
+    v[Vital.sbp] == null ? null : (v[Vital.sbp]! >= 116 ? 0 : 1);

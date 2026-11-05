@@ -4,6 +4,8 @@ import '../app.dart';
 import '../scores/model.dart';
 import '../scores/score_store.dart';
 import '../theme.dart';
+import '../vitals/vitals.dart';
+import 'vitals_page.dart';
 import 'widgets.dart';
 
 /// Generic page that renders any [ScoreDefinition].
@@ -55,7 +57,11 @@ class ScorePage extends StatelessWidget {
                 _ItemSection(
                   item: item,
                   picks: answers.of(item.id),
-                  onTap: (i) => store.toggle(score.id, item, i),
+                  vitals: store.vitals,
+                  fromVitals: store.fromVitals(score.id, item) != null,
+                  onTap: (i) => store.fromVitals(score.id, item) != null
+                      ? pushPage(context, const VitalsPage())
+                      : store.toggle(score.id, item, i),
                 ),
             ],
           ),
@@ -70,11 +76,17 @@ class _ItemSection extends StatelessWidget {
   const _ItemSection({
     required this.item,
     required this.picks,
+    required this.vitals,
+    required this.fromVitals,
     required this.onTap,
   });
 
   final ScoreItem item;
   final Set<int> picks;
+  final VitalSigns vitals;
+
+  /// Answered by the vital signs: the options open them instead.
+  final bool fromVitals;
   final ValueChanged<int> onTap;
 
   @override
@@ -120,6 +132,8 @@ class _ItemSection extends StatelessWidget {
               ),
             ),
           ),
+        if (item.vital != null)
+          _VitalsLink(binding: item.vital!, vitals: vitals, used: fromVitals),
         LayoutBuilder(
           builder: (context, constraints) {
             const gap = 8.0;
@@ -208,6 +222,60 @@ class _OptionTile extends StatelessWidget {
           else if (selected)
             Icon(Icons.check, color: fg, size: 20),
         ],
+      ),
+    );
+  }
+}
+
+/// Where a vital-sign item gets its answer: the recorded value, or a link to
+/// record it.
+class _VitalsLink extends StatelessWidget {
+  const _VitalsLink({
+    required this.binding,
+    required this.vitals,
+    required this.used,
+  });
+
+  final VitalBinding binding;
+  final VitalSigns vitals;
+  final bool used;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = used
+        ? theme.colorScheme.primary
+        : theme.colorScheme.onSurfaceVariant;
+    final values = [
+      for (final v in binding.vitals)
+        if (vitals[v] != null) '${v.short} ${vitals.format(v)}',
+    ].join(' · ');
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(8),
+        onTap: () => pushPage(context, const VitalsPage()),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          child: Row(
+            children: [
+              Icon(Icons.monitor_heart_outlined, size: 18, color: color),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  used
+                      ? 'Dos sinais vitais: $values'
+                      : 'Ou registar nos sinais vitais',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: color,
+                    fontWeight: used ? FontWeight.w600 : null,
+                  ),
+                ),
+              ),
+              Icon(Icons.chevron_right, size: 18, color: color),
+            ],
+          ),
+        ),
       ),
     );
   }

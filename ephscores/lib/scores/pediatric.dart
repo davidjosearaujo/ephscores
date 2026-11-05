@@ -1,3 +1,4 @@
+import '../vitals/vitals.dart';
 import 'model.dart';
 
 final apgar = ScoreDefinition(
@@ -94,6 +95,7 @@ final pts = ScoreDefinition(
     ScoreItem(
       id: 'sbp',
       label: 'Pressão arterial sistólica',
+      vital: VitalBinding([Vital.sbp], _ptsSbp),
       options: [
         ScoreOption('> 90 mmHg', 2, detail: 'ou pulso radial palpável'),
         ScoreOption('50 – 90 mmHg', 1, detail: 'ou pulso femoral palpável'),
@@ -223,4 +225,97 @@ final pat = ScoreDefinition(
   },
 );
 
-final pediatricScores = [apgar, pat, pts];
+/// Observational pain scale, in the Portuguese version of DGS guidance
+/// 014/2010 (Batalha et al., 2009). © The Regents of the University of
+/// Michigan.
+final flacc = ScoreDefinition(
+  id: 'flacc',
+  name: 'FLACC',
+  fullName: 'Face, Legs, Activity, Cry, Consolability',
+  description:
+      'Dor em crianças com menos de 4 anos ou sem capacidade para a '
+      'verbalizar, de 0 a 10. A partir dos 6 anos usar a escala numérica '
+      '(Dor, nos sinais vitais).',
+  items: const [
+    ScoreItem(
+      id: 'face',
+      label: 'Face',
+      options: [
+        ScoreOption('Nenhuma expressão particular ou sorriso', 0),
+        ScoreOption(
+          'Caretas ou sobrancelhas franzidas de vez em quando',
+          1,
+          detail: 'Introversão, desinteresse',
+        ),
+        ScoreOption('Tremor frequente do queixo, mandíbulas cerradas', 2),
+      ],
+    ),
+    ScoreItem(
+      id: 'legs',
+      label: 'Pernas',
+      options: [
+        ScoreOption('Posição normal ou relaxadas', 0),
+        ScoreOption('Inquietas, agitadas, tensas', 1),
+        ScoreOption('Aos pontapés ou esticadas', 2),
+      ],
+    ),
+    ScoreItem(
+      id: 'activity',
+      label: 'Atividade',
+      options: [
+        ScoreOption(
+          'Deitado calmamente',
+          0,
+          detail: 'Posição normal, mexe-se facilmente',
+        ),
+        ScoreOption(
+          'Contorcendo-se',
+          1,
+          detail: 'Virando-se para trás e para a frente, tenso',
+        ),
+        ScoreOption('Curvado, rígido ou com movimentos bruscos', 2),
+      ],
+    ),
+    ScoreItem(
+      id: 'cry',
+      label: 'Choro',
+      options: [
+        ScoreOption('Ausência de choro', 0, detail: 'Acordado ou adormecido'),
+        ScoreOption('Gemidos ou choramingos', 1, detail: 'Queixas ocasionais'),
+        ScoreOption(
+          'Choro persistente, gritos ou soluços',
+          2,
+          detail: 'Queixas frequentes',
+        ),
+      ],
+    ),
+    ScoreItem(
+      id: 'consolability',
+      label: 'Consolabilidade',
+      options: [
+        ScoreOption('Satisfeito, relaxado', 0),
+        ScoreOption(
+          'Tranquilizado por toques, abraços ou conversas ocasionais',
+          1,
+          detail: 'Pode ser distraído',
+        ),
+        ScoreOption('Difícil de consolar ou confortar', 2),
+      ],
+    ),
+  ],
+  evaluate: additive(const [
+    Band(0, Severity.ok, 'Sem dor'),
+    Band(1, Severity.ok, 'Dor ligeira'),
+    Band(4, Severity.warning, 'Dor moderada'),
+    Band(7, Severity.danger, 'Dor intensa'),
+  ], display: (sum) => '$sum/10'),
+);
+
+final pediatricScores = [apgar, flacc, pat, pts];
+
+int? _ptsSbp(VitalSigns v, Answers _) => switch (v[Vital.sbp]) {
+  null => null,
+  > 90 => 0,
+  >= 50 => 1,
+  _ => 2,
+};

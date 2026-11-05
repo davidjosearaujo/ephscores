@@ -6,6 +6,7 @@ import 'patient/patient.dart';
 import 'scores/score_store.dart';
 import 'start/start.dart';
 import 'theme.dart';
+import 'viaverde/via_verde.dart';
 import 'ui/root_page.dart';
 
 class EPHScoresApp extends StatelessWidget {
@@ -118,4 +119,13 @@ extension PatientFlow on AppScope {
   /// Registers the current answers. They stay in place as the reference for
   /// the next evaluation.
   Evaluation registerEvaluation() => patient.register(scores.sheet, burn.sheet);
+
+  /// The live answers, vital signs, burns, onset and ticked criteria.
+  ClinicalState clinicalState({DateTime? now}) => ClinicalState(
+    scores: scores.sheet,
+    burns: burn.sheet,
+    onset: patient.onset,
+    checks: patient.checks,
+    now: now ?? DateTime.now(),
+  );
 }

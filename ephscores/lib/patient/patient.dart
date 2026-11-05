@@ -6,6 +6,7 @@ import '../burn/burn.dart';
 import '../persistence.dart';
 import '../scores/model.dart';
 import '../scores/score_store.dart';
+import '../viaverde/via_verde.dart';
 
 /// One registered evaluation: a snapshot of every score and the burn map.
 class Evaluation {
@@ -57,6 +58,24 @@ class PatientStore extends PersistedStore {
   DateTime? _startedAt;
   DateTime? _finishedAt;
   final List<Evaluation> _evaluations = [];
+  Onset? _onset;
+  final Set<String> _checks = {};
+
+  /// When the symptoms began (or the patient was last seen well).
+  Onset? get onset => _onset;
+
+  set onset(Onset? value) {
+    _onset = value;
+    changed();
+  }
+
+  /// Via Verde criteria ticked by hand, as "pathway.criterion" ids.
+  Set<String> get checks => UnmodifiableSetView(_checks);
+
+  void toggleCheck(String id) {
+    if (!_checks.remove(id)) _checks.add(id);
+    changed();
+  }
 
   DateTime? get startedAt => _startedAt;
   DateTime? get finishedAt => _finishedAt;
@@ -79,6 +98,8 @@ class PatientStore extends PersistedStore {
     _startedAt = at ?? DateTime.now();
     _finishedAt = null;
     _evaluations.clear();
+    _onset = null;
+    _checks.clear();
     changed();
   }
 
@@ -115,6 +136,8 @@ class PatientStore extends PersistedStore {
     _startedAt = null;
     _finishedAt = null;
     _evaluations.clear();
+    _onset = null;
+    _checks.clear();
     changed();
   }
 
@@ -131,6 +154,8 @@ class PatientStore extends PersistedStore {
     if (_startedAt != null) 'start': _startedAt!.millisecondsSinceEpoch,
     if (_finishedAt != null) 'end': _finishedAt!.millisecondsSinceEpoch,
     'evaluations': [for (final e in _evaluations) e.toJson()],
+    if (_onset != null) 'onset': _onset!.toJson(),
+    if (_checks.isNotEmpty) 'checks': _checks.toList()..sort(),
   };
 
   @override
@@ -143,8 +168,12 @@ class PatientStore extends PersistedStore {
       for (final e in data['evaluations'] as List)
         Evaluation.fromJson(e as Map<String, dynamic>),
     ];
+    final onset = data['onset'] as Map<String, dynamic>?;
+    final checks = (data['checks'] as List?)?.cast<String>() ?? const [];
     _startedAt = DateTime.fromMillisecondsSinceEpoch(start);
     _finishedAt = end == null ? null : DateTime.fromMillisecondsSinceEpoch(end);
     _evaluations.addAll(evaluations);
+    _onset = onset == null ? null : Onset.fromJson(onset);
+    _checks.addAll(checks);
   }
 }

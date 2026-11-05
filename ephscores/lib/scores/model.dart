@@ -5,6 +5,8 @@
 /// isolation from Flutter.
 library;
 
+import '../vitals/vitals.dart';
+
 /// Clinical severity of a result, mapped to the traffic-light palette.
 enum Severity { incomplete, ok, warning, danger }
 
@@ -36,6 +38,7 @@ class ScoreItem {
     this.multi = false,
     this.optional = false,
     this.visibleWhen,
+    this.vital,
   });
 
   final String id;
@@ -53,6 +56,9 @@ class ScoreItem {
   final bool Function(Answers answers)? visibleWhen;
 
   bool isVisible(Answers answers) => visibleWhen?.call(answers) ?? true;
+
+  /// Answered from the vital signs when they decide it.
+  final VitalBinding? vital;
 }
 
 /// The options picked for each item of one score, by option index.

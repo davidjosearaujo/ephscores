@@ -10,11 +10,15 @@ import '../scores/adult.dart';
 import '../scores/model.dart';
 import '../scores/pediatric.dart';
 import '../theme.dart';
+import '../viaverde/via_verde.dart';
+import '../vitals/vitals.dart';
 import 'brand.dart';
 import 'burn_page.dart';
 import 'contacts_page.dart';
 import 'evolution_page.dart';
 import 'score_list_page.dart';
+import 'via_verde_page.dart';
+import 'vitals_page.dart';
 import 'widgets.dart';
 
 /// The open patient: entry to every assessment tool, plus the bar to
@@ -29,7 +33,7 @@ class DashboardPage extends StatelessWidget {
     void open(Widget page) => pushPage(context, page);
 
     String? filled(List<ScoreDefinition> scores) {
-      final n = scores.where((s) => scope.scores.hasAnswers(s.id)).length;
+      final n = scores.where((s) => scope.scores.isFilled(s.id)).length;
       return n == 0 ? null : '$n ${n == 1 ? 'preenchida' : 'preenchidas'}';
     }
 
@@ -40,7 +44,18 @@ class DashboardPage extends StatelessWidget {
         listenable: scope.patientState,
         builder: (context, _) {
           if (!scope.patient.isActive) return const SizedBox.shrink();
+          final vitals = scope.scores.vitals;
+          final recorded = Vital.values.where((v) => vitals[v] != null).length;
           final entries = [
+            _MenuCard(
+              icon: Icons.monitor_heart,
+              title: 'Sinais vitais',
+              subtitle: 'AVDS · FR · SpO₂ · FC · PA · Temp. · Dor · Glicemia',
+              badge: recorded == 0
+                  ? null
+                  : '$recorded ${recorded == 1 ? 'registado' : 'registados'}',
+              onTap: () => open(const VitalsPage()),
+            ),
             _MenuCard(
               icon: Icons.person,
               title: 'Escalas gerais',
@@ -70,6 +85,13 @@ class DashboardPage extends StatelessWidget {
                   ? null
                   : 'SCQ ${formatPercent(scope.burn.tbsa)}',
               onTap: () => open(const BurnPage()),
+            ),
+            _MenuCard(
+              icon: Icons.alt_route,
+              title: 'Vias Verdes',
+              subtitle: viasVerdes.map((p) => p.name).join(' · '),
+              badge: _viaVerdeBadge(scope.clinicalState()),
+              onTap: () => open(const ViaVerdePage()),
             ),
             _MenuCard(
               icon: Icons.phone,
@@ -113,6 +135,19 @@ class DashboardPage extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "Critérios: AVC" when a pathway is met, otherwise the ones to check.
+String? _viaVerdeBadge(ClinicalState state) {
+  List<String> withSeverity(Severity s) => [
+    for (final p in viasVerdes)
+      if (p.check(state).result.severity == s) p.name,
+  ];
+  final met = withSeverity(Severity.danger);
+  if (met.isNotEmpty) return 'Critérios: ${met.join(', ')}';
+  final check = withSeverity(Severity.warning);
+  if (check.isNotEmpty) return 'Verificar: ${check.join(', ')}';
+  return null;
 }
 
 class _Header extends StatelessWidget {
@@ -349,13 +384,19 @@ class _ClocksState extends State<_Clocks> {
     final total = formatTimer(now.difference(p.startedAt!));
     final current = formatTimer(now.difference(p.evaluationStartedAt));
     final next = p.evaluations.length + 1;
+    final onset = p.onset;
+    final symptoms = onset == null
+        ? null
+        : formatTimer(now.difference(onset.at));
     final theme = Theme.of(context);
     final style = theme.textTheme.bodySmall?.copyWith(
       color: theme.colorScheme.outline,
       fontFeatures: const [FontFeature.tabularFigures()],
     );
     return Semantics(
-      label: 'Doente há $total, avaliação $next há $current',
+      label:
+          'Doente há $total, avaliação $next há $current'
+          '${symptoms == null ? '' : ', sintomas há $symptoms'}',
       excludeSemantics: true,
       // Shrinks rather than wraps: it must stay a single, quiet line.
       child: FittedBox(
@@ -368,6 +409,10 @@ class _ClocksState extends State<_Clocks> {
             Text('Doente $total', style: style),
             Text('   ·   ', style: style),
             Text('Avaliação $next  $current', style: style),
+            if (symptoms != null) ...[
+              Text('   ·   ', style: style),
+              Text('Sintomas $symptoms', style: style),
+            ],
           ],
         ),
       ),

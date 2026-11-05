@@ -1,0 +1,400 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../app.dart';
+import '../format.dart';
+import '../scores/model.dart';
+import '../scores/score_store.dart';
+import '../theme.dart';
+import '../vitals/vitals.dart';
+import 'widgets.dart';
+
+/// Names of the scores filled from [vital] ("NEWS2 · RTS").
+String usedBy(Vital vital) => {
+  for (final s in allScores.values)
+    for (final item in s.items)
+      if (item.vital?.vitals.contains(vital) ?? false) s.name,
+}.join(' · ');
+
+/// The vital signs, in the order of the national form. Each value is typed
+/// once and fills every score that uses it.
+class VitalsPage extends StatelessWidget {
+  const VitalsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final store = AppScope.of(context).scores;
+    return ListenableBuilder(
+      listenable: store,
+      builder: (context, _) {
+        final v = store.vitals;
+        Widget field(Vital vital, {String? hint, Widget? below}) => _VitalField(
+          // Keyed so the text survives rebuilds, and resets with "Limpar".
+          key: ValueKey(vital),
+          vital: vital,
+          value: v[vital],
+          hint: hint,
+          below: below,
+          onChanged: (value) => store.setVital(vital, value),
+        );
+        final glucose = v[Vital.glucose];
+        final flag = glucose == null ? null : glucoseFlag(glucose);
+        final si = v.shockIndex;
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Sinais vitais'),
+            actions: [
+              IconButton(
+                tooltip: 'Limpar sinais vitais',
+                icon: const Icon(Icons.restart_alt),
+                onPressed: v.isEmpty
+                    ? null
+                    : () async {
+                        if (await confirm(
+                          context,
+                          title: 'Limpar sinais vitais?',
+                          message:
+                              'Apaga os valores registados. As avaliações já '
+                              'registadas não são alteradas.',
+                        )) {
+                          store.clearVitals();
+                        }
+                      },
+              ),
+            ],
+          ),
+          body: ListView(
+            padding: listPadding,
+            children: [
+              Text(
+                'Registados uma vez, preenchem as escalas que os usam.',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              field(
+                Vital.age,
+                hint: 'Menos de 16 anos: a NEWS2 não é preenchida.',
+              ),
+              _AvdsField(
+                level: v[Vital.avds]?.toInt(),
+                newConfusion: v.newConfusion,
+                onLevel: (i) => store.setVital(Vital.avds, i),
+                onConfusion: (c) => store.newConfusion = c,
+              ),
+              field(Vital.rr),
+              field(Vital.spo2),
+              field(Vital.o2, hint: '0 = ar ambiente.'),
+              field(Vital.hr),
+              field(Vital.sbp),
+              field(Vital.dbp),
+              field(Vital.temp),
+              field(
+                Vital.pain,
+                hint:
+                    'Escala numérica, a partir dos 6 anos. Abaixo dos 4 anos '
+                    'ou sem verbalizar: FLACC (escalas pediátricas).',
+              ),
+              field(
+                Vital.glucose,
+                below: flag == null
+                    ? null
+                    : _Flag(severity: flag.$1, text: flag.$2),
+              ),
+              if (si != null) _ShockIndexCard(shockIndexResult(si)),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _FieldHeader extends StatelessWidget {
+  const _FieldHeader({required this.title, this.subtitle});
+
+  final String title;
+  final String? subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          if (subtitle != null && subtitle!.isNotEmpty)
+            Text(
+              subtitle!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VitalField extends StatefulWidget {
+  const _VitalField({
+    super.key,
+    required this.vital,
+    required this.value,
+    required this.onChanged,
+    this.hint,
+    this.below,
+  });
+
+  final Vital vital;
+  final num? value;
+  final ValueChanged<num?> onChanged;
+  final String? hint;
+  final Widget? below;
+
+  @override
+  State<_VitalField> createState() => _VitalFieldState();
+}
+
+class _VitalFieldState extends State<_VitalField> {
+  late final _controller = TextEditingController(text: _text(widget.value));
+  final _focus = FocusNode();
+
+  static String _text(num? v) => v == null ? '' : formatNumber(v.toDouble());
+
+  @override
+  void initState() {
+    super.initState();
+    // The range error only shows once the field is left.
+    _focus.addListener(() => setState(() {}));
+  }
+
+  @override
+  void didUpdateWidget(_VitalField old) {
+    super.didUpdateWidget(old);
+    // Cleared or changed elsewhere ("Limpar"): show the stored value.
+    if (widget.value != widget.vital.parse(_controller.text)) {
+      _controller.text = _text(widget.value);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focus.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final vital = widget.vital;
+    final text = _controller.text;
+    final invalid =
+        !_focus.hasFocus && text.trim().isNotEmpty && vital.parse(text) == null;
+    final range =
+        '${formatNumber(vital.min.toDouble())} a '
+        '${formatNumber(vital.max.toDouble())}';
+    final used = usedBy(vital);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _FieldHeader(
+          title: vital.label,
+          subtitle: [
+            ?widget.hint,
+            if (used.isNotEmpty) 'Preenche: $used',
+          ].join('\n'),
+        ),
+        TextField(
+          controller: _controller,
+          focusNode: _focus,
+          keyboardType: TextInputType.numberWithOptions(
+            decimal: vital.decimals,
+          ),
+          inputFormatters: [
+            FilteringTextInputFormatter.allow(
+              RegExp(vital.decimals ? r'[0-9.,]' : r'[0-9]'),
+            ),
+          ],
+          textInputAction: TextInputAction.next,
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+          decoration: InputDecoration(
+            suffixText: vital.unit,
+            hintText: range,
+            errorText: invalid ? 'Valor entre $range ${vital.unit}' : null,
+            filled: true,
+            fillColor: Theme.of(context).colorScheme.tile,
+            border: const OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(14)),
+            ),
+          ),
+          onChanged: (t) {
+            widget.onChanged(vital.parse(t));
+            setState(() {});
+          },
+        ),
+        ?widget.below,
+      ],
+    );
+  }
+}
+
+class _AvdsField extends StatelessWidget {
+  const _AvdsField({
+    required this.level,
+    required this.newConfusion,
+    required this.onLevel,
+    required this.onConfusion,
+  });
+
+  final int? level;
+  final bool newConfusion;
+  final ValueChanged<int?> onLevel;
+  final ValueChanged<bool> onConfusion;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _FieldHeader(
+          title: Vital.avds.label,
+          subtitle: 'Preenche: ${usedBy(Vital.avds)} · Vias Verdes',
+        ),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            const gap = 8.0;
+            final width = (constraints.maxWidth - gap) / 2;
+            return Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                for (final (i, (letter, name)) in avdsLevels.indexed)
+                  SizedBox(
+                    width: width,
+                    child: SelectableTile(
+                      selected: level == i,
+                      onTap: () => onLevel(level == i ? null : i),
+                      builder: (fg) => Row(
+                        children: [
+                          Text(
+                            letter,
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: fg,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              name,
+                              style: TextStyle(fontSize: 15, color: fg),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+        if (level == 0) ...[
+          const SizedBox(height: 8),
+          SelectableTile(
+            selected: newConfusion,
+            onTap: () => onConfusion(!newConfusion),
+            builder: (fg) => Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Confusão recente',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: fg,
+                        ),
+                      ),
+                      Text(
+                        'Na NEWS2 pontua como V, D ou S',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: fg.withValues(alpha: 0.75),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (newConfusion) Icon(Icons.check, color: fg, size: 20),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _Flag extends StatelessWidget {
+  const _Flag({required this.severity, required this.text});
+
+  final Severity severity;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Palette.severity(severity, scheme),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: Palette.onSeverity(severity, scheme),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ShockIndexCard extends StatelessWidget {
+  const _ShockIndexCard(this.result);
+
+  final ScoreResult result;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Card(
+        color: Theme.of(context).colorScheme.secondaryContainer,
+        shape: filledCardShape,
+        child: ListTile(
+          contentPadding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
+          title: const Text(
+            'Índice de choque (FC/PAS)',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          subtitle: Text('${result.label} · adulto'),
+          trailing: ResultPill(result),
+        ),
+      ),
+    );
+  }
+}

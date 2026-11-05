@@ -11,8 +11,15 @@ de forma rápida e simples, no terreno.
   as respostas ficam como referência para a seguinte, e a página
   *Evolução* mostra a tendência de cada escala e permite copiar um resumo
   em texto
+- **Sinais vitais:** os campos do verbete nacional (AVDS, FR, SpO₂, O₂, FC,
+  PA, temperatura, dor e glicemia), registados uma vez e usados por todas as
+  escalas que deles precisam; a NEWS2 fica calculada sem mais toques, com o
+  índice de choque ao lado
+- **Vias Verdes:** hora de início dos sintomas e critérios das Vias Verdes
+  AVC, Coronária, Sépsis e Trauma, assinalados automaticamente a partir dos
+  sinais vitais, das escalas e do mapa de queimaduras
 - **Escalas gerais:** Cincinnati, Glasgow (ECG), MGAP, NEWS2, ProACS, RACE e RTS
-- **Escalas pediátricas:** APGAR, Triângulo de Avaliação Pediátrica (TAP) e PTS
+- **Escalas pediátricas:** APGAR, FLACC, Triângulo de Avaliação Pediátrica (TAP) e PTS
 - **Avaliação do queimado:** regra dos nove para adulto e criança, com grau por região
 - **Triagem START:** algoritmo passo a passo e contagem de vítimas por
   prioridade, separada do doente
@@ -25,8 +32,8 @@ de forma rápida e simples, no terreno.
 - **Botões grandes**, pensados para usar com luvas.
 - **Nada se perde:** as respostas e as avaliações são guardadas a cada toque
   e sobrevivem ao fecho da aplicação.
-- **Sem dados pessoais:** não há campos de identificação, e só o último
-  doente é mantido. "Novo doente" apaga o anterior.
+- **Sem dados pessoais:** não há campos de identificação (apenas a idade),
+  e só o último doente é mantido. "Novo doente" apaga o anterior.
 - **Modo escuro** automático, para turnos noturnos.
 
 > A aplicação é um auxiliar de cálculo. Não substitui a avaliação clínica nem
