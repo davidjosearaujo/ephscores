@@ -4,7 +4,7 @@ import 'package:ephscores/patient/summary.dart';
 import 'package:ephscores/scores/adult.dart';
 import 'package:ephscores/scores/model.dart';
 import 'package:ephscores/scores/score_store.dart';
-import 'package:ephscores/ui/via_verde_page.dart';
+import 'package:ephscores/ui/widgets.dart' show resolveClockTime;
 import 'package:ephscores/viaverde/via_verde.dart';
 import 'package:ephscores/vitals/vitals.dart';
 import 'package:flutter/material.dart';
@@ -206,7 +206,10 @@ void main() {
       scores.setVital(Vital.sbp, 85);
       expect(check(viaVerdeTrauma).result.display, '–');
       patient.register(scores.sheet, burns.sheet, at: now);
-      expect(viaVerdeLines(patient), everyElement(isNot(contains('Trauma'))));
+      expect(
+        viaVerdeStatus(patient).map((e) => e.$1),
+        isNot(contains(viaVerdeTrauma)),
+      );
     });
 
     test('a mechanism is enough context', () {

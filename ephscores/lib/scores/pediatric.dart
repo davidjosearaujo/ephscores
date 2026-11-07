@@ -1,4 +1,5 @@
 import '../vitals/vitals.dart';
+import 'adult.dart' show gcsEyes, glasgow;
 import 'model.dart';
 
 final apgar = ScoreDefinition(
@@ -311,12 +312,6 @@ final flacc = ScoreDefinition(
   ], display: (sum) => '$sum/10'),
 );
 
-final _pgcsTotal = additive(const [
-  Band(3, Severity.danger, 'Grave'),
-  Band(9, Severity.warning, 'Moderado'),
-  Band(13, Severity.ok, 'Ligeiro'),
-]);
-
 /// Glasgow Coma Scale adapted to children under 2, who can't yet answer
 /// with words or obey orders. Same eyes item and bands as the adult scale.
 final pgcs = ScoreDefinition(
@@ -327,16 +322,7 @@ final pgcs = ScoreDefinition(
       'Nível de consciência em crianças com menos de 2 anos. A partir dos '
       '2 anos usar a ECG (escalas gerais).',
   items: const [
-    ScoreItem(
-      id: 'eyes',
-      label: 'Abertura ocular',
-      options: [
-        ScoreOption('Espontânea', 4),
-        ScoreOption('À voz', 3),
-        ScoreOption('À dor', 2),
-        ScoreOption('Sem resposta', 1),
-      ],
-    ),
+    gcsEyes,
     ScoreItem(
       id: 'verbal',
       label: 'Resposta verbal',
@@ -361,21 +347,7 @@ final pgcs = ScoreDefinition(
       ],
     ),
   ],
-  evaluate: (score, answers, lookup) {
-    final base = _pgcsTotal(score, answers, lookup);
-    String part(String letter, String id) {
-      final i = answers.choice(id);
-      final item = score.items.firstWhere((it) => it.id == id);
-      return '$letter${i == null ? '–' : item.options[i].points}';
-    }
-
-    return base.answered == 0
-        ? base
-        : base.copyWith(
-            breakdown:
-                '${part('O', 'eyes')} ${part('V', 'verbal')} ${part('M', 'motor')}',
-          );
-  },
+  evaluate: glasgow,
 );
 
 final pediatricScores = [apgar, pgcs, flacc, pat, pts];

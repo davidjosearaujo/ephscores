@@ -152,9 +152,10 @@ class DashboardPage extends StatelessWidget {
 
 /// "Critérios: AVC" when a pathway is met, otherwise the ones to check.
 String? _viaVerdeBadge(ClinicalState state) {
+  final results = {for (final p in viasVerdes) p: p.check(state).result};
   List<String> withSeverity(Severity s) => [
-    for (final p in viasVerdes)
-      if (p.check(state).result.severity == s) p.name,
+    for (final MapEntry(key: p, value: r) in results.entries)
+      if (r.severity == s) p.name,
   ];
   final met = withSeverity(Severity.danger);
   if (met.isNotEmpty) return 'Critérios: ${met.join(', ')}';

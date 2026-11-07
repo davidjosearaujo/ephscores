@@ -135,7 +135,8 @@ class CriteriaCheck {
           reasons[c.id]!.isEmpty ? c.label : '${c.label} (${reasons[c.id]})',
   ];
 
-  ScoreResult get result => pathway.evaluate(this);
+  /// The pathway's status; worked out once, as it is read several times.
+  late final ScoreResult result = pathway.evaluate(this);
 }
 
 class ViaVerde {
@@ -210,6 +211,15 @@ String? _altered(String scoreId, String itemId, ClinicalState s, String name) =>
 
 String? _raceAtLeast1(String itemId, ClinicalState s) =>
     (s.points('race', itemId) ?? 0) >= 1 ? 'RACE' : null;
+
+/// Met when the score [id] is complete and its total passes [test]:
+/// "RTS 10".
+AutoCheck _scoreWhere(String id, bool Function(int total) test) => (s) {
+  final r = s.scores.resultFor(id);
+  return r.complete && test(r.value!)
+      ? '${allScores[id]!.name} ${r.value}'
+      : null;
+};
 
 String? _alteredConsciousness(ClinicalState s) {
   final avds = s.vitals[Vital.avds];
@@ -541,20 +551,14 @@ final viaVerdeTrauma = ViaVerde(
         'RTS ≤ 10',
         detail: 'Calculada nas escalas gerais',
         manual: false,
-        auto: (s) {
-          final r = s.scores.resultFor('rts');
-          return r.complete && r.value! <= 10 ? 'RTS ${r.value}' : null;
-        },
+        auto: _scoreWhere('rts', (v) => v <= 10),
       ),
       Criterion(
         'mgap',
         'MGAP < 18',
         detail: 'Calculada nas escalas gerais',
         manual: false,
-        auto: (s) {
-          final r = s.scores.resultFor('mgap');
-          return r.complete && r.value! < 18 ? 'MGAP ${r.value}' : null;
-        },
+        auto: _scoreWhere('mgap', (v) => v < 18),
       ),
     ]),
   ],

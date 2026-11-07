@@ -222,3 +222,126 @@ class SelectableTile extends StatelessWidget {
     );
   }
 }
+
+/// The text of a [SelectableTile]: a label with an optional, smaller detail
+/// line, in the tile's foreground colour.
+class TileLabel extends StatelessWidget {
+  const TileLabel(this.label, {super.key, this.detail, required this.color});
+
+  final String label;
+  final String? detail;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: color,
+          ),
+        ),
+        if (detail != null)
+          Text(
+            detail!,
+            style: TextStyle(
+              fontSize: 13,
+              color: color.withValues(alpha: 0.75),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// The time [picked] on the clock, on the most recent day it isn't in the
+/// future: a time later than now is taken as yesterday.
+DateTime resolveClockTime(TimeOfDay picked, DateTime now) {
+  final today = DateTime(
+    now.year,
+    now.month,
+    now.day,
+    picked.hour,
+    picked.minute,
+  );
+  return today.isAfter(now) ? today.subtract(const Duration(days: 1)) : today;
+}
+
+/// Asks for a time of day, starting at [initial]; returns it on the most
+/// recent day it isn't in the future (see [resolveClockTime]), or null if
+/// cancelled.
+Future<DateTime?> pickClockTime(
+  BuildContext context, {
+  required DateTime initial,
+  required String title,
+}) async {
+  final picked = await showTimePicker(
+    context: context,
+    initialTime: TimeOfDay.fromDateTime(initial),
+    helpText: title,
+  );
+  return picked == null ? null : resolveClockTime(picked, DateTime.now());
+}
+
+/// Bold heading above a question, field or group, with an optional grey
+/// line under it and an optional marker at the right ("answered", ...).
+class ItemHeader extends StatelessWidget {
+  const ItemHeader({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.trailing,
+    this.top = 20,
+  });
+
+  final String title;
+  final String? subtitle;
+  final Widget? trailing;
+  final double top;
+
+  /// The tick shown when an item is answered or a group is met.
+  static Widget done(BuildContext context) => Icon(
+    Icons.check_circle,
+    size: 20,
+    color: Theme.of(context).colorScheme.primary,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final subtitle = this.subtitle;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(4, top, 4, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              ?trailing,
+            ],
+          ),
+          if (subtitle != null && subtitle.isNotEmpty)
+            Text(
+              subtitle,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}

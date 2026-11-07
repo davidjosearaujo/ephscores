@@ -40,22 +40,46 @@ final _gcsTotal = additive(const [
   Band(13, Severity.ok, 'Ligeiro'),
 ]);
 
+/// Eye opening, the same in the adult and paediatric scales.
+const gcsEyes = ScoreItem(
+  id: 'eyes',
+  label: 'Abertura ocular',
+  options: [
+    ScoreOption('Espontânea', 4),
+    ScoreOption('À voz', 3),
+    ScoreOption('À dor', 2),
+    ScoreOption('Sem resposta', 1),
+  ],
+);
+
+/// Glasgow total and bands, with the "O4 V5 M6" breakdown; shared by the
+/// adult and paediatric scales.
+ScoreResult glasgow(
+  ScoreDefinition score,
+  Answers answers,
+  ResultLookup lookup,
+) {
+  final base = _gcsTotal(score, answers, lookup);
+  if (base.answered == 0) return base;
+  String part(String letter, String id) {
+    final i = answers.choice(id);
+    final item = score.items.firstWhere((it) => it.id == id);
+    return '$letter${i == null ? '–' : item.options[i].points}';
+  }
+
+  return base.copyWith(
+    breakdown:
+        '${part('O', 'eyes')} ${part('V', 'verbal')} ${part('M', 'motor')}',
+  );
+}
+
 final gcs = ScoreDefinition(
   id: 'gcs',
   name: 'ECG',
   fullName: 'Escala de Coma de Glasgow',
   description: 'Nível de consciência. Usada também pela MGAP e RTS.',
   items: const [
-    ScoreItem(
-      id: 'eyes',
-      label: 'Abertura ocular',
-      options: [
-        ScoreOption('Espontânea', 4),
-        ScoreOption('À voz', 3),
-        ScoreOption('À dor', 2),
-        ScoreOption('Sem resposta', 1),
-      ],
-    ),
+    gcsEyes,
     ScoreItem(
       id: 'verbal',
       label: 'Resposta verbal',
@@ -80,21 +104,7 @@ final gcs = ScoreDefinition(
       ],
     ),
   ],
-  evaluate: (score, answers, lookup) {
-    final base = _gcsTotal(score, answers, lookup);
-    String part(String letter, String id) {
-      final i = answers.choice(id);
-      final item = score.items.firstWhere((it) => it.id == id);
-      return '$letter${i == null ? '–' : item.options[i].points}';
-    }
-
-    return base.answered == 0
-        ? base
-        : base.copyWith(
-            breakdown:
-                '${part('O', 'eyes')} ${part('V', 'verbal')} ${part('M', 'motor')}',
-          );
-  },
+  evaluate: glasgow,
 );
 
 final mgap = ScoreDefinition(

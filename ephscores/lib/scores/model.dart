@@ -8,7 +8,15 @@ library;
 import '../vitals/vitals.dart';
 
 /// Clinical severity of a result, mapped to the traffic-light palette.
-enum Severity { incomplete, ok, warning, danger }
+enum Severity {
+  incomplete,
+  ok,
+  warning,
+  danger;
+
+  /// Amber or red: worth flagging.
+  bool get isAlert => this == warning || this == danger;
+}
 
 class ScoreOption {
   const ScoreOption(

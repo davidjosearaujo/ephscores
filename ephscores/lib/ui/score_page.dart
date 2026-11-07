@@ -173,28 +173,13 @@ class _ItemSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  item.label,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              if (item.multi)
-                Text('Várias opções', style: theme.textTheme.labelSmall)
-              else if (picks.isNotEmpty)
-                Icon(
-                  Icons.check_circle,
-                  size: 20,
-                  color: theme.colorScheme.primary,
-                ),
-            ],
-          ),
+        ItemHeader(
+          title: item.label,
+          trailing: item.multi
+              ? Text('Várias opções', style: theme.textTheme.labelSmall)
+              : picks.isNotEmpty
+              ? ItemHeader.done(context)
+              : null,
         ),
         if (item.hint != null)
           Padding(
@@ -261,28 +246,7 @@ class _OptionTile extends StatelessWidget {
       builder: (fg) => Row(
         children: [
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  option.label,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: fg,
-                  ),
-                ),
-                if (option.detail != null)
-                  Text(
-                    option.detail!,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: fg.withValues(alpha: 0.75),
-                    ),
-                  ),
-              ],
-            ),
+            child: TileLabel(option.label, detail: option.detail, color: fg),
           ),
           if (showPoints)
             Text(

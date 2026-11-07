@@ -12,12 +12,18 @@ import 'pain_faces.dart';
 import 'score_page.dart';
 import 'widgets.dart';
 
-/// Names of the scores filled from [vital] ("NEWS2 · RTS").
-String usedBy(Vital vital) => {
-  for (final s in allScores.values)
-    for (final item in s.items)
-      if (item.vital?.vitals.contains(vital) ?? false) s.name,
-}.join(' · ');
+/// Names of the scores filled from each vital ("NEWS2 · RTS"). Fixed, so
+/// worked out once rather than on every rebuild.
+final _usedBy = {
+  for (final vital in Vital.values)
+    vital: {
+      for (final s in allScores.values)
+        for (final item in s.items)
+          if (item.vital?.vitals.contains(vital) ?? false) s.name,
+    }.join(' · '),
+};
+
+String usedBy(Vital vital) => _usedBy[vital]!;
 
 /// The vital signs, in the order of the national form. Each value is typed
 /// once and fills every score that uses it.
@@ -145,39 +151,6 @@ class VitalsPage extends StatelessWidget {
   }
 }
 
-class _FieldHeader extends StatelessWidget {
-  const _FieldHeader({required this.title, this.subtitle});
-
-  final String title;
-  final String? subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          if (subtitle != null && subtitle!.isNotEmpty)
-            Text(
-              subtitle!,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
 class _VitalField extends StatefulWidget {
   const _VitalField({
     super.key,
@@ -245,7 +218,7 @@ class _VitalFieldState extends State<_VitalField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _FieldHeader(
+        ItemHeader(
           title: vital.label,
           subtitle: [
             ?widget.hint,
@@ -310,7 +283,7 @@ class _AvdsField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _FieldHeader(
+          ItemHeader(
             title: Vital.avds.label,
             subtitle: 'Preenche: ${usedBy(Vital.avds)} · Vias Verdes',
           ),
@@ -361,25 +334,10 @@ class _AvdsField extends StatelessWidget {
               builder: (fg) => Row(
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Confusão recente',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: fg,
-                          ),
-                        ),
-                        Text(
-                          'Na NEWS2 pontua como V, D ou S',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: fg.withValues(alpha: 0.75),
-                          ),
-                        ),
-                      ],
+                    child: TileLabel(
+                      'Confusão recente',
+                      detail: 'Na NEWS2 pontua como V, D ou S',
+                      color: fg,
                     ),
                   ),
                   if (newConfusion) Icon(Icons.check, color: fg, size: 20),

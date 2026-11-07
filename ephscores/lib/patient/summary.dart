@@ -118,12 +118,11 @@ List<String> alterations(Evaluation e) {
   final flag = glucose == null ? null : glucoseFlag(glucose);
   return [
     for (final MapEntry(key: id, value: r) in e.results.entries)
-      if (r.complete &&
-          (r.severity == Severity.warning || r.severity == Severity.danger))
+      if (r.complete && r.severity.isAlert)
         '${allScores[id]!.name} ${r.display} (${r.label})',
-    if (si != null && shockIndexResult(si).severity != Severity.ok)
-      'Índice de choque ${formatShockIndex(si)} '
-          '(${shockIndexResult(si).label})',
+    if (si == null ? null : shockIndexResult(si) case final r?
+        when r.severity.isAlert)
+      'Índice de choque ${r.display} (${r.label})',
     ?flag?.$2,
     if (v[Vital.age] case final age?)
       for (final vital in [Vital.rr, Vital.hr, Vital.sbp])
@@ -166,16 +165,6 @@ List<(ViaVerde, CriteriaCheck)> viaVerdeStatus(PatientStore patient) {
     for (final p in viasVerdes)
       // Met, or signs to check; partial counts ("1 de 4 campos") are noise
       // at handover.
-      if (p.check(state) case final c
-          when c.result.severity == Severity.danger ||
-              c.result.severity == Severity.warning)
-        (p, c),
+      if (p.check(state) case final c when c.result.severity.isAlert) (p, c),
   ];
 }
-
-/// "- Via Verde AVC: Critérios cumpridos: contactar CODU — Assimetria
-/// facial (Cincinnati); ..." for each pathway with a status.
-List<String> viaVerdeLines(PatientStore patient) => [
-  for (final (p, c) in viaVerdeStatus(patient))
-    '- ${p.fullName}: ${c.result.label} — ${c.metLabels.join('; ')}',
-];

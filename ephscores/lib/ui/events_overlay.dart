@@ -4,7 +4,6 @@ import '../app.dart';
 import '../format.dart';
 import '../patient/patient.dart';
 import '../theme.dart';
-import 'via_verde_page.dart' show resolveClockTime;
 import 'widgets.dart';
 
 /// Counts the dialogs and sheets open on the navigator, so the tab can
@@ -172,14 +171,12 @@ class EventsPanel extends StatelessWidget {
     PatientEvent event,
     DateTime current,
   ) async {
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(current),
-      helpText: event.label,
+    final at = await pickClockTime(
+      context,
+      initial: current,
+      title: event.label,
     );
-    if (picked != null) {
-      patient.setEvent(event, resolveClockTime(picked, DateTime.now()));
-    }
+    if (at != null) patient.setEvent(event, at);
   }
 
   @override
@@ -319,16 +316,7 @@ class _EventTile extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
       builder: (fg) => Row(
         children: [
-          Expanded(
-            child: Text(
-              event.label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: fg,
-              ),
-            ),
-          ),
+          Expanded(child: TileLabel(event.label, color: fg)),
           if (at == null)
             Padding(
               padding: const EdgeInsets.only(right: 10),

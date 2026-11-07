@@ -9,19 +9,6 @@ import '../theme.dart';
 import '../viaverde/via_verde.dart';
 import 'widgets.dart';
 
-/// The time [picked] on the clock, on the most recent day it isn't in the
-/// future: a time later than now is taken as yesterday.
-DateTime resolveClockTime(TimeOfDay picked, DateTime now) {
-  final today = DateTime(
-    now.year,
-    now.month,
-    now.day,
-    picked.hour,
-    picked.minute,
-  );
-  return today.isAfter(now) ? today.subtract(const Duration(days: 1)) : today;
-}
-
 /// Symptom onset and the criteria of each Via Verde.
 class ViaVerdePage extends StatelessWidget {
   const ViaVerdePage({super.key});
@@ -89,16 +76,13 @@ class _OnsetCardState extends State<_OnsetCard> {
   Future<void> _pick() async {
     final patient = widget.patient;
     final current = patient.onset;
-    final picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(current?.at ?? DateTime.now()),
-      helpText: 'Hora de início dos sintomas',
+    final at = await pickClockTime(
+      context,
+      initial: current?.at ?? DateTime.now(),
+      title: 'Hora de início dos sintomas',
     );
-    if (picked == null) return;
-    patient.onset = Onset(
-      resolveClockTime(picked, DateTime.now()),
-      lastSeenWell: current?.lastSeenWell ?? false,
-    );
+    if (at == null) return;
+    patient.onset = Onset(at, lastSeenWell: current?.lastSeenWell ?? false);
   }
 
   @override
@@ -255,28 +239,14 @@ class _PathwayCard extends StatelessWidget {
         expandedCrossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (final g in p.groups) ...[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(4, 12, 4, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      g.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                  if (check.groupMet(g))
-                    Icon(
-                      Icons.check_circle,
-                      size: 20,
-                      color: theme.colorScheme.primary,
-                    )
-                  else if (g.all)
-                    Text('Todos', style: theme.textTheme.labelSmall),
-                ],
-              ),
+            ItemHeader(
+              title: g.title,
+              top: 12,
+              trailing: check.groupMet(g)
+                  ? ItemHeader.done(context)
+                  : g.all
+                  ? Text('Todos', style: theme.textTheme.labelSmall)
+                  : null,
             ),
             for (final c in g.criteria)
               Padding(
@@ -348,28 +318,7 @@ class _CriterionTile extends StatelessWidget {
       builder: (fg) => Row(
         children: [
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  criterion.label,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: fg,
-                  ),
-                ),
-                if (note != null)
-                  Text(
-                    note,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: fg.withValues(alpha: 0.75),
-                    ),
-                  ),
-              ],
-            ),
+            child: TileLabel(criterion.label, detail: note, color: fg),
           ),
           if (met)
             Icon(auto ? Icons.auto_awesome : Icons.check, color: fg, size: 20),
