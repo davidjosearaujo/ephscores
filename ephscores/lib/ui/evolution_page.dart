@@ -210,16 +210,12 @@ class _SummaryCard extends StatelessWidget {
                         'duração ${formatDuration(end.difference(start))}',
               style: body,
             ),
-            Text('$n ${n == 1 ? 'avaliação' : 'avaliações'}', style: body),
+            Text(formatCount(n, 'avaliação', 'avaliações'), style: body),
             for (final MapEntry(key: event, value: at)
                 in patient.events.entries)
               Text('${event.label}: ${formatClock(at)}', style: body),
             if (patient.onset case final onset?)
-              Text(
-                '${onset.label}: ${formatClock(onset.at)} '
-                '(há ${formatDuration((end ?? DateTime.now()).difference(onset.at))})',
-                style: body,
-              ),
+              Text(onsetLine(onset, end ?? DateTime.now()), style: body),
             if (expiresAt case final at?)
               Text('Guardado até ${formatDate(at)}', style: body),
             if (unsaved) ...[
@@ -297,9 +293,6 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-Widget _resultCell(ScoreResult? result, Widget empty) =>
-    result == null ? empty : ResultPill(result, compact: true);
-
 /// Scores as rows, evaluations as columns. The names stay put while the
 /// values scroll; the newest evaluation is shown first.
 class _TrendTable extends StatelessWidget {
@@ -321,6 +314,8 @@ class _TrendTable extends StatelessWidget {
     ];
     final burns = evaluations.any((e) => e.burns.hasBurns);
     final dash = Text('–', style: TextStyle(color: theme.colorScheme.outline));
+    Widget pill(ScoreResult? r) =>
+        r == null ? dash : ResultPill(r, compact: true);
     // Vital signs first, as on the national form; age doesn't trend, and
     // the two pressures share a row.
     final vitals = [
@@ -421,18 +416,8 @@ class _TrendTable extends StatelessWidget {
                             for (final v in vitals)
                               cell(vitalCell(e.scores.vitals, v)),
                             if (shock)
-                              cell(
-                                e.scores.vitals.shockIndex == null
-                                    ? dash
-                                    : ResultPill(
-                                        shockIndexResult(
-                                          e.scores.vitals.shockIndex!,
-                                        ),
-                                        compact: true,
-                                      ),
-                              ),
-                            for (final s in scores)
-                              cell(_resultCell(e.results[s.id], dash)),
+                              cell(pill(e.scores.vitals.shockResult)),
+                            for (final s in scores) cell(pill(e.results[s.id])),
                             if (burns)
                               cell(
                                 e.burns.hasBurns
@@ -483,7 +468,7 @@ class _EvaluationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final e = evaluation;
     final vitals = e.scores.vitals;
-    final si = vitals.shockIndex;
+    final shock = vitals.shockResult;
     final n =
         e.results.length +
         (e.burns.hasBurns ? 1 : 0) +
@@ -504,16 +489,16 @@ class _EvaluationCard extends StatelessWidget {
           ),
           subtitle: Text(
             'Duração ${formatDuration(e.duration)} · '
-            '$n ${n == 1 ? 'registo' : 'registos'}',
+            '${formatCount(n, 'registo', 'registos')}',
           ),
           children: [
             if (!vitals.isEmpty)
               _ResultRow(
                 title: 'Sinais vitais',
                 subtitle: vitals.summary(),
-                trailing: si == null
+                trailing: shock == null
                     ? null
-                    : ResultPill(shockIndexResult(si), compact: true),
+                    : ResultPill(shock, compact: true),
               ),
             for (final MapEntry(key: id, value: r) in e.results.entries)
               _ResultRow(

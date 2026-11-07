@@ -104,6 +104,88 @@ class BurnPill extends StatelessWidget {
   }
 }
 
+/// A result shown on a tinted card: a score this one depends on, or the
+/// shock index.
+class ResultCard extends StatelessWidget {
+  const ResultCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.result,
+    this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final ScoreResult result;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Theme.of(context).colorScheme.secondaryContainer,
+      shape: filledCardShape,
+      child: ListTile(
+        contentPadding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text(subtitle),
+        trailing: ResultPill(result),
+        onTap: onTap,
+      ),
+    );
+  }
+}
+
+/// A tinted note with an icon: how a page works, or a hint to dismiss.
+class NoteCard extends StatelessWidget {
+  const NoteCard({
+    super.key,
+    required this.icon,
+    required this.text,
+    this.onDismiss,
+  });
+
+  final IconData icon;
+
+  /// Plain text or a [TextSpan] with bold parts.
+  final InlineSpan text;
+
+  /// Shows a close button when set.
+  final VoidCallback? onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final fg = theme.colorScheme.onSecondaryContainer;
+    return Card(
+      color: theme.colorScheme.secondaryContainer,
+      shape: filledCardShape,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(16, 12, onDismiss == null ? 16 : 4, 12),
+        child: Row(
+          children: [
+            Icon(icon, color: fg),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text.rich(
+                text,
+                style: theme.textTheme.bodyMedium?.copyWith(color: fg),
+              ),
+            ),
+            if (onDismiss != null)
+              IconButton(
+                tooltip: 'Fechar',
+                color: fg,
+                onPressed: onDismiss,
+                icon: const Icon(Icons.close),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// Section heading used inside pages.
 class SectionLabel extends StatelessWidget {
   const SectionLabel(this.text, {super.key});

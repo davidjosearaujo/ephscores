@@ -44,6 +44,10 @@ abstract class HistoryStore extends ChangeNotifier {
   /// Deletes what finished before [now] minus [historyRetention].
   Future<void> purge({DateTime? now});
 
+  /// The id a patient is kept under: its start time.
+  static int idOf(PatientRecord patient) =>
+      patient.startedAt!.millisecondsSinceEpoch;
+
   /// Rows as stored: the patient's JSON (the format of
   /// [PatientStore.toJson]) by id. For implementations.
   @protected
@@ -80,7 +84,7 @@ class MemoryHistoryStore extends HistoryStore {
   @override
   Future<void> save(PatientStore patient) async {
     if (!available || !patient.isFinished) return;
-    _rows[patient.startedAt!.millisecondsSinceEpoch] = jsonEncode(
+    _rows[HistoryStore.idOf(patient)] = jsonEncode(
       patient.toJson(),
     );
     notifyListeners();

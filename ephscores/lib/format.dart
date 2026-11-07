@@ -9,6 +9,10 @@ String formatNumber(double v) =>
     (v == v.roundToDouble() ? v.toInt().toString() : v.toStringAsFixed(1))
         .replaceAll('.', ',');
 
+/// "1 avaliação", "3 avaliações".
+String formatCount(int n, String one, String many) =>
+    '$n ${n == 1 ? one : many}';
+
 String formatPercent(double v) => '${formatNumber(v)}%';
 
 /// "14:05".

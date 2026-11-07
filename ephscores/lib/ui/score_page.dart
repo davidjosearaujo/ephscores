@@ -330,23 +330,13 @@ class _LinkedScoreCard extends StatelessWidget {
     final result = AppScope.of(context).scores.resultFor(score.id);
     return Padding(
       padding: const EdgeInsets.only(top: 16),
-      child: Card(
-        color: Theme.of(context).colorScheme.secondaryContainer,
-        shape: filledCardShape,
-        child: ListTile(
-          contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
-          title: Text(
-            score.fullName,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-          subtitle: Text(
-            result.complete
-                ? 'Incluída no total'
-                : 'Por preencher — toque para avaliar',
-          ),
-          trailing: ResultPill(result),
-          onTap: () => pushPage(context, ScorePage(score: score)),
-        ),
+      child: ResultCard(
+        title: score.fullName,
+        subtitle: result.complete
+            ? 'Incluída no total'
+            : 'Por preencher — toque para avaliar',
+        result: result,
+        onTap: () => pushPage(context, ScorePage(score: score)),
       ),
     );
   }

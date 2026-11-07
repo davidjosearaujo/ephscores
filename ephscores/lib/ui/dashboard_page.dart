@@ -35,7 +35,7 @@ class DashboardPage extends StatelessWidget {
 
     String? filled(List<ScoreDefinition> scores) {
       final n = scores.where((s) => scope.scores.isFilled(s.id)).length;
-      return n == 0 ? null : '$n ${n == 1 ? 'preenchida' : 'preenchidas'}';
+      return n == 0 ? null : formatCount(n, 'preenchida', 'preenchidas');
     }
 
     return AnnotatedRegion(
@@ -54,7 +54,7 @@ class DashboardPage extends StatelessWidget {
               subtitle: 'AVDS · FR · SpO₂ · FC · PA · Temp. · Dor · Glicemia',
               badge: recorded == 0
                   ? null
-                  : '$recorded ${recorded == 1 ? 'registado' : 'registados'}',
+                  : formatCount(recorded, 'registado', 'registados'),
               onTap: () => open(const VitalsPage()),
             ),
             _MenuCard(

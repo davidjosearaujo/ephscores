@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app.dart';
-import '../format.dart';
+import '../patient/summary.dart';
 import '../platform/install_hint.dart';
-import '../theme.dart';
 import 'brand.dart';
 import 'contacts_page.dart';
 import 'evolution_page.dart';
@@ -214,7 +213,6 @@ class _LastPatientCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final patient = AppScope.of(context).patient;
-    final n = patient.evaluations.length;
     // Built from a Row rather than a ListTile, whose intrinsic height is
     // too small with large text: the start page sizes itself from it.
     return Card(
@@ -239,9 +237,7 @@ class _LastPatientCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${formatClock(patient.startedAt!)}–'
-                      '${formatClock(patient.finishedAt!)} · '
-                      '$n ${n == 1 ? 'avaliação' : 'avaliações'}\n'
+                      '${patientSpan(patient)}\n'
                       'Mantenha premido para apagar',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
@@ -266,48 +262,26 @@ class _InstallHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final fg = theme.colorScheme.onSecondaryContainer;
-    return Card(
-      color: theme.colorScheme.secondaryContainer,
-      shape: filledCardShape,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 4, 12),
-        child: Row(
-          children: [
-            Icon(Icons.ios_share, color: fg),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text.rich(
-                const TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Instale no iPhone: ',
-                      style: TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                    TextSpan(text: 'toque em Partilhar e depois em '),
-                    TextSpan(
-                      text: '"Adicionar ao ecrã principal"',
-                      style: TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                    TextSpan(
-                      text:
-                          '. Abra-a uma vez com rede para ficar disponível '
-                          'sem rede.',
-                    ),
-                  ],
-                ),
-                style: theme.textTheme.bodyMedium?.copyWith(color: fg),
-              ),
-            ),
-            IconButton(
-              tooltip: 'Fechar',
-              color: fg,
-              onPressed: onDismiss,
-              icon: const Icon(Icons.close),
-            ),
-          ],
-        ),
+    return NoteCard(
+      icon: Icons.ios_share,
+      onDismiss: onDismiss,
+      text: const TextSpan(
+        children: [
+          TextSpan(
+            text: 'Instale no iPhone: ',
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
+          TextSpan(text: 'toque em Partilhar e depois em '),
+          TextSpan(
+            text: '"Adicionar ao ecrã principal"',
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
+          TextSpan(
+            text:
+                '. Abra-a uma vez com rede para ficar disponível '
+                'sem rede.',
+          ),
+        ],
       ),
     );
   }

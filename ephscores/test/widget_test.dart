@@ -1,6 +1,7 @@
 import 'package:ephscores/app.dart';
 import 'package:ephscores/burn/burn.dart';
 import 'package:ephscores/history/history.dart';
+import 'package:ephscores/history/secure_screen.dart';
 import 'package:ephscores/history/unlock.dart';
 import 'package:ephscores/ui/history_page.dart';
 import 'package:ephscores/patient/patient.dart';
@@ -353,6 +354,35 @@ void main() {
       await tester.tap(find.text('Desbloquear'));
       await tester.pumpAndSettle();
       expect(find.textContaining('3 avaliações'), findsOneWidget);
+    });
+
+    testWidgets('screenshots are blocked only while it is open', (
+      tester,
+    ) async {
+      final calls = <Object?>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        secureScreenChannel,
+        (call) async => calls.add(call.arguments),
+      );
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          secureScreenChannel,
+          null,
+        ),
+      );
+      await finishedApp(tester);
+      await tester.tap(find.text('Histórico'));
+      await tester.pumpAndSettle();
+      expect(calls, [true]);
+      await tester.tap(find.textContaining('3 avaliações'));
+      await tester.pumpAndSettle();
+      expect(calls, [true]);
+      // The Android back button, twice.
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(calls, [true, false]);
     });
 
     testWidgets('a failed unlock shows nothing', (tester) async {

@@ -28,6 +28,16 @@ String burnLine(BurnSheet b) {
   return 'Queimados ($who): SCQ ${formatPercent(b.tbsa)} — ${burnDetail(b)}';
 }
 
+/// "14:05–14:52 · 3 avaliações": a finished patient at a glance.
+String patientSpan(PatientRecord p) =>
+    '${formatClock(p.startedAt!)}–${formatClock(p.finishedAt!)} · '
+    '${formatCount(p.evaluations.length, 'avaliação', 'avaliações')}';
+
+/// "Início dos sintomas: 13:40 (há 25 min)", counted up to [now].
+String onsetLine(Onset onset, DateTime now) =>
+    '${onset.label}: ${formatClock(onset.at)} '
+    '(há ${formatDuration(now.difference(onset.at))})';
+
 /// Plain-text handover summary in the ISBAR structure of INEM's national
 /// form (Identificação, Situação, Background, Avaliação, Recomendações), to
 /// read out or paste into a report.
@@ -69,9 +79,7 @@ String patientSummary(PatientRecord patient, {DateTime? now}) {
   final onset = patient.onset;
   final pathways = viaVerdeStatus(patient);
   final situation = [
-    if (onset != null)
-      '${onset.label}: ${formatClock(onset.at)} '
-          '(há ${formatDuration(end.difference(onset.at))})',
+    if (onset != null) onsetLine(onset, end),
     for (final (p, c) in pathways) '${p.fullName}: ${c.result.label}',
     if (last != null) ...alterations(last),
     if (last == null) 'Sem avaliações registadas',
@@ -113,15 +121,13 @@ String patientSummary(PatientRecord patient, {DateTime? now}) {
 /// glucose flag. "NEWS2 8 (Risco alto)".
 List<String> alterations(Evaluation e) {
   final v = e.scores.vitals;
-  final si = v.shockIndex;
   final glucose = v[Vital.glucose];
   final flag = glucose == null ? null : glucoseFlag(glucose);
   return [
     for (final MapEntry(key: id, value: r) in e.results.entries)
       if (r.complete && r.severity.isAlert)
         '${allScores[id]!.name} ${r.display} (${r.label})',
-    if (si == null ? null : shockIndexResult(si) case final r?
-        when r.severity.isAlert)
+    if (v.shockResult case final r? when r.severity.isAlert)
       'Índice de choque ${r.display} (${r.label})',
     ?flag?.$2,
     if (v[Vital.age] case final age?)

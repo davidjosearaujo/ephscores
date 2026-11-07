@@ -154,7 +154,7 @@ extension PatientFlow on AppScope {
   /// a finished one is deleted from the history too.
   void discardPatient() {
     if (patient.isFinished) {
-      history.delete(patient.startedAt!.millisecondsSinceEpoch);
+      history.delete(HistoryStore.idOf(patient));
     }
     scores.resetAll();
     burn.clearAll();

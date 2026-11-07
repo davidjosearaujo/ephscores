@@ -77,7 +77,7 @@ class SqliteHistoryStore extends HistoryStore {
     _db.execute(
       'INSERT OR REPLACE INTO patients (id, finished, data) VALUES (?, ?, ?)',
       [
-        patient.startedAt!.millisecondsSinceEpoch,
+        HistoryStore.idOf(patient),
         patient.finishedAt!.millisecondsSinceEpoch,
         jsonEncode(patient.toJson()),
       ],

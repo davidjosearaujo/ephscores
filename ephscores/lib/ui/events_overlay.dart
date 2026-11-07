@@ -84,6 +84,15 @@ class _EventsBubbleState extends State<EventsBubble> {
   /// The resting place, from the last layout.
   Offset _rest = Offset.zero;
 
+  late final PatientStore _patient = AppScope.of(context).patient;
+
+  /// What shows or hides the bubble; merged once, not on every build.
+  late final Listenable _shown = Listenable.merge([
+    _patient,
+    widget.popups.open,
+    widget.popups.panelOpen,
+  ]);
+
   void _toggle() {
     final navigator = widget.navigatorKey.currentState;
     if (widget.popups.panelOpen.value) {
@@ -106,10 +115,10 @@ class _EventsBubbleState extends State<EventsBubble> {
 
   @override
   Widget build(BuildContext context) {
-    final patient = AppScope.of(context).patient;
+    final patient = _patient;
     final popups = widget.popups;
     return ListenableBuilder(
-      listenable: Listenable.merge([patient, popups.open, popups.panelOpen]),
+      listenable: _shown,
       builder: (context, _) {
         if (!patient.isActive ||
             popups.open.value > 0 ||
@@ -246,13 +255,13 @@ Future<void> showEventsPanel(
 );
 
 /// Where the panel goes: next to the bubble, whose top may have moved.
-typedef _Placement = ({double bubbleTop, bool above});
+typedef PanelPlacement = ({double bubbleTop, bool above});
 
 /// Chooses where a panel of [height] goes next to a bubble at [anchor],
 /// within [top] and [bottom]: below if it fits, else above, else the
 /// smallest move of the bubble that makes it fit on one side.
 @visibleForTesting
-({double bubbleTop, bool above}) placePanel({
+PanelPlacement placePanel({
   required Rect anchor,
   required double height,
   required double top,
@@ -295,7 +304,7 @@ class _SpeechBubbleLayoutState extends State<_SpeechBubbleLayout> {
 
   /// Measures the panel's natural height on the first frame.
   final _measure = GlobalKey();
-  _Placement? _placement;
+  PanelPlacement? _placement;
 
   void _place(Size size, EdgeInsets pad) {
     final box = _measure.currentContext?.findRenderObject() as RenderBox?;

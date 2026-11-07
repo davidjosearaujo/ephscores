@@ -131,6 +131,12 @@ class VitalSigns {
     return hr / sbp;
   }
 
+  /// The [shockIndex] graded, when known.
+  ScoreResult? get shockResult => switch (shockIndex) {
+    final si? => shockIndexResult(si),
+    null => null,
+  };
+
   /// One value with its unit: "36,8 °C", "95%", "A", "3/10".
   String format(Vital vital) {
     final v = _values[vital];
@@ -264,7 +270,7 @@ int childHypotension(num age) =>
 /// "aos 4 anos", "no 1.º ano de vida".
 String childAgeLabel(num age) => age < 1
     ? 'no 1.º ano de vida'
-    : 'aos ${age.toInt()} ${age == 1 ? 'ano' : 'anos'}';
+    : 'aos ${formatCount(age.toInt(), 'ano', 'anos')}';
 
 /// Flags a child's value outside the normal range for the age, in red for
 /// hypotension.

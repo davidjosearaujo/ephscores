@@ -66,7 +66,7 @@ class VitalsPage extends StatelessWidget {
 
         final glucose = v[Vital.glucose];
         final flag = glucose == null ? null : glucoseFlag(glucose);
-        final si = v.shockIndex;
+        final shock = v.shockResult;
         return Scaffold(
           appBar: AppBar(
             title: const Text('Sinais vitais'),
@@ -142,7 +142,7 @@ class VitalsPage extends StatelessWidget {
                     ? null
                     : _Flag(severity: flag.$1, text: flag.$2),
               ),
-              if (si != null) _ShockIndexCard(shockIndexResult(si)),
+              if (shock != null) _ShockIndexCard(shock),
             ],
           ),
         );
@@ -419,18 +419,10 @@ class _ShockIndexCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
-      child: Card(
-        color: Theme.of(context).colorScheme.secondaryContainer,
-        shape: filledCardShape,
-        child: ListTile(
-          contentPadding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
-          title: const Text(
-            'Índice de choque (FC/PAS)',
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          subtitle: Text('${result.label} · adulto'),
-          trailing: ResultPill(result),
-        ),
+      child: ResultCard(
+        title: 'Índice de choque (FC/PAS)',
+        subtitle: '${result.label} · adulto',
+        result: result,
       ),
     );
   }

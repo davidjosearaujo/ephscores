@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 import '../app.dart';
 import '../format.dart';
 import '../history/history.dart';
+import '../history/secure_screen.dart';
 import '../history/unlock.dart';
 import '../patient/summary.dart';
 import '../theme.dart';
+import '../vitals/vitals.dart';
 import 'evolution_page.dart';
 import 'widgets.dart';
 
 /// Finished patients kept on the device, behind the phone's screen lock.
 /// It locks again whenever the app goes to the background, closing any
-/// patient opened from it.
+/// patient opened from it, and screenshots are blocked while it is open.
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
 
@@ -41,6 +43,7 @@ class _HistoryPageState extends State<HistoryPage> {
   @override
   void initState() {
     super.initState();
+    setSecureScreen(true);
     _history = AppScope.of(context).history..addListener(_load);
     _lifecycle = AppLifecycleListener(onHide: _relock);
     WidgetsBinding.instance.addPostFrameCallback((_) => _unlock());
@@ -50,6 +53,7 @@ class _HistoryPageState extends State<HistoryPage> {
   void dispose() {
     _history.removeListener(_load);
     _lifecycle.dispose();
+    setSecureScreen(false);
     super.dispose();
   }
 
@@ -211,7 +215,6 @@ class _List extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     // One heading per day, newest first.
     final byDay = <Widget>[];
     String? day;
@@ -232,30 +235,13 @@ class _List extends StatelessWidget {
     return ListView(
       padding: listPadding,
       children: [
-        Card(
-          color: theme.colorScheme.secondaryContainer,
-          shape: filledCardShape,
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.lock_outline,
-                  color: theme.colorScheme.onSecondaryContainer,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Guardados só neste dispositivo, cifrados, e apagados '
-                    '${historyRetention.inDays} dias depois de finalizados. '
-                    'Mantenha premido um doente para o apagar.',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSecondaryContainer,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+        NoteCard(
+          icon: Icons.lock_outline,
+          text: TextSpan(
+            text:
+                'Guardados só neste dispositivo, cifrados, e apagados '
+                '${historyRetention.inDays} dias depois de finalizados. '
+                'Mantenha premido um doente para o apagar.',
           ),
         ),
         if (entries.isEmpty)
@@ -284,13 +270,11 @@ class _EntryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final p = entry.patient;
-    final n = p.evaluations.length;
     final pathways = [for (final (v, _) in viaVerdeStatus(p)) v.name];
     final last = p.evaluations.lastOrNull;
     final alerts = last == null ? const <String>[] : alterations(last);
-    final age = last?.scores.vitals.summary().split(' · ').first;
     final details = [
-      if (age != null && age.endsWith('anos')) age,
+      if (last?.scores.vitals[Vital.age] case final age?) '$age anos',
       if (pathways.isNotEmpty) 'Vias Verdes: ${pathways.join(', ')}',
       ...alerts.take(2),
     ];
@@ -298,8 +282,7 @@ class _EntryCard extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
         title: Text(
-          '${formatClock(entry.startedAt)}–${formatClock(entry.finishedAt)}'
-          ' · $n ${n == 1 ? 'avaliação' : 'avaliações'}',
+          patientSpan(p),
           style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         subtitle: details.isEmpty ? null : Text(details.join('\n')),

@@ -154,7 +154,7 @@ class PatientStore extends PersistedStore implements PatientRecord {
   @override
   Map<PatientEvent, DateTime> get events => {
     for (final e in PatientEvent.values)
-      if (_events[e] != null) e: _events[e]!,
+      e: ?_events[e],
   };
 
   /// Stamps [event] at [at] (now by default), or clears it with null.
@@ -207,12 +207,8 @@ class PatientStore extends PersistedStore implements PatientRecord {
 
   /// Starts a new patient, discarding the previous one.
   void start({DateTime? at}) {
+    _reset();
     _startedAt = at ?? DateTime.now();
-    _finishedAt = null;
-    _evaluations.clear();
-    _onset = null;
-    _checks.clear();
-    _events.clear();
     changed();
   }
 
@@ -246,13 +242,17 @@ class PatientStore extends PersistedStore implements PatientRecord {
 
   /// Forgets the patient entirely.
   void clear() {
+    _reset();
+    changed();
+  }
+
+  void _reset() {
     _startedAt = null;
     _finishedAt = null;
     _evaluations.clear();
     _onset = null;
     _checks.clear();
     _events.clear();
-    changed();
   }
 
   /// Whether [scores] and [burns] differ from the last registered
