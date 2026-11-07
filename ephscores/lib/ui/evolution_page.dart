@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../app.dart';
 import '../format.dart';
@@ -42,19 +43,7 @@ class EvolutionPage extends StatelessWidget {
                 _EmptyState(patient: patient)
               else ...[
                 const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(48),
-                  ),
-                  onPressed: () async {
-                    await Clipboard.setData(
-                      ClipboardData(text: patientSummary(patient)),
-                    );
-                    if (context.mounted) showToast(context, 'Resumo copiado');
-                  },
-                  icon: const Icon(Icons.copy),
-                  label: const Text('Copiar resumo (ISBAR)'),
-                ),
+                const _ShareButton(),
                 const SectionLabel('Tendência'),
                 _TrendTable(evaluations: evaluations),
                 const SectionLabel('Avaliações'),
@@ -79,6 +68,43 @@ class EvolutionPage extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// Opens the system share menu with the ISBAR summary: messaging apps,
+/// notes, e-mail, and Quick Share / AirDrop to a phone nearby. Where the
+/// browser can't share, copies it instead.
+class _ShareButton extends StatelessWidget {
+  const _ShareButton();
+
+  Future<void> _share(BuildContext context) async {
+    final text = patientSummary(AppScope.of(context).patient);
+    // iPad shows the menu as a popover anchored to the button.
+    final box = context.findRenderObject() as RenderBox?;
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          text: text,
+          subject: 'EPHScores — resumo ISBAR',
+          sharePositionOrigin: box == null
+              ? null
+              : box.localToGlobal(Offset.zero) & box.size,
+        ),
+      );
+    } on Object {
+      await Clipboard.setData(ClipboardData(text: text));
+      if (context.mounted) showToast(context, 'Resumo copiado');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton.icon(
+      style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+      onPressed: () => _share(context),
+      icon: const Icon(Icons.share),
+      label: const Text('Partilhar resumo (ISBAR)'),
     );
   }
 }

@@ -229,6 +229,37 @@ void main() {
     expect(find.text('Finalizado'), findsOneWidget);
     expect(find.textContaining('Avaliação 2 ·'), findsOneWidget);
 
+    String? shared;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      const MethodChannel('dev.fluttercommunity.plus/share'),
+      (call) async {
+        if (call.method == 'share') {
+          shared = (call.arguments as Map)['text'] as String;
+        }
+        return 'dev.fluttercommunity.plus/share/unavailable';
+      },
+    );
+    await tester.tap(find.text('Partilhar resumo (ISBAR)'));
+    await tester.pump();
+    final copied = shared;
+    expect(copied, startsWith('EPHScores — resumo ISBAR'));
+    expect(copied, contains('A — Avaliação\n- Avaliação 2'));
+
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.text('Último doente'), findsOneWidget);
+  });
+
+  testWidgets('copies the summary where sharing is not possible', (
+    tester,
+  ) async {
+    final app = await buildApp(tester);
+    seedEvaluations(app);
+    await tester.pumpWidget(app);
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      const MethodChannel('dev.fluttercommunity.plus/share'),
+      (call) async => throw PlatformException(code: 'unavailable'),
+    );
     String? copied;
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.platform,
@@ -239,14 +270,12 @@ void main() {
         return null;
       },
     );
-    await tester.tap(find.text('Copiar resumo (ISBAR)'));
-    await tester.pump();
-    expect(copied, startsWith('EPHScores — resumo ISBAR'));
-    expect(copied, contains('A — Avaliação\n- Avaliação 2'));
-
-    await tester.tap(find.byType(BackButton));
+    await tester.tap(find.text('Evolução (3)'));
     await tester.pumpAndSettle();
-    expect(find.text('Último doente'), findsOneWidget);
+    await tester.tap(find.text('Partilhar resumo (ISBAR)'));
+    await tester.pumpAndSettle();
+    expect(copied, startsWith('EPHScores — resumo ISBAR'));
+    expect(find.text('Resumo copiado'), findsOneWidget);
   });
 
   testWidgets('cancelling a patient with no evaluations', (tester) async {
