@@ -46,8 +46,9 @@ class PopupTracker extends NavigatorObserver {
 /// A small floating bubble, on every page while a patient is open, that
 /// opens the occurrence times in a speech bubble. It can be dragged to
 /// either side so it never hides what is underneath, and steps aside while
-/// typing or while a dialog is open. While its panel is open it moves to
-/// the bottom of its side, so the whole panel fits above it.
+/// typing or while a dialog is open. Its panel opens below it, or above
+/// when there's no room below; if neither fits, the bubble moves just far
+/// enough while the panel is open.
 class EventsBubble extends StatefulWidget {
   const EventsBubble({
     super.key,
@@ -74,11 +75,14 @@ class _EventsBubbleState extends State<EventsBubble> {
   /// Free position while being dragged.
   Offset? _drag;
 
-  /// Where the bubble goes while its panel is open: the bottom of its side,
-  /// leaving the most room above for the whole panel. Set on each layout.
-  Offset _dock = Offset.zero;
+  /// Where the bubble moved to (its top) so its open panel fits; null when
+  /// it didn't need to move.
+  double? _openTop;
 
   final _stackKey = GlobalKey();
+
+  /// The resting place, from the last layout.
+  Offset _rest = Offset.zero;
 
   void _toggle() {
     final navigator = widget.navigatorKey.currentState;
@@ -89,12 +93,15 @@ class _EventsBubbleState extends State<EventsBubble> {
     final stack = _stackKey.currentContext?.findRenderObject() as RenderBox?;
     final overlay = navigator?.overlay?.context.findRenderObject();
     if (navigator == null || stack == null || overlay == null) return;
-    // Where the bubble is going, in the coordinates the panel is laid out
-    // in: the panel grows out of it as it arrives.
-    final anchor =
-        stack.localToGlobal(_dock, ancestor: overlay) &
-        const Size.square(EventsBubble.size);
-    showEventsPanel(navigator.context, anchor);
+    // The bubble, in the coordinates the panel is laid out in.
+    final origin = stack.localToGlobal(Offset.zero, ancestor: overlay);
+    final anchor = (_rest + origin) & const Size.square(EventsBubble.size);
+    setState(() => _openTop = null);
+    showEventsPanel(
+      navigator.context,
+      anchor,
+      onMoveBubble: (top) => setState(() => _openTop = top - origin.dy),
+    );
   }
 
   @override
@@ -118,8 +125,9 @@ class _EventsBubbleState extends State<EventsBubble> {
             final maxY = h - pad.bottom - s - _margin;
             final x = _right ? w - s - _margin : _margin;
             final rest = Offset(x, (_y * h).clamp(minY, maxY));
-            _dock = Offset(x, maxY);
-            final at = _drag ?? (popups.panelOpen.value ? _dock : rest);
+            _rest = rest;
+            final openTop = popups.panelOpen.value ? _openTop : null;
+            final at = _drag ?? (openTop == null ? rest : Offset(x, openTop));
             return Stack(
               key: _stackKey,
               children: [
@@ -217,28 +225,93 @@ class _Bubble extends StatelessWidget {
 }
 
 /// The occurrence times in a speech bubble that grows out of the bubble at
-/// [anchor], above it or below it, wherever there is more room.
-Future<void> showEventsPanel(BuildContext context, Rect anchor) =>
-    showGeneralDialog(
-      context: context,
-      routeSettings: const RouteSettings(name: _panelRoute),
-      barrierDismissible: true,
-      barrierLabel: 'Fechar',
-      barrierColor: Colors.black38,
-      transitionDuration: const Duration(milliseconds: 200),
-      pageBuilder: (context, _, _) => _SpeechBubbleLayout(anchor: anchor),
-      // The layout animates itself, from the bubble outwards.
-      transitionBuilder: (context, animation, _, child) => child,
-    );
+/// [anchor]. It opens below the bubble when it fits there, otherwise above;
+/// when it fits on neither side, [onMoveBubble] is asked to move the bubble
+/// (to a new top, in the same coordinates as [anchor]) just far enough.
+Future<void> showEventsPanel(
+  BuildContext context,
+  Rect anchor, {
+  required ValueChanged<double> onMoveBubble,
+}) => showGeneralDialog(
+  context: context,
+  routeSettings: const RouteSettings(name: _panelRoute),
+  barrierDismissible: true,
+  barrierLabel: 'Fechar',
+  barrierColor: Colors.black38,
+  transitionDuration: const Duration(milliseconds: 200),
+  pageBuilder: (context, _, _) =>
+      _SpeechBubbleLayout(anchor: anchor, onMoveBubble: onMoveBubble),
+  // The layout animates itself, from the bubble outwards.
+  transitionBuilder: (context, animation, _, child) => child,
+);
 
-class _SpeechBubbleLayout extends StatelessWidget {
-  const _SpeechBubbleLayout({required this.anchor});
+/// Where the panel goes: next to the bubble, whose top may have moved.
+typedef _Placement = ({double bubbleTop, bool above});
+
+/// Chooses where a panel of [height] goes next to a bubble at [anchor],
+/// within [top] and [bottom]: below if it fits, else above, else the
+/// smallest move of the bubble that makes it fit on one side.
+@visibleForTesting
+({double bubbleTop, bool above}) placePanel({
+  required Rect anchor,
+  required double height,
+  required double top,
+  required double bottom,
+  double gap = 4,
+}) {
+  final s = anchor.height;
+  if (anchor.bottom + gap + height <= bottom) {
+    return (bubbleTop: anchor.top, above: false);
+  }
+  if (anchor.top - gap - height >= top) {
+    return (bubbleTop: anchor.top, above: true);
+  }
+  // Up until it fits below, or down until it fits above.
+  final up = bottom - height - gap - s;
+  final down = top + height + gap;
+  final canUp = up >= top, canDown = down + s <= bottom;
+  if (canUp && (!canDown || anchor.top - up <= down - anchor.top)) {
+    return (bubbleTop: up, above: false);
+  }
+  if (canDown) return (bubbleTop: down, above: true);
+  // Taller than the screen: bubble at the bottom, panel scrolls above it.
+  return (bubbleTop: bottom - s, above: true);
+}
+
+class _SpeechBubbleLayout extends StatefulWidget {
+  const _SpeechBubbleLayout({required this.anchor, required this.onMoveBubble});
 
   final Rect anchor;
+  final ValueChanged<double> onMoveBubble;
 
+  @override
+  State<_SpeechBubbleLayout> createState() => _SpeechBubbleLayoutState();
+}
+
+class _SpeechBubbleLayoutState extends State<_SpeechBubbleLayout> {
   static const _maxWidth = 380.0;
   static const _margin = 12.0;
   static const _gap = 4.0;
+
+  /// Measures the panel's natural height on the first frame.
+  final _measure = GlobalKey();
+  _Placement? _placement;
+
+  void _place(Size size, EdgeInsets pad) {
+    final box = _measure.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !mounted) return;
+    final placement = placePanel(
+      anchor: widget.anchor,
+      height: box.size.height,
+      top: pad.top + _margin,
+      bottom: size.height - pad.bottom - _margin,
+      gap: _gap,
+    );
+    if (placement.bubbleTop != widget.anchor.top) {
+      widget.onMoveBubble(placement.bubbleTop);
+    }
+    setState(() => _placement = placement);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -248,46 +321,74 @@ class _SpeechBubbleLayout extends StatelessWidget {
       builder: (context, constraints) {
         final size = constraints.biggest;
         final width = math.min(_maxWidth, size.width - 2 * _margin);
+        final anchor = widget.anchor;
         final left = (anchor.center.dx - width / 2).clamp(
           _margin,
           size.width - _margin - width,
         );
-        final spaceAbove = anchor.top - pad.top - _gap - _margin;
-        final spaceBelow =
-            size.height - pad.bottom - anchor.bottom - _gap - _margin;
-        final above = spaceAbove >= spaceBelow;
-        // Tail position along the bubble's edge, kept off the corners.
+        // Tail position along the panel's edge, kept off the corners.
         final tailX = (anchor.center.dx - left).clamp(
           _SpeechBubbleBorder.radius + _SpeechBubbleBorder.tail,
           width - _SpeechBubbleBorder.radius - _SpeechBubbleBorder.tail,
+        );
+        final placement = _placement;
+        if (placement == null) {
+          // First frame: lay the panel out unseen to learn its height.
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => _place(size, pad),
+          );
+          return Stack(
+            children: [
+              Positioned(
+                left: 0,
+                top: 0,
+                width: width,
+                child: Offstage(
+                  child: EventsPanel(key: _measure, tailX: tailX),
+                ),
+              ),
+            ],
+          );
+        }
+        final above = placement.above;
+        final bubble = Rect.fromLTWH(
+          anchor.left,
+          placement.bubbleTop,
+          anchor.width,
+          anchor.height,
         );
         final grow = CurvedAnimation(
           parent: animation,
           curve: Curves.easeOutBack,
           reverseCurve: Curves.easeIn,
         );
-        final panel = FadeTransition(
-          opacity: animation,
-          child: ScaleTransition(
-            scale: grow,
-            // Grows out of the tail, i.e. out of the bubble.
-            alignment: Alignment(tailX / width * 2 - 1, above ? 1 : -1),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: above ? spaceAbove : spaceBelow,
-              ),
-              child: EventsPanel(tailX: tailX, tailBelow: above),
-            ),
-          ),
-        );
         return Stack(
           children: [
             Positioned(
               left: left,
               width: width,
-              top: above ? null : anchor.bottom + _gap,
-              bottom: above ? size.height - anchor.top + _gap : null,
-              child: panel,
+              top: above ? null : bubble.bottom + _gap,
+              bottom: above ? size.height - bubble.top + _gap : null,
+              child: FadeTransition(
+                opacity: animation,
+                child: ScaleTransition(
+                  scale: grow,
+                  // Grows out of the tail, i.e. out of the bubble.
+                  alignment: Alignment(tailX / width * 2 - 1, above ? 1 : -1),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: above
+                          ? bubble.top - pad.top - _gap - _margin
+                          : size.height -
+                                pad.bottom -
+                                bubble.bottom -
+                                _gap -
+                                _margin,
+                    ),
+                    child: EventsPanel(tailX: tailX, tailBelow: above),
+                  ),
+                ),
+              ),
             ),
           ],
         );

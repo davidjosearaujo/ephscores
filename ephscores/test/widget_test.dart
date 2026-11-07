@@ -543,24 +543,85 @@ void main() {
     );
   });
 
-  testWidgets('the bubble moves so the whole panel fits', (tester) async {
+  group('times panel placement', () {
+    const top = 20.0, bottom = 760.0;
+    Rect bubble(double y) => Rect.fromLTWH(300, y, 52, 52);
+
+    test('below when it fits there', () {
+      final p = placePanel(
+        anchor: bubble(100),
+        height: 400,
+        top: top,
+        bottom: bottom,
+      );
+      expect(p, (bubbleTop: 100.0, above: false));
+    });
+    test('above when only that side fits', () {
+      final p = placePanel(
+        anchor: bubble(600),
+        height: 400,
+        top: top,
+        bottom: bottom,
+      );
+      expect(p, (bubbleTop: 600.0, above: true));
+    });
+    test('otherwise the bubble moves the shortest way', () {
+      // 500 tall: fits below only if the bubble rises to 204, above only if
+      // it drops to 524. From 300, rising is shorter.
+      expect(
+        placePanel(anchor: bubble(300), height: 500, top: top, bottom: bottom),
+        (bubbleTop: 204.0, above: false),
+      );
+      // From 450, dropping is shorter.
+      expect(
+        placePanel(anchor: bubble(450), height: 500, top: top, bottom: bottom),
+        (bubbleTop: 524.0, above: true),
+      );
+    });
+    test('taller than the screen: bubble at the bottom, panel above', () {
+      final p = placePanel(
+        anchor: bubble(300),
+        height: 900,
+        top: top,
+        bottom: bottom,
+      );
+      expect(p, (bubbleTop: 708.0, above: true));
+    });
+  });
+
+  Future<(Rect, Rect)> openPanel(WidgetTester tester, Finder bubble) async {
+    await tester.tap(bubble);
+    await tester.pumpAndSettle();
+    return (tester.getRect(bubble), tester.getRect(find.byType(EventsPanel)));
+  }
+
+  testWidgets('the panel opens below a bubble near the top', (tester) async {
     await tester.pumpWidget(await buildApp(tester));
     final bubble = find.bySemanticsLabel(RegExp('^Horas da ocorrência, '));
-    final at = tester.getRect(bubble);
+    await tester.drag(bubble, const Offset(0, -600));
+    await tester.pumpAndSettle();
+    final before = tester.getRect(bubble);
+    final (at, panel) = await openPanel(tester, bubble);
+    // The bubble stays put; the whole panel is below it, on screen.
+    expect(at, before);
+    expect(panel.top, greaterThanOrEqualTo(at.bottom));
+    expect(panel.bottom, lessThanOrEqualTo(780));
+  });
+
+  testWidgets('the panel opens above a bubble near the bottom', (tester) async {
+    await tester.pumpWidget(await buildApp(tester));
+    final bubble = find.bySemanticsLabel(RegExp('^Horas da ocorrência, '));
+    await tester.drag(bubble, const Offset(0, 300));
+    await tester.pumpAndSettle();
+    final before = tester.getRect(bubble);
+    final (at, panel) = await openPanel(tester, bubble);
+    expect(at, before);
+    expect(panel.bottom, lessThanOrEqualTo(at.top));
+    expect(panel.top, greaterThanOrEqualTo(0));
+    // Back in place, and still there, once it closes.
     await tester.tap(bubble);
     await tester.pumpAndSettle();
-    final panel = tester.getRect(find.byType(EventsPanel));
-    // The bubble moved down to the bottom of its side, and the whole panel
-    // sits above it, pointing at it.
-    final docked = tester.getRect(bubble);
-    expect(docked.top, greaterThan(at.top));
-    expect(docked.left, at.left);
-    expect(panel.bottom, lessThanOrEqualTo(docked.top));
-    expect(panel.right, greaterThan(docked.center.dx));
-    // Back where it was once the panel closes.
-    await tester.tap(bubble);
-    await tester.pumpAndSettle();
-    expect(tester.getRect(bubble), at);
+    expect(tester.getRect(bubble), before);
   });
 
   testWidgets('the bubble can be dragged to the other side', (tester) async {
