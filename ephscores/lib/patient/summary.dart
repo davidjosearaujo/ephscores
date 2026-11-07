@@ -31,7 +31,7 @@ String burnLine(BurnSheet b) {
 /// Plain-text handover summary in the ISBAR structure of INEM's national
 /// form (Identificação, Situação, Background, Avaliação, Recomendações), to
 /// read out or paste into a report.
-String patientSummary(PatientStore patient, {DateTime? now}) {
+String patientSummary(PatientRecord patient, {DateTime? now}) {
   final start = patient.startedAt!;
   final end = patient.finishedAt ?? now ?? DateTime.now();
   final evaluations = patient.evaluations;
@@ -151,7 +151,7 @@ String compactLine(Evaluation e) {
 
 /// The pathways met, or with signs to check, at the last evaluation, with
 /// their criteria.
-List<(ViaVerde, CriteriaCheck)> viaVerdeStatus(PatientStore patient) {
+List<(ViaVerde, CriteriaCheck)> viaVerdeStatus(PatientRecord patient) {
   if (patient.evaluations.isEmpty) return const [];
   final last = patient.evaluations.last;
   final state = ClinicalState(

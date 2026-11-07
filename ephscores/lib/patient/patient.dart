@@ -62,10 +62,83 @@ class Evaluation {
   };
 }
 
+/// What a patient's summary and evolution are built from: the live patient
+/// ([PatientStore]) or one kept in the history ([SavedPatient]).
+abstract interface class PatientRecord {
+  DateTime? get startedAt;
+  DateTime? get finishedAt;
+  bool get isFinished;
+
+  /// Oldest first.
+  List<Evaluation> get evaluations;
+  Onset? get onset;
+
+  /// Via Verde criteria ticked by hand, as "pathway.criterion" ids.
+  Set<String> get checks;
+
+  /// Occurrence times, in form order.
+  Map<PatientEvent, DateTime> get events;
+}
+
+/// A patient read back from its JSON (the format of [PatientStore.toJson]),
+/// e.g. from the history. Immutable.
+class SavedPatient implements PatientRecord {
+  SavedPatient._({
+    required DateTime this.startedAt,
+    required this.finishedAt,
+    required List<Evaluation> evaluations,
+    required this.onset,
+    required Set<String> checks,
+    required Map<PatientEvent, DateTime> events,
+  }) : evaluations = List.unmodifiable(evaluations),
+       checks = Set.unmodifiable(checks),
+       events = Map.unmodifiable(events);
+
+  /// Parses [PatientStore.toJson] output; null when no patient was started.
+  /// Throws on malformed data.
+  static SavedPatient? fromJson(Map<String, dynamic> data) {
+    final start = data['start'] as int?;
+    if (start == null) return null;
+    final end = data['end'] as int?;
+    final onset = data['onset'] as Map<String, dynamic>?;
+    final events = (data['events'] as Map<String, dynamic>?) ?? const {};
+    return SavedPatient._(
+      startedAt: DateTime.fromMillisecondsSinceEpoch(start),
+      finishedAt: end == null ? null : DateTime.fromMillisecondsSinceEpoch(end),
+      evaluations: [
+        for (final e in data['evaluations'] as List)
+          Evaluation.fromJson(e as Map<String, dynamic>),
+      ],
+      onset: onset == null ? null : Onset.fromJson(onset),
+      checks: {...?(data['checks'] as List?)?.cast<String>()},
+      events: {
+        for (final e in PatientEvent.values)
+          if (events[e.name] case final int ms)
+            e: DateTime.fromMillisecondsSinceEpoch(ms),
+      },
+    );
+  }
+
+  @override
+  final DateTime? startedAt;
+  @override
+  final DateTime? finishedAt;
+  @override
+  bool get isFinished => finishedAt != null;
+  @override
+  final List<Evaluation> evaluations;
+  @override
+  final Onset? onset;
+  @override
+  final Set<String> checks;
+  @override
+  final Map<PatientEvent, DateTime> events;
+}
+
 /// The patient being assessed (or the last one, once finished) and the
-/// timeline of their evaluations. Only one patient is kept, and nothing
-/// identifies them.
-class PatientStore extends PersistedStore {
+/// timeline of their evaluations. Only one patient is kept here, and
+/// nothing identifies them; finished patients also go to the history.
+class PatientStore extends PersistedStore implements PatientRecord {
   PatientStore(SharedPreferences prefs) : super(prefs, 'patient.v2') {
     load();
   }
@@ -78,6 +151,7 @@ class PatientStore extends PersistedStore {
   final Map<PatientEvent, DateTime> _events = {};
 
   /// Times stamped so far, in form order.
+  @override
   Map<PatientEvent, DateTime> get events => {
     for (final e in PatientEvent.values)
       if (_events[e] != null) e: _events[e]!,
@@ -94,6 +168,7 @@ class PatientStore extends PersistedStore {
   }
 
   /// When the symptoms began (or the patient was last seen well).
+  @override
   Onset? get onset => _onset;
 
   set onset(Onset? value) {
@@ -102,6 +177,7 @@ class PatientStore extends PersistedStore {
   }
 
   /// Via Verde criteria ticked by hand, as "pathway.criterion" ids.
+  @override
   Set<String> get checks => UnmodifiableSetView(_checks);
 
   void toggleCheck(String id) {
@@ -109,16 +185,20 @@ class PatientStore extends PersistedStore {
     changed();
   }
 
+  @override
   DateTime? get startedAt => _startedAt;
+  @override
   DateTime? get finishedAt => _finishedAt;
 
   /// A patient is open: evaluations can be registered.
   bool get isActive => _startedAt != null && _finishedAt == null;
 
   /// The last patient was finished and its summary is still kept.
+  @override
   bool get isFinished => _finishedAt != null;
 
   /// Oldest first; a read-only view.
+  @override
   List<Evaluation> get evaluations => UnmodifiableListView(_evaluations);
 
   /// When the evaluation in progress began.
@@ -199,26 +279,13 @@ class PatientStore extends PersistedStore {
 
   @override
   void restore(Object? json) {
-    final data = json as Map<String, dynamic>;
-    final start = data['start'] as int?;
-    if (start == null) return;
-    final end = data['end'] as int?;
-    final evaluations = [
-      for (final e in data['evaluations'] as List)
-        Evaluation.fromJson(e as Map<String, dynamic>),
-    ];
-    final onset = data['onset'] as Map<String, dynamic>?;
-    final checks = (data['checks'] as List?)?.cast<String>() ?? const [];
-    _startedAt = DateTime.fromMillisecondsSinceEpoch(start);
-    _finishedAt = end == null ? null : DateTime.fromMillisecondsSinceEpoch(end);
-    _evaluations.addAll(evaluations);
-    _onset = onset == null ? null : Onset.fromJson(onset);
-    _checks.addAll(checks);
-    final events = (data['events'] as Map<String, dynamic>?) ?? const {};
-    for (final e in PatientEvent.values) {
-      if (events[e.name] case final int ms) {
-        _events[e] = DateTime.fromMillisecondsSinceEpoch(ms);
-      }
-    }
+    final saved = SavedPatient.fromJson(json as Map<String, dynamic>);
+    if (saved == null) return;
+    _startedAt = saved.startedAt;
+    _finishedAt = saved.finishedAt;
+    _evaluations.addAll(saved.evaluations);
+    _onset = saved.onset;
+    _checks.addAll(saved.checks);
+    _events.addAll(saved.events);
   }
 }

@@ -24,8 +24,8 @@ class EPHScoresApp extends StatelessWidget {
   final BurnStore burn;
   final PatientStore patient;
 
-  /// Lets the occurrence-times tab, which sits above every page, open its
-  /// panel on the navigator and step aside while a dialog is shown.
+  /// Lets the occurrence-times bubble, which floats above every page, open
+  /// its panel on the navigator and step aside while a dialog is shown.
   final navigatorKey = GlobalKey<NavigatorState>();
   final popups = PopupTracker();
 
@@ -53,7 +53,7 @@ class EPHScoresApp extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               child!,
-              EventsTab(navigatorKey: navigatorKey, popups: popups),
+              EventsBubble(navigatorKey: navigatorKey, popups: popups),
             ],
           ),
         ),

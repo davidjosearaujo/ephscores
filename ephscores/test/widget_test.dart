@@ -103,7 +103,7 @@ final pageScrollable = find.byType(Scrollable).last;
 
 /// Taps a home-screen entry, scrolling to it first on short screens.
 Future<void> openFromHome(WidgetTester tester, String label) async {
-  // Centred, clear of the times tab at the top edge.
+  // Centred on screen before tapping.
   await Scrollable.ensureVisible(
     tester.element(find.text(label)),
     alignment: 0.5,
@@ -504,7 +504,7 @@ void main() {
     expect(find.text('Critérios: Trauma'), findsOneWidget);
   });
 
-  testWidgets('the times tab opens the panel from any page', (tester) async {
+  testWidgets('the times bubble opens the panel from any page', (tester) async {
     final app = await buildApp(tester);
     await tester.pumpWidget(app);
     final bubble = find.bySemanticsLabel(RegExp('^Horas da ocorrência, '));
@@ -516,8 +516,8 @@ void main() {
     await tester.tap(bubble);
     await tester.pumpAndSettle();
     expect(find.byType(EventsPanel), findsOneWidget);
-    // The tab steps aside while the panel is open.
-    expect(bubble, findsNothing);
+    // The bubble stays in view, with the panel pointing at it.
+    expect(bubble, findsOneWidget);
 
     await tester.tap(find.text('Chegada à vítima'));
     await tester.pump();
@@ -528,8 +528,13 @@ void main() {
     await tester.tap(find.text('Contacto CODU'));
     await tester.pump();
 
-    // Swiping up puts the panel away.
-    await tester.fling(find.text('Disponível'), const Offset(0, -300), 1000);
+    // Tapping outside puts it away; so does tapping the bubble again.
+    await tester.tapAt(const Offset(20, 770));
+    await tester.pumpAndSettle();
+    expect(find.byType(EventsPanel), findsNothing);
+    await tester.tap(bubble);
+    await tester.pumpAndSettle();
+    await tester.tap(bubble);
     await tester.pumpAndSettle();
     expect(find.byType(EventsPanel), findsNothing);
     expect(
@@ -538,19 +543,36 @@ void main() {
     );
   });
 
-  testWidgets('pulling the tab down opens the times', (tester) async {
+  testWidgets('the bubble moves so the whole panel fits', (tester) async {
     await tester.pumpWidget(await buildApp(tester));
-    final tab = find.bySemanticsLabel(RegExp('^Horas da ocorrência, '));
-    // At the top, right of centre (clear of the front camera) and left of
-    // the app bar actions.
-    expect(tester.getCenter(tab).dx, inInclusiveRange(200, 260));
-    expect(tester.getTopLeft(tab).dy, 0);
-    await tester.drag(tab, const Offset(0, 120));
+    final bubble = find.bySemanticsLabel(RegExp('^Horas da ocorrência, '));
+    final at = tester.getRect(bubble);
+    await tester.tap(bubble);
     await tester.pumpAndSettle();
-    expect(find.byType(EventsPanel), findsOneWidget);
+    final panel = tester.getRect(find.byType(EventsPanel));
+    // The bubble moved down to the bottom of its side, and the whole panel
+    // sits above it, pointing at it.
+    final docked = tester.getRect(bubble);
+    expect(docked.top, greaterThan(at.top));
+    expect(docked.left, at.left);
+    expect(panel.bottom, lessThanOrEqualTo(docked.top));
+    expect(panel.right, greaterThan(docked.center.dx));
+    // Back where it was once the panel closes.
+    await tester.tap(bubble);
+    await tester.pumpAndSettle();
+    expect(tester.getRect(bubble), at);
   });
 
-  testWidgets('no times tab without an open patient', (tester) async {
+  testWidgets('the bubble can be dragged to the other side', (tester) async {
+    await tester.pumpWidget(await buildApp(tester));
+    final bubble = find.bySemanticsLabel(RegExp('^Horas da ocorrência, '));
+    expect(tester.getCenter(bubble).dx, greaterThan(300));
+    await tester.drag(bubble, const Offset(-250, 0));
+    await tester.pumpAndSettle();
+    expect(tester.getCenter(bubble).dx, lessThan(60));
+  });
+
+  testWidgets('no times bubble without an open patient', (tester) async {
     await tester.pumpWidget(await buildApp(tester, openPatient: false));
     expect(
       find.bySemanticsLabel(RegExp('^Horas da ocorrência, ')),
