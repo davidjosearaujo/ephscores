@@ -566,7 +566,10 @@ void main() {
     await tester.pump();
     expect(app.scores.resultFor('race').value, 6);
     expect(
-      find.text('RACE ≥ 5: suspeita de oclusão de grande vaso'),
+      find.descendant(
+        of: find.byType(SnackBar),
+        matching: find.text('Oclusão de grande vaso?'),
+      ),
       findsOneWidget,
     );
     await tester.pumpAndSettle();

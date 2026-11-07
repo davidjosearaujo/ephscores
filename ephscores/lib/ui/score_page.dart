@@ -91,22 +91,56 @@ void _answer(
   final before = score.id == race.id && lvo();
   store.toggle(score.id, item, index);
   if (score.id != race.id || before || !lvo()) return;
-  final scheme = Theme.of(context).colorScheme;
-  ScaffoldMessenger.of(context)
+  final messenger = ScaffoldMessenger.of(context);
+  messenger
     ..hideCurrentSnackBar()
     ..showSnackBar(
       SnackBar(
         duration: const Duration(seconds: 8),
         backgroundColor: Palette.red,
-        content: const Text(
-          'RACE ≥ 5: suspeita de oclusão de grande vaso',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-        ),
-        action: SnackBarAction(
-          label: 'Via Verde AVC',
-          textColor: Colors.white,
-          backgroundColor: scheme.onSurface.withValues(alpha: 0.2),
-          onPressed: () => pushPage(context, const ViaVerdePage()),
+        shape: const StadiumBorder(),
+        padding: const EdgeInsets.fromLTRB(16, 6, 6, 6),
+        content: Row(
+          children: [
+            const Icon(Icons.warning_rounded, color: Colors.white, size: 22),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'RACE ≥ 5',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 14,
+                    ),
+                  ),
+                  Text(
+                    'Oclusão de grande vaso?',
+                    style: TextStyle(color: Colors.white, fontSize: 13),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Palette.red,
+                shape: const StadiumBorder(),
+                minimumSize: const Size(0, 40),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                textStyle: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+              onPressed: () {
+                messenger.hideCurrentSnackBar();
+                pushPage(context, const ViaVerdePage());
+              },
+              child: const Text('Via Verde AVC'),
+            ),
+          ],
         ),
       ),
     );
