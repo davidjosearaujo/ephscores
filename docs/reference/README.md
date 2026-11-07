@@ -17,4 +17,5 @@ critérios da Via Verde Sépsis.
 | DGS, Norma 003/2025, *Via Verde Coronária no Adulto* | Janela de 12 h da Via Verde Coronária |
 | DGS, Norma 012/2022, *Via Verde do Trauma no Adulto* (Anexo II) | Critérios de ativação da Via Verde Trauma |
 | DGS, Orientação 014/2010, *Avaliação da dor nas crianças* | Escala FLACC (versão portuguesa) e escolha da escala por idade |
+| AHA, *PALS* (2020) | Sinais vitais normais e hipotensão por idade nas crianças |
 | Recomendações para a sépsis no pré-hospitalar português, *Acta Médica Portuguesa* (2025) | Limiar de 0,7 do índice de choque |

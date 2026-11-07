@@ -53,7 +53,7 @@ class EvolutionPage extends StatelessWidget {
                     if (context.mounted) showToast(context, 'Resumo copiado');
                   },
                   icon: const Icon(Icons.copy),
-                  label: const Text('Copiar resumo'),
+                  label: const Text('Copiar resumo (ISBAR)'),
                 ),
                 const SectionLabel('Tendência'),
                 _TrendTable(evaluations: evaluations),
@@ -125,6 +125,9 @@ class _SummaryCard extends StatelessWidget {
               style: body,
             ),
             Text('$n ${n == 1 ? 'avaliação' : 'avaliações'}', style: body),
+            for (final MapEntry(key: event, value: at)
+                in patient.events.entries)
+              Text('${event.label}: ${formatClock(at)}', style: body),
             if (patient.onset case final onset?)
               Text(
                 '${onset.label}: ${formatClock(onset.at)} '

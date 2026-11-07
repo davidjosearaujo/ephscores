@@ -237,24 +237,49 @@ void main() {
       expect(restored.checks, isEmpty);
     });
 
-    test('summary has the vitals, the onset and the pathways', () {
+    test('ISBAR has the vitals, the onset and the pathways', () {
       onsetAgo(const Duration(hours: 1));
       scores
         ..setVital(Vital.age, 58)
         ..setVital(Vital.hr, 96);
+      answer(cincinnati, 'face', 'Normal');
+      answer(cincinnati, 'arm', 'Normal');
       answer(cincinnati, 'speech', 'Alterado');
       patient.register(scores.sheet, burns.sheet, at: now);
       final text = patientSummary(patient, now: now);
-      expect(text, contains('Início dos sintomas: 05/11/2026 14:00'));
-      expect(text, contains('- Sinais vitais: 58 anos · FC 96 bpm'));
+      // A partial sepsis count (FC > 90) is left out.
+      expect(text, isNot(contains('Sépsis')));
+      expect(text, contains('I — Identificação\n- Vítima de 58 anos'));
       expect(
         text,
         contains(
-          '- Via Verde AVC: Critérios cumpridos: contactar CODU — '
-          'Disartria / afasia (Cincinnati); Idade ≥ 18 anos (Idade 58 anos); '
+          'S — Situação atual\n'
+          '- Início dos sintomas: 14:00 (há 1 h 00 min)\n'
+          '- Via Verde AVC: Critérios cumpridos: contactar CODU\n'
+          '- Cincinnati 1/3 (Suspeita de AVC)',
+        ),
+      );
+      expect(text, contains('  - Sinais vitais: 58 anos · FC 96 bpm'));
+      expect(
+        text,
+        contains(
+          'R — Recomendações\n'
+          '- Via Verde AVC: Disartria / afasia (Cincinnati); '
+          'Idade ≥ 18 anos (Idade 58 anos); '
           'Início dos sintomas há 24 h ou menos (há 1 h 00 min)',
         ),
       );
+    });
+
+    test('ISBAR flags a child out of the normal range', () {
+      scores
+        ..setVital(Vital.age, 4)
+        ..setVital(Vital.rr, 34)
+        ..setVital(Vital.sbp, 75);
+      patient.register(scores.sheet, burns.sheet, at: now);
+      final text = patientSummary(patient, now: now);
+      expect(text, contains('- FR elevada para a idade (normal 20–28 cpm)'));
+      expect(text, contains('- Hipotensão para a idade (< 78 mmHg)'));
     });
 
     test('vitals alone can be registered', () {

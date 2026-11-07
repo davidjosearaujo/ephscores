@@ -40,6 +40,24 @@ class VitalsPage extends StatelessWidget {
           below: below,
           onChanged: (value) => store.setVital(vital, value),
         );
+        final age = v[Vital.age];
+        // Children: the normal range for the age, flagged when outside it.
+        Widget? child(Vital vital) {
+          final range = age == null ? null : childNormal(vital, age);
+          if (range == null) return null;
+          final value = v[vital];
+          final flag = value == null ? null : childFlag(vital, value, age!);
+          if (flag != null) return _Flag(severity: flag.$1, text: flag.$2);
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(4, 6, 4, 0),
+            child: Text(
+              'Normal ${childAgeLabel(age!)}: ${range.$1}–${range.$2} '
+              '${vital.unit}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          );
+        }
+
         final glucose = v[Vital.glucose];
         final flag = glucose == null ? null : glucoseFlag(glucose);
         final si = v.shockIndex;
@@ -75,7 +93,9 @@ class VitalsPage extends StatelessWidget {
               ),
               field(
                 Vital.age,
-                hint: 'Menos de 16 anos: a NEWS2 não é preenchida.',
+                hint:
+                    'Menos de 16 anos: a NEWS2 não é preenchida e FR, FC e '
+                    'PAS são comparadas com o normal para a idade.',
               ),
               _AvdsField(
                 level: v[Vital.avds]?.toInt(),
@@ -83,11 +103,11 @@ class VitalsPage extends StatelessWidget {
                 onLevel: (i) => store.setVital(Vital.avds, i),
                 onConfusion: (c) => store.newConfusion = c,
               ),
-              field(Vital.rr),
+              field(Vital.rr, below: child(Vital.rr)),
               field(Vital.spo2),
               field(Vital.o2, hint: '0 = ar ambiente.'),
-              field(Vital.hr),
-              field(Vital.sbp),
+              field(Vital.hr, below: child(Vital.hr)),
+              field(Vital.sbp, below: child(Vital.sbp)),
               field(Vital.dbp),
               field(Vital.temp),
               field(

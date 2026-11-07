@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../app.dart';
+import '../scores/adult.dart' show race;
 import '../scores/model.dart';
 import '../scores/score_store.dart';
 import '../theme.dart';
 import '../vitals/vitals.dart';
+import 'via_verde_page.dart';
 import 'vitals_page.dart';
 import 'widgets.dart';
 
@@ -61,7 +63,7 @@ class ScorePage extends StatelessWidget {
                   fromVitals: store.fromVitals(score.id, item) != null,
                   onTap: (i) => store.fromVitals(score.id, item) != null
                       ? pushPage(context, const VitalsPage())
-                      : store.toggle(score.id, item, i),
+                      : _answer(context, store, score, item, i),
                 ),
             ],
           ),
@@ -70,6 +72,44 @@ class ScorePage extends StatelessWidget {
       },
     );
   }
+}
+
+/// Records an answer; when it brings RACE to 5 or more (suspected large
+/// vessel occlusion), offers a shortcut to the Via Verde AVC.
+void _answer(
+  BuildContext context,
+  ScoreStore store,
+  ScoreDefinition score,
+  ScoreItem item,
+  int index,
+) {
+  bool lvo() {
+    final r = store.resultFor(race.id);
+    return r.complete && r.value! >= 5;
+  }
+
+  final before = score.id == race.id && lvo();
+  store.toggle(score.id, item, index);
+  if (score.id != race.id || before || !lvo()) return;
+  final scheme = Theme.of(context).colorScheme;
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 8),
+        backgroundColor: Palette.red,
+        content: const Text(
+          'RACE ≥ 5: suspeita de oclusão de grande vaso',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        ),
+        action: SnackBarAction(
+          label: 'Via Verde AVC',
+          textColor: Colors.white,
+          backgroundColor: scheme.onSurface.withValues(alpha: 0.2),
+          onPressed: () => pushPage(context, const ViaVerdePage()),
+        ),
+      ),
+    );
 }
 
 class _ItemSection extends StatelessWidget {

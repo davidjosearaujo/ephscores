@@ -130,24 +130,68 @@ void main() {
         ..finish(at: at(35));
 
       expect(patientSummary(patient), '''
-EPHScores — evolução do doente
-Início: 03/11/2026 14:20
-Fim: 14:55 (35 min 00 s)
-Avaliações: 2
+EPHScores — resumo ISBAR
+Início: 03/11/2026 14:20 · fim 14:55 (35 min 00 s)
 
-Avaliação 1 — 14:22 (duração 2 min 10 s)
-- ECG: 15 — Ligeiro (O4 V5 M6)
+I — Identificação
+- Idade não registada
 
-Avaliação 2 — 14:29 (duração 6 min 50 s)
-- ECG: 14 — Ligeiro (O4 V4 M6)
-- NEWS2: 0 (incompleto, 1/7)
-- Queimados (adulto): SCQ 13,5% — 2.º grau 9%, 3.º grau 4,5%''');
+S — Situação atual
+- Sem alterações de gravidade
+
+B — Antecedentes
+- A completar: doenças, medicação habitual, alergias
+
+A — Avaliação
+- Avaliação 2 (14:29):
+  - ECG: 14 — Ligeiro (O4 V4 M6)
+  - NEWS2: 0 (incompleto, 1/7)
+  - Queimados (adulto): SCQ 13,5% — 2.º grau 9%, 3.º grau 4,5%
+- Evolução:
+  - #1 14:22: ECG 15
+  - #2 14:29: ECG 14 · NEWS2 0 · SCQ 13,5%
+
+R — Recomendações
+- Sem critérios de Via Verde''');
     });
 
     test('says when the patient is still open', () {
       expect(
         patientSummary(patient, now: at(61)),
-        contains('Em curso há 1 h 01 min'),
+        contains('em curso há 1 h 01 min'),
+      );
+    });
+  });
+
+  group('events', () {
+    test('are stamped, edited, cleared and saved', () {
+      patient
+        ..setEvent(PatientEvent.codu, at(5))
+        ..setEvent(PatientEvent.atVictim, at(1))
+        ..setEvent(PatientEvent.toScene, at(-8));
+      // Always in the order of the national form.
+      expect(patient.events.keys, [
+        PatientEvent.toScene,
+        PatientEvent.atVictim,
+        PatientEvent.codu,
+      ]);
+      patient.setEvent(PatientEvent.toScene, null);
+      final restored = PatientStore(prefs);
+      expect(restored.events, {
+        PatientEvent.atVictim: at(1),
+        PatientEvent.codu: at(5),
+      });
+      restored.start(at: at(60));
+      expect(restored.events, isEmpty);
+    });
+
+    test('appear at the top of the summary', () {
+      patient
+        ..setEvent(PatientEvent.atVictim, at(1))
+        ..setEvent(PatientEvent.codu, at(5));
+      expect(
+        patientSummary(patient, now: at(10)).split('\n')[2],
+        'Horas: Chegada à vítima 14:21 · Contacto CODU 14:25',
       );
     });
   });

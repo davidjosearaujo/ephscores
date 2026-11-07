@@ -311,7 +311,74 @@ final flacc = ScoreDefinition(
   ], display: (sum) => '$sum/10'),
 );
 
-final pediatricScores = [apgar, flacc, pat, pts];
+final _pgcsTotal = additive(const [
+  Band(3, Severity.danger, 'Grave'),
+  Band(9, Severity.warning, 'Moderado'),
+  Band(13, Severity.ok, 'Ligeiro'),
+]);
+
+/// Glasgow Coma Scale adapted to children under 2, who can't yet answer
+/// with words or obey orders. Same eyes item and bands as the adult scale.
+final pgcs = ScoreDefinition(
+  id: 'pgcs',
+  name: 'ECG pediátrica',
+  fullName: 'Escala de Coma de Glasgow pediátrica',
+  description:
+      'Nível de consciência em crianças com menos de 2 anos. A partir dos '
+      '2 anos usar a ECG (escalas gerais).',
+  items: const [
+    ScoreItem(
+      id: 'eyes',
+      label: 'Abertura ocular',
+      options: [
+        ScoreOption('Espontânea', 4),
+        ScoreOption('À voz', 3),
+        ScoreOption('À dor', 2),
+        ScoreOption('Sem resposta', 1),
+      ],
+    ),
+    ScoreItem(
+      id: 'verbal',
+      label: 'Resposta verbal',
+      options: [
+        ScoreOption('Palra e balbucia', 5, detail: 'Sorri, segue objetos'),
+        ScoreOption('Choro irritado', 4, detail: 'Consolável'),
+        ScoreOption('Chora à dor', 3),
+        ScoreOption('Geme à dor', 2),
+        ScoreOption('Sem resposta', 1),
+      ],
+    ),
+    ScoreItem(
+      id: 'motor',
+      label: 'Resposta motora',
+      options: [
+        ScoreOption('Movimentos espontâneos', 6, detail: 'Com intenção'),
+        ScoreOption('Retira ao toque', 5),
+        ScoreOption('Retira à dor', 4),
+        ScoreOption('Flexão anormal', 3, detail: 'Descorticação'),
+        ScoreOption('Extensão', 2, detail: 'Descerebração'),
+        ScoreOption('Sem resposta', 1),
+      ],
+    ),
+  ],
+  evaluate: (score, answers, lookup) {
+    final base = _pgcsTotal(score, answers, lookup);
+    String part(String letter, String id) {
+      final i = answers.choice(id);
+      final item = score.items.firstWhere((it) => it.id == id);
+      return '$letter${i == null ? '–' : item.options[i].points}';
+    }
+
+    return base.answered == 0
+        ? base
+        : base.copyWith(
+            breakdown:
+                '${part('O', 'eyes')} ${part('V', 'verbal')} ${part('M', 'motor')}',
+          );
+  },
+);
+
+final pediatricScores = [apgar, pgcs, flacc, pat, pts];
 
 int? _ptsSbp(VitalSigns v, Answers _) => switch (v[Vital.sbp]) {
   null => null,

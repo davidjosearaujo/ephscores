@@ -8,6 +8,21 @@ import '../scores/model.dart';
 import '../scores/score_store.dart';
 import '../viaverde/via_verde.dart';
 
+/// Times of the occurrence, in the order of the national form (verbete),
+/// plus the CODU contact.
+enum PatientEvent {
+  toScene('A caminho do local'),
+  atVictim('Chegada à vítima'),
+  codu('Contacto CODU'),
+  toHospital('A caminho da unidade de saúde'),
+  atHospital('Chegada à unidade de saúde'),
+  available('Disponível');
+
+  const PatientEvent(this.label);
+
+  final String label;
+}
+
 /// One registered evaluation: a snapshot of every score and the burn map.
 class Evaluation {
   Evaluation({
@@ -60,6 +75,23 @@ class PatientStore extends PersistedStore {
   final List<Evaluation> _evaluations = [];
   Onset? _onset;
   final Set<String> _checks = {};
+  final Map<PatientEvent, DateTime> _events = {};
+
+  /// Times stamped so far, in form order.
+  Map<PatientEvent, DateTime> get events => {
+    for (final e in PatientEvent.values)
+      if (_events[e] != null) e: _events[e]!,
+  };
+
+  /// Stamps [event] at [at] (now by default), or clears it with null.
+  void setEvent(PatientEvent event, DateTime? at) {
+    if (at == null) {
+      _events.remove(event);
+    } else {
+      _events[event] = at;
+    }
+    changed();
+  }
 
   /// When the symptoms began (or the patient was last seen well).
   Onset? get onset => _onset;
@@ -100,6 +132,7 @@ class PatientStore extends PersistedStore {
     _evaluations.clear();
     _onset = null;
     _checks.clear();
+    _events.clear();
     changed();
   }
 
@@ -138,6 +171,7 @@ class PatientStore extends PersistedStore {
     _evaluations.clear();
     _onset = null;
     _checks.clear();
+    _events.clear();
     changed();
   }
 
@@ -156,6 +190,11 @@ class PatientStore extends PersistedStore {
     'evaluations': [for (final e in _evaluations) e.toJson()],
     if (_onset != null) 'onset': _onset!.toJson(),
     if (_checks.isNotEmpty) 'checks': _checks.toList()..sort(),
+    if (_events.isNotEmpty)
+      'events': {
+        for (final MapEntry(:key, :value) in events.entries)
+          key.name: value.millisecondsSinceEpoch,
+      },
   };
 
   @override
@@ -175,5 +214,11 @@ class PatientStore extends PersistedStore {
     _evaluations.addAll(evaluations);
     _onset = onset == null ? null : Onset.fromJson(onset);
     _checks.addAll(checks);
+    final events = (data['events'] as Map<String, dynamic>?) ?? const {};
+    for (final e in PatientEvent.values) {
+      if (events[e.name] case final int ms) {
+        _events[e] = DateTime.fromMillisecondsSinceEpoch(ms);
+      }
+    }
   }
 }

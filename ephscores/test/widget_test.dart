@@ -7,6 +7,7 @@ import 'package:ephscores/start/start.dart';
 import 'package:ephscores/ui/burn_page.dart';
 import 'package:ephscores/ui/contacts_page.dart';
 import 'package:ephscores/ui/dashboard_page.dart';
+import 'package:ephscores/ui/events_overlay.dart';
 import 'package:ephscores/ui/evolution_page.dart';
 import 'package:ephscores/ui/score_list_page.dart';
 import 'package:ephscores/ui/score_page.dart';
@@ -102,7 +103,11 @@ final pageScrollable = find.byType(Scrollable).last;
 
 /// Taps a home-screen entry, scrolling to it first on short screens.
 Future<void> openFromHome(WidgetTester tester, String label) async {
-  await tester.ensureVisible(find.text(label));
+  // Centred, clear of the times tab at the top edge.
+  await Scrollable.ensureVisible(
+    tester.element(find.text(label)),
+    alignment: 0.5,
+  );
   await tester.pumpAndSettle();
   await tester.tap(find.text(label));
 }
@@ -234,10 +239,10 @@ void main() {
         return null;
       },
     );
-    await tester.tap(find.text('Copiar resumo'));
+    await tester.tap(find.text('Copiar resumo (ISBAR)'));
     await tester.pump();
-    expect(copied, startsWith('EPHScores — evolução do doente'));
-    expect(copied, contains('Avaliação 2'));
+    expect(copied, startsWith('EPHScores — resumo ISBAR'));
+    expect(copied, contains('A — Avaliação\n- Avaliação 2'));
 
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
@@ -470,6 +475,106 @@ void main() {
     expect(find.text('Critérios: Trauma'), findsOneWidget);
   });
 
+  testWidgets('the times tab opens the panel from any page', (tester) async {
+    final app = await buildApp(tester);
+    await tester.pumpWidget(app);
+    final bubble = find.bySemanticsLabel(RegExp('^Horas da ocorrência, '));
+    expect(bubble, findsOneWidget);
+
+    // On a page deeper in the app too.
+    await openFromHome(tester, 'Sinais vitais');
+    await tester.pumpAndSettle();
+    await tester.tap(bubble);
+    await tester.pumpAndSettle();
+    expect(find.byType(EventsPanel), findsOneWidget);
+    // The tab steps aside while the panel is open.
+    expect(bubble, findsNothing);
+
+    await tester.tap(find.text('Chegada à vítima'));
+    await tester.pump();
+    expect(app.patient.events.keys, [PatientEvent.atVictim]);
+    await tester.tap(find.byTooltip('Limpar Chegada à vítima'));
+    await tester.pump();
+    expect(app.patient.events, isEmpty);
+    await tester.tap(find.text('Contacto CODU'));
+    await tester.pump();
+
+    // Swiping up puts the panel away.
+    await tester.fling(find.text('Disponível'), const Offset(0, -300), 1000);
+    await tester.pumpAndSettle();
+    expect(find.byType(EventsPanel), findsNothing);
+    expect(
+      find.bySemanticsLabel('Horas da ocorrência, 1 registadas'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('pulling the tab down opens the times', (tester) async {
+    await tester.pumpWidget(await buildApp(tester));
+    final tab = find.bySemanticsLabel(RegExp('^Horas da ocorrência, '));
+    // Centred at the top of the screen.
+    expect(tester.getCenter(tab).dx, 180);
+    expect(tester.getTopLeft(tab).dy, 0);
+    await tester.drag(tab, const Offset(0, 120));
+    await tester.pumpAndSettle();
+    expect(find.byType(EventsPanel), findsOneWidget);
+  });
+
+  testWidgets('no times tab without an open patient', (tester) async {
+    await tester.pumpWidget(await buildApp(tester, openPatient: false));
+    expect(
+      find.bySemanticsLabel(RegExp('^Horas da ocorrência, ')),
+      findsNothing,
+    );
+  });
+
+  testWidgets('RACE 5 or more offers the Via Verde AVC', (tester) async {
+    final app = await buildApp(tester);
+    void set(String id, String label) {
+      final item = race.items.firstWhere((i) => i.id == id);
+      app.scores.toggle(
+        'race',
+        item,
+        item.options.indexWhere((o) => o.label == label),
+      );
+    }
+
+    set('side', 'Direito');
+    set('face', 'Moderada a grave');
+    set('arm', 'Grave');
+    set('leg', 'Ausente ou ligeira');
+    set('gaze', 'Ausente');
+    await tester.pumpWidget(app);
+    await openFromHome(tester, 'Escalas gerais');
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('RACE'));
+    await tester.pumpAndSettle();
+    final last = find.text('Não cumpre ordens');
+    await tester.scrollUntilVisible(
+      last,
+      100,
+      scrollable: find
+          .descendant(
+            of: find.byType(ScorePage),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+    await tester.ensureVisible(last);
+    await tester.pumpAndSettle();
+    await tester.tap(last);
+    await tester.pump();
+    expect(app.scores.resultFor('race').value, 6);
+    expect(
+      find.text('RACE ≥ 5: suspeita de oclusão de grande vaso'),
+      findsOneWidget,
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Via Verde AVC'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ViaVerdePage), findsOneWidget);
+  });
+
   testWidgets('trend names stay put while the values scroll', (tester) async {
     final app = await buildApp(tester);
     for (var i = 0; i < 12; i++) {
@@ -513,6 +618,7 @@ void largeTextTests() {
     'contacts': () => const ContactsPage(),
     'vitals': () => const VitalsPage(),
     'vias verdes': () => const ViaVerdePage(),
+    'events panel': () => const EventsPanel(),
   };
   for (final MapEntry(key: name, value: page) in pages.entries) {
     testWidgets('$name fits at 1.6x text', (tester) async {

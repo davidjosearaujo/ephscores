@@ -228,3 +228,62 @@ class VitalBinding {
   final List<Vital> vitals;
   final int? Function(VitalSigns v, Answers own) pick;
 }
+
+/// Normal awake ranges by age for children (under 16, where NEWS2 doesn't
+/// apply), from PALS (AHA, 2020); the respiratory rates are also those of
+/// DGS Norma 012/2022. Rows: (up to this age in years, FR, FC, PAS).
+const _childNormals = [
+  (0, (30, 53), (100, 180), (72, 104)),
+  (2, (22, 37), (98, 140), (86, 106)),
+  (3, (22, 37), (80, 120), (89, 112)),
+  (5, (20, 28), (80, 120), (89, 112)),
+  (9, (18, 25), (75, 118), (97, 115)),
+  (11, (18, 25), (75, 118), (102, 120)),
+  (12, (18, 25), (60, 100), (102, 120)),
+  (15, (12, 20), (60, 100), (110, 131)),
+];
+
+/// The normal range of [vital] for a child of [age] years, or null for
+/// adults and for vitals without a table.
+(int, int)? childNormal(Vital vital, num age) {
+  if (age >= 16) return null;
+  final row = _childNormals.firstWhere((r) => age <= r.$1);
+  return switch (vital) {
+    Vital.rr => row.$2,
+    Vital.hr => row.$3,
+    Vital.sbp => row.$4,
+    _ => null,
+  };
+}
+
+/// PALS hypotension: PAS below 70 in the first year, 70 + 2 × age up to
+/// 10 years, 90 from then on.
+int childHypotension(num age) =>
+    age < 1 ? 70 : (age < 10 ? 70 + 2 * age.toInt() : 90);
+
+/// "aos 4 anos", "no 1.º ano de vida".
+String childAgeLabel(num age) => age < 1
+    ? 'no 1.º ano de vida'
+    : 'aos ${age.toInt()} ${age == 1 ? 'ano' : 'anos'}';
+
+/// Flags a child's value outside the normal range for the age, in red for
+/// hypotension.
+(Severity, String)? childFlag(Vital vital, num value, num age) {
+  final range = childNormal(vital, age);
+  if (range == null) return null;
+  if (vital == Vital.sbp && value < childHypotension(age)) {
+    return (
+      Severity.danger,
+      'Hipotensão para a idade (< ${childHypotension(age)} mmHg)',
+    );
+  }
+  final (lo, hi) = range;
+  if (value < lo || value > hi) {
+    return (
+      Severity.warning,
+      '${vital.short} ${value < lo ? 'baixa' : 'elevada'} para a idade '
+          '(normal $lo–$hi ${vital.unit})',
+    );
+  }
+  return null;
+}

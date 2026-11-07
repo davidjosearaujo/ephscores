@@ -291,6 +291,70 @@ void main() {
     });
   });
 
+  group('children', () {
+    test('normal ranges by age (PALS)', () {
+      expect(childNormal(Vital.rr, 0), (30, 53));
+      expect(childNormal(Vital.rr, 4), (20, 28));
+      expect(childNormal(Vital.hr, 7), (75, 118));
+      expect(childNormal(Vital.sbp, 14), (110, 131));
+      expect(childNormal(Vital.rr, 16), isNull);
+      expect(childNormal(Vital.temp, 4), isNull);
+    });
+
+    test('hypotension threshold', () {
+      expect([0, 1, 5, 9, 10, 15].map(childHypotension), [
+        70,
+        72,
+        80,
+        88,
+        90,
+        90,
+      ]);
+    });
+
+    test('flags', () {
+      expect(childFlag(Vital.rr, 24, 4), isNull);
+      expect(childFlag(Vital.rr, 34, 4), (
+        Severity.warning,
+        'FR elevada para a idade (normal 20–28 cpm)',
+      ));
+      expect(childFlag(Vital.hr, 70, 7)?.$2, startsWith('FC baixa'));
+      // Below the normal range but not hypotension: amber.
+      expect(childFlag(Vital.sbp, 82, 4)?.$1, Severity.warning);
+      expect(childFlag(Vital.sbp, 75, 4), (
+        Severity.danger,
+        'Hipotensão para a idade (< 78 mmHg)',
+      ));
+      expect(childFlag(Vital.sbp, 75, 30), isNull);
+    });
+
+    test('age labels', () {
+      expect(childAgeLabel(0), 'no 1.º ano de vida');
+      expect(childAgeLabel(1), 'aos 1 ano');
+      expect(childAgeLabel(6), 'aos 6 anos');
+    });
+  });
+
+  group('paediatric GCS', () {
+    void pick(int eyes, int verbal, int motor) {
+      for (final (i, item) in pgcs.items.indexed) {
+        store.toggle('pgcs', item, [eyes, verbal, motor][i]);
+      }
+    }
+
+    test('15 is mild, with the breakdown', () {
+      pick(0, 0, 0);
+      final r = store.resultFor('pgcs');
+      expect((r.value, r.severity, r.breakdown), (15, Severity.ok, 'O4 V5 M6'));
+    });
+
+    test('8 is severe', () {
+      pick(2, 3, 2); // 2 + 2 + 4
+      final r = store.resultFor('pgcs');
+      expect((r.value, r.label), (8, 'Grave'));
+    });
+  });
+
   group('FLACC', () {
     ScoreResult flaccWith(List<int> picks) {
       for (final (i, item) in flacc.items.indexed) {

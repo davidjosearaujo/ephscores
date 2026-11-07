@@ -7,10 +7,11 @@ import 'scores/score_store.dart';
 import 'start/start.dart';
 import 'theme.dart';
 import 'viaverde/via_verde.dart';
+import 'ui/events_overlay.dart';
 import 'ui/root_page.dart';
 
 class EPHScoresApp extends StatelessWidget {
-  const EPHScoresApp({
+  EPHScoresApp({
     super.key,
     required this.scores,
     required this.start,
@@ -22,6 +23,11 @@ class EPHScoresApp extends StatelessWidget {
   final StartStore start;
   final BurnStore burn;
   final PatientStore patient;
+
+  /// Lets the occurrence-times tab, which sits above every page, open its
+  /// panel on the navigator and step aside while a dialog is shown.
+  final navigatorKey = GlobalKey<NavigatorState>();
+  final popups = PopupTracker();
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +45,18 @@ class EPHScoresApp extends StatelessWidget {
         locale: const Locale('pt', 'PT'),
         supportedLocales: const [Locale('pt', 'PT')],
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
-        builder: phoneWidth,
+        navigatorKey: navigatorKey,
+        navigatorObservers: [popups],
+        builder: (context, child) => phoneWidth(
+          context,
+          Stack(
+            fit: StackFit.expand,
+            children: [
+              child!,
+              EventsTab(navigatorKey: navigatorKey, popups: popups),
+            ],
+          ),
+        ),
         home: const RootPage(),
       ),
     );

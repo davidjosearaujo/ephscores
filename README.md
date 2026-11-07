@@ -9,18 +9,23 @@ de forma rápida e simples, no terreno.
 
 - **Evolução do doente:** cada avaliação é registada com hora e duração;
   as respostas ficam como referência para a seguinte, e a página
-  *Evolução* mostra a tendência de cada escala e permite copiar um resumo
-  em texto
+  *Evolução* mostra a tendência de cada escala e copia um resumo para a
+  passagem de dados no formato ISBAR, como no verbete
+- **Horas da ocorrência:** a caminho do local, chegada à vítima, contacto
+  CODU, transporte e disponível, registadas com um toque a partir de uma
+  aba no topo de qualquer ecrã
 - **Sinais vitais:** os campos do verbete nacional (AVDS, FR, SpO₂, O₂, FC,
   PA, temperatura, dor por escala numérica ou de faces, e glicemia),
   registados uma vez e usados por todas as
   escalas que deles precisam; a NEWS2 fica calculada sem mais toques, com o
-  índice de choque ao lado
+  índice de choque ao lado; nas crianças, FR, FC e PAS são comparadas com o
+  normal para a idade
 - **Vias Verdes:** hora de início dos sintomas e critérios das Vias Verdes
   AVC, Coronária, Sépsis e Trauma, assinalados automaticamente a partir dos
   sinais vitais, das escalas e do mapa de queimaduras
 - **Escalas gerais:** Cincinnati, Glasgow (ECG), MGAP, NEWS2, ProACS, RACE e RTS
-- **Escalas pediátricas:** APGAR, FLACC, Triângulo de Avaliação Pediátrica (TAP) e PTS
+- **Escalas pediátricas:** APGAR, Glasgow pediátrica, FLACC, Triângulo de
+  Avaliação Pediátrica (TAP) e PTS
 - **Avaliação do queimado:** regra dos nove para adulto e criança, com grau por região
 - **Triagem START:** algoritmo passo a passo e contagem de vítimas por
   prioridade, separada do doente
