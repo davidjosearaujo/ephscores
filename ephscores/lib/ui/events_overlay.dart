@@ -31,8 +31,8 @@ class PopupTracker extends NavigatorObserver {
 
 /// A small tab hanging from the top of every page while a patient is open,
 /// with an arrow pointing down: tap it or pull it down to open the
-/// occurrence times. It is short enough to sit above the page titles, with
-/// a larger touch area for gloved hands.
+/// occurrence times. It sits above the page titles (the app bars are tall
+/// enough for it), with a larger touch area for gloved hands.
 class EventsTab extends StatelessWidget {
   const EventsTab({
     super.key,
@@ -58,10 +58,15 @@ class EventsTab extends StatelessWidget {
           return const SizedBox.shrink();
         }
         final count = patient.events.length;
+        // Right of centre, clear of the front camera that most phones have
+        // in the middle, and left of the app bar actions.
         return Align(
-          alignment: Alignment.topCenter,
+          alignment: Alignment.topRight,
           child: Padding(
-            padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
+            padding: EdgeInsets.only(
+              top: MediaQuery.paddingOf(context).top,
+              right: 60,
+            ),
             child: Semantics(
               container: true,
               button: true,
@@ -75,8 +80,8 @@ class EventsTab extends StatelessWidget {
                   if ((d.primaryVelocity ?? 0) >= 0) _open();
                 },
                 child: SizedBox(
-                  width: 120,
-                  height: 40,
+                  width: 116,
+                  height: 44,
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: _Tab(count: count),
@@ -99,13 +104,12 @@ class _Tab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const fg = Colors.white;
-    // Short enough to clear the page titles below it.
     return Container(
-      height: 15,
-      padding: const EdgeInsets.symmetric(horizontal: 9),
+      height: 22,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: const BoxDecoration(
         color: Palette.navy,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(8)),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(11)),
         border: Border(
           left: BorderSide(color: fg, width: 1.5),
           right: BorderSide(color: fg, width: 1.5),
@@ -119,13 +123,13 @@ class _Tab extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.schedule, size: 11, color: fg),
+            const Icon(Icons.schedule, size: 15, color: fg),
             if (count > 0) ...[
-              const SizedBox(width: 3),
+              const SizedBox(width: 4),
               Text(
                 '$count',
                 style: const TextStyle(
-                  fontSize: 11,
+                  fontSize: 14,
                   height: 1,
                   fontWeight: FontWeight.w800,
                   color: Palette.amber,
@@ -133,7 +137,7 @@ class _Tab extends StatelessWidget {
               ),
             ],
             const SizedBox(width: 2),
-            const Icon(Icons.keyboard_arrow_down, size: 15, color: fg),
+            const Icon(Icons.keyboard_arrow_down, size: 20, color: fg),
           ],
         ),
       ),

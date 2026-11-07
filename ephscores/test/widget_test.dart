@@ -512,8 +512,9 @@ void main() {
   testWidgets('pulling the tab down opens the times', (tester) async {
     await tester.pumpWidget(await buildApp(tester));
     final tab = find.bySemanticsLabel(RegExp('^Horas da ocorrência, '));
-    // Centred at the top of the screen.
-    expect(tester.getCenter(tab).dx, 180);
+    // At the top, right of centre (clear of the front camera) and left of
+    // the app bar actions.
+    expect(tester.getCenter(tab).dx, inInclusiveRange(200, 260));
     expect(tester.getTopLeft(tab).dy, 0);
     await tester.drag(tab, const Offset(0, 120));
     await tester.pumpAndSettle();

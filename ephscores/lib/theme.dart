@@ -60,6 +60,9 @@ ThemeData buildTheme(Brightness brightness) {
     fontFamily: 'Roboto',
     scaffoldBackgroundColor: scheme.pageBackground,
     appBarTheme: AppBarTheme(
+      // Taller than the default 56 so the times tab at the top clears the
+      // titles.
+      toolbarHeight: 72,
       backgroundColor: scheme.pageBackground,
       foregroundColor: dark ? scheme.onSurface : Palette.navy,
       surfaceTintColor: Colors.transparent,

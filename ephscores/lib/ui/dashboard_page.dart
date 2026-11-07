@@ -180,7 +180,7 @@ class _Header extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 20),
+          padding: const EdgeInsets.fromLTRB(24, 26, 24, 20),
           child: Row(
             children: [
               const AppLogo(size: 64),
