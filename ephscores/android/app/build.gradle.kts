@@ -66,3 +66,9 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // AppCompat themes, needed by the fingerprint/face prompt (local_auth)
+    // on Android 8 and older.
+    implementation("androidx.appcompat:appcompat:1.7.0")
+}

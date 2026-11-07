@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../app.dart';
 import '../format.dart';
+import '../history/history.dart';
 import '../patient/patient.dart';
 import '../scores/adult.dart';
 import '../scores/model.dart';
@@ -269,12 +270,15 @@ class _PatientBar extends StatelessWidget {
     } else if (!await confirm(
       context,
       title: 'Finalizar doente?',
-      message: 'O resumo fica disponível até iniciar um novo doente.',
+      message: scope.history.available
+          ? 'Fica guardado no histórico durante '
+                '${historyRetention.inDays} dias.'
+          : 'O resumo fica disponível até iniciar um novo doente.',
       action: 'Finalizar',
     )) {
       return;
     }
-    scope.patient.finish();
+    scope.finishPatient();
     navigator.push(
       MaterialPageRoute<void>(builder: (_) => const EvolutionPage()),
     );

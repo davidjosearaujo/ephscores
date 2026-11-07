@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
 import 'burn/burn.dart';
+import 'history/open_history.dart';
+import 'history/unlock.dart';
 import 'patient/patient.dart';
 import 'scores/score_store.dart';
 import 'start/start.dart';
@@ -20,12 +22,16 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   final start = StartStore(prefs);
   await migrateLegacyPrefs(prefs, start);
+  final history = await openHistory();
+  await history.purge();
   runApp(
     EPHScoresApp(
       scores: ScoreStore(prefs),
       start: start,
       burn: BurnStore(prefs),
       patient: PatientStore(prefs),
+      history: history,
+      unlocker: DeviceUnlocker(),
     ),
   );
 }

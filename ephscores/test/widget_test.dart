@@ -1,5 +1,8 @@
 import 'package:ephscores/app.dart';
 import 'package:ephscores/burn/burn.dart';
+import 'package:ephscores/history/history.dart';
+import 'package:ephscores/history/unlock.dart';
+import 'package:ephscores/ui/history_page.dart';
 import 'package:ephscores/patient/patient.dart';
 import 'package:ephscores/scores/adult.dart';
 import 'package:ephscores/scores/score_store.dart';
@@ -27,6 +30,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<EPHScoresApp> buildApp(
   WidgetTester tester, {
   bool openPatient = true,
+  HistoryStore? history,
+  Unlocker unlocker = const NoUnlocker(),
 }) async {
   tester.view
     ..physicalSize = const Size(1080, 2340)
@@ -41,6 +46,8 @@ Future<EPHScoresApp> buildApp(
     start: StartStore(prefs),
     burn: BurnStore(prefs),
     patient: patient,
+    history: history,
+    unlocker: unlocker,
   );
 }
 
@@ -276,6 +283,117 @@ void main() {
     await tester.pumpAndSettle();
     expect(copied, startsWith('EPHScores — resumo ISBAR'));
     expect(find.text('Resumo copiado'), findsOneWidget);
+  });
+
+  group('history', () {
+    Future<EPHScoresApp> finishedApp(
+      WidgetTester tester, {
+      Unlocker unlocker = const NoUnlocker(),
+    }) async {
+      final app = await buildApp(
+        tester,
+        history: MemoryHistoryStore(),
+        unlocker: unlocker,
+      );
+      seedEvaluations(app);
+      AppScope(
+        scores: app.scores,
+        start: app.start,
+        burn: app.burn,
+        patient: app.patient,
+        history: app.history,
+        unlocker: app.unlocker,
+        child: const SizedBox(),
+      ).finishPatient();
+      await tester.pumpWidget(app);
+      return app;
+    }
+
+    testWidgets('a finished patient is kept and opens read-only', (
+      tester,
+    ) async {
+      final app = await finishedApp(tester);
+      expect(await app.history.entries(), hasLength(1));
+      // Starting the next patient doesn't ask: the last one is kept.
+      await tester.tap(find.text('Novo doente'));
+      await tester.pumpAndSettle();
+      expect(app.patient.isActive, isTrue);
+      expect(await app.history.entries(), hasLength(1));
+      app.patient.clear();
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Histórico'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('3 avaliações'), findsOneWidget);
+      await tester.tap(find.textContaining('3 avaliações'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Doente de '), findsOneWidget);
+      expect(find.textContaining('Guardado até'), findsOneWidget);
+      expect(find.text('Partilhar resumo (ISBAR)'), findsOneWidget);
+      // Read-only: no deleting evaluations.
+      expect(find.textContaining('Mantenha premida'), findsNothing);
+    });
+
+    testWidgets('going to the background locks it and closes the patient', (
+      tester,
+    ) async {
+      await finishedApp(tester);
+      await tester.tap(find.text('Histórico'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('3 avaliações'));
+      await tester.pumpAndSettle();
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      // The very first frame back shows the lock, not the patient.
+      await tester.pump();
+      expect(find.textContaining('Doente de '), findsNothing);
+      expect(find.text('O histórico está bloqueado.'), findsOneWidget);
+      await tester.tap(find.text('Desbloquear'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('3 avaliações'), findsOneWidget);
+    });
+
+    testWidgets('a failed unlock shows nothing', (tester) async {
+      await finishedApp(
+        tester,
+        unlocker: const NoUnlocker(UnlockResult.failed),
+      );
+      await tester.tap(find.text('Histórico'));
+      await tester.pumpAndSettle();
+      expect(find.text('O histórico está bloqueado.'), findsOneWidget);
+      expect(find.textContaining('avaliações'), findsNothing);
+    });
+
+    testWidgets('without a screen lock it explains why', (tester) async {
+      await finishedApp(
+        tester,
+        unlocker: const NoUnlocker(UnlockResult.noLock),
+      );
+      await tester.tap(find.text('Histórico'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('bloqueio de ecrã'), findsOneWidget);
+    });
+
+    testWidgets('deleting the last patient deletes it from the history', (
+      tester,
+    ) async {
+      final app = await finishedApp(tester);
+      await tester.longPress(find.text('Último doente'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('também do histórico'), findsOneWidget);
+      await tester.tap(find.widgetWithText(FilledButton, 'Apagar'));
+      await tester.pumpAndSettle();
+      expect(await app.history.entries(), isEmpty);
+    });
+
+    testWidgets('no history button where there is no history', (tester) async {
+      final app = await buildApp(tester, openPatient: false);
+      await tester.pumpWidget(app);
+      expect(find.text('Histórico'), findsNothing);
+      expect(app.history.available, isFalse);
+    });
   });
 
   testWidgets('cancelling a patient with no evaluations', (tester) async {
@@ -735,6 +853,7 @@ void largeTextTests() {
     'vitals': () => const VitalsPage(),
     'vias verdes': () => const ViaVerdePage(),
     'events panel': () => const EventsPanel(),
+    'history': () => const HistoryPage(),
   };
   for (final MapEntry(key: name, value: page) in pages.entries) {
     testWidgets('$name fits at 1.6x text', (tester) async {
@@ -748,6 +867,8 @@ void largeTextTests() {
           start: app.start,
           burn: app.burn,
           patient: app.patient,
+          history: app.history,
+          unlocker: app.unlocker,
           child: MaterialApp(
             builder: (context, child) => MediaQuery(
               data: MediaQuery.of(context)

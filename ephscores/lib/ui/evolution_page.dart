@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../app.dart';
 import '../format.dart';
+import '../history/history.dart';
 import '../patient/patient.dart';
 import '../patient/summary.dart';
 import '../scores/model.dart';
@@ -12,12 +13,24 @@ import '../theme.dart';
 import '../vitals/vitals.dart';
 import 'widgets.dart';
 
-/// Timeline of the patient's registered evaluations.
+/// Timeline of the patient's registered evaluations: the patient in
+/// progress (or the last one), or, read-only, one from the history.
 class EvolutionPage extends StatelessWidget {
-  const EvolutionPage({super.key});
+  const EvolutionPage({super.key, this.entry});
+
+  /// A patient from the history; null for the live patient.
+  final HistoryEntry? entry;
 
   @override
   Widget build(BuildContext context) {
+    final entry = this.entry;
+    if (entry != null) {
+      return _Evolution(
+        title: 'Doente de ${formatDate(entry.startedAt)}',
+        patient: entry.patient,
+        expiresAt: entry.expiresAt,
+      );
+    }
     final scope = AppScope.of(context);
     final patient = scope.patient;
     return ListenableBuilder(
@@ -29,45 +42,85 @@ class EvolutionPage extends StatelessWidget {
             body: const Center(child: Text('Sem doente')),
           );
         }
-        final evaluations = patient.evaluations;
-        return Scaffold(
-          appBar: AppBar(title: const Text('Evolução')),
-          body: ListView(
-            padding: listPadding,
-            children: [
-              _SummaryCard(
-                patient: patient,
-                unsaved: patient.isActive && scope.hasUnsavedChanges,
-              ),
-              if (evaluations.isEmpty)
-                _EmptyState(patient: patient)
-              else ...[
-                const SizedBox(height: 12),
-                const _ShareButton(),
-                const SectionLabel('Tendência'),
-                _TrendTable(evaluations: evaluations),
-                const SectionLabel('Avaliações'),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
-                  child: Text(
-                    'Mantenha premida uma avaliação para a apagar.',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
-                for (final (i, e) in evaluations.indexed.toList().reversed)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: _EvaluationCard(
-                      index: i,
-                      evaluation: e,
-                      isLatest: i == evaluations.length - 1,
-                    ),
-                  ),
-              ],
-            ],
-          ),
+        return _Evolution(
+          title: 'Evolução',
+          patient: patient,
+          unsaved: patient.isActive && scope.hasUnsavedChanges,
+          onDelete: scope.removeEvaluation,
+          empty: _EmptyState(patient: patient),
         );
       },
+    );
+  }
+}
+
+class _Evolution extends StatelessWidget {
+  const _Evolution({
+    required this.title,
+    required this.patient,
+    this.unsaved = false,
+    this.onDelete,
+    this.empty,
+    this.expiresAt,
+  });
+
+  final String title;
+  final PatientRecord patient;
+  final bool unsaved;
+
+  /// Deletes an evaluation by index; null when read-only.
+  final ValueChanged<int>? onDelete;
+  final Widget? empty;
+
+  /// When a patient from the history will be deleted.
+  final DateTime? expiresAt;
+
+  @override
+  Widget build(BuildContext context) {
+    final evaluations = patient.evaluations;
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: ListView(
+        padding: listPadding,
+        children: [
+          _SummaryCard(
+            patient: patient,
+            unsaved: unsaved,
+            expiresAt: expiresAt,
+          ),
+          if (evaluations.isEmpty)
+            empty ??
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: Center(child: Text('Sem avaliações registadas.')),
+                )
+          else ...[
+            const SizedBox(height: 12),
+            _ShareButton(patient),
+            const SectionLabel('Tendência'),
+            _TrendTable(evaluations: evaluations),
+            const SectionLabel('Avaliações'),
+            if (onDelete != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+                child: Text(
+                  'Mantenha premida uma avaliação para a apagar.',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+            for (final (i, e) in evaluations.indexed.toList().reversed)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: _EvaluationCard(
+                  index: i,
+                  evaluation: e,
+                  isLatest: i == evaluations.length - 1,
+                  onDelete: onDelete == null ? null : () => onDelete!(i),
+                ),
+              ),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -76,10 +129,12 @@ class EvolutionPage extends StatelessWidget {
 /// notes, e-mail, and Quick Share / AirDrop to a phone nearby. Where the
 /// browser can't share, copies it instead.
 class _ShareButton extends StatelessWidget {
-  const _ShareButton();
+  const _ShareButton(this.patient);
+
+  final PatientRecord patient;
 
   Future<void> _share(BuildContext context) async {
-    final text = patientSummary(AppScope.of(context).patient);
+    final text = patientSummary(patient);
     // iPad shows the menu as a popover anchored to the button.
     final box = context.findRenderObject() as RenderBox?;
     try {
@@ -110,9 +165,14 @@ class _ShareButton extends StatelessWidget {
 }
 
 class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({required this.patient, required this.unsaved});
+  const _SummaryCard({
+    required this.patient,
+    required this.unsaved,
+    this.expiresAt,
+  });
 
-  final PatientStore patient;
+  final PatientRecord patient;
+  final DateTime? expiresAt;
   final bool unsaved;
 
   @override
@@ -160,6 +220,8 @@ class _SummaryCard extends StatelessWidget {
                 '(há ${formatDuration((end ?? DateTime.now()).difference(onset.at))})',
                 style: body,
               ),
+            if (expiresAt case final at?)
+              Text('Guardado até ${formatDate(at)}', style: body),
             if (unsaved) ...[
               const SizedBox(height: 8),
               Row(
@@ -396,7 +458,11 @@ class _EvaluationCard extends StatelessWidget {
     required this.index,
     required this.evaluation,
     required this.isLatest,
+    this.onDelete,
   });
+
+  /// Deletes this evaluation (after confirmation); null when read-only.
+  final VoidCallback? onDelete;
 
   /// Position in the timeline, oldest first.
   final int index;
@@ -404,13 +470,12 @@ class _EvaluationCard extends StatelessWidget {
   final bool isLatest;
 
   Future<void> _delete(BuildContext context) async {
-    final patient = AppScope.of(context).patient;
     if (await confirmDelete(
       context,
       title: 'Apagar avaliação ${index + 1}?',
       message: 'As respostas atuais no painel não são alteradas.',
     )) {
-      patient.removeAt(index);
+      onDelete!();
     }
   }
 
@@ -424,7 +489,7 @@ class _EvaluationCard extends StatelessWidget {
         (e.burns.hasBurns ? 1 : 0) +
         (vitals.isEmpty ? 0 : 1);
     return GestureDetector(
-      onLongPress: () => _delete(context),
+      onLongPress: onDelete == null ? null : () => _delete(context),
       child: Card(
         child: ExpansionTile(
           // Keyed by time so expansion state follows the evaluation, not its

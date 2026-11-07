@@ -72,3 +72,11 @@ flutter_launcher_icons:
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
   adaptive_icon_monochrome: "assets/icon/app_icon_monochrome.png"
+
+# Native SQLite with encryption (SQLCipher) for the patient history. The
+# build downloads the library and checks it against hashes pinned in
+# package:sqlite3.
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlcipher

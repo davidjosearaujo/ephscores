@@ -9,11 +9,15 @@ de forma rápida e simples, no terreno.
 
 - **Evolução do doente:** cada avaliação é registada com hora e duração;
   as respostas ficam como referência para a seguinte, e a página
-  *Evolução* mostra a tendência de cada escala e copia um resumo para a
-  passagem de dados no formato ISBAR, como no verbete
+  *Evolução* mostra a tendência de cada escala e partilha um resumo para a
+  passagem de dados no formato ISBAR, como no verbete, para qualquer
+  aplicação (mensagens, notas, e-mail ou Quick Share)
+- **Histórico (Android):** os doentes finalizados ficam guardados durante
+  30 dias numa base de dados cifrada, que só abre com o bloqueio de ecrã do
+  telemóvel
 - **Horas da ocorrência:** a caminho do local, chegada à vítima, contacto
   CODU, transporte e disponível, registadas com um toque a partir de uma
-  aba no topo de qualquer ecrã
+  bolha flutuante presente em todos os ecrãs
 - **Sinais vitais:** os campos do verbete nacional (AVDS, FR, SpO₂, O₂, FC,
   PA, temperatura, dor por escala numérica ou de faces, e glicemia),
   registados uma vez e usados por todas as
@@ -34,7 +38,8 @@ de forma rápida e simples, no terreno.
 ### Feita para o terreno
 
 - **100 % offline.** A versão de produção não pede permissão de Internet; nada
-  sai do dispositivo.
+  sai do dispositivo, a não ser que o utilizador partilhe um resumo. Também
+  não há cópias de segurança automáticas dos dados.
 - **Botões grandes**, pensados para usar com luvas.
 - **Nada se perde:** as respostas e as avaliações são guardadas a cada toque
   e sobrevivem ao fecho da aplicação.

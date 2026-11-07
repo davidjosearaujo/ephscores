@@ -8,6 +8,7 @@ import '../theme.dart';
 import 'brand.dart';
 import 'contacts_page.dart';
 import 'evolution_page.dart';
+import 'history_page.dart';
 import 'info_dialog.dart';
 import 'start_page.dart';
 import 'widgets.dart';
@@ -45,7 +46,9 @@ class _WelcomePageState extends State<WelcomePage> {
 
   Future<void> _newPatient() async {
     final scope = AppScope.of(context);
+    // Where the history keeps it, nothing is lost: no need to ask.
     if (scope.patient.isFinished &&
+        !scope.history.available &&
         !await confirm(
           context,
           title: 'Novo doente?',
@@ -62,7 +65,10 @@ class _WelcomePageState extends State<WelcomePage> {
     if (await confirmDelete(
       context,
       title: 'Apagar último doente?',
-      message: 'Apaga o resumo e todas as avaliações deste doente.',
+      message: scope.history.available
+          ? 'Apaga o resumo e todas as avaliações deste doente, também '
+                'do histórico.'
+          : 'Apaga o resumo e todas as avaliações deste doente.',
     )) {
       scope.discardPatient();
     }
@@ -130,6 +136,15 @@ class _WelcomePageState extends State<WelcomePage> {
                         ),
                       ],
                       const SizedBox(height: 24),
+                      if (AppScope.of(context).history.available) ...[
+                        _SecondaryButton(
+                          icon: Icons.history,
+                          label: 'Histórico',
+                          onPressed: () =>
+                              pushPage(context, const HistoryPage()),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
                       Row(
                         children: [
                           Expanded(
@@ -200,24 +215,45 @@ class _LastPatientCard extends StatelessWidget {
     final theme = Theme.of(context);
     final patient = AppScope.of(context).patient;
     final n = patient.evaluations.length;
+    // Built from a Row rather than a ListTile, whose intrinsic height is
+    // too small with large text: the start page sizes itself from it.
     return Card(
-      child: ListTile(
-        contentPadding: const EdgeInsets.fromLTRB(16, 4, 12, 4),
-        leading: const Icon(Icons.timeline),
-        title: const Text(
-          'Último doente',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          '${formatClock(patient.startedAt!)}–'
-          '${formatClock(patient.finishedAt!)} · '
-          '$n ${n == 1 ? 'avaliação' : 'avaliações'}\n'
-          'Mantenha premido para apagar',
-        ),
-        isThreeLine: true,
-        trailing: Icon(Icons.chevron_right, color: theme.colorScheme.outline),
+      child: InkWell(
         onTap: onTap,
         onLongPress: onLongPress,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.timeline),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Último doente',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      '${formatClock(patient.startedAt!)}–'
+                      '${formatClock(patient.finishedAt!)} · '
+                      '$n ${n == 1 ? 'avaliação' : 'avaliações'}\n'
+                      'Mantenha premido para apagar',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: theme.colorScheme.outline),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -1,5 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Only to show the phone's own fingerprint/face/PIN prompt before
+         the patient history opens. No other permissions: the app is
+         offline. -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    <!-- No backups: patient data stays on this phone. (The history key
+         lives in the Keystore and couldn't be restored anyway.) -->
     <application
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:label="EPHScores"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
