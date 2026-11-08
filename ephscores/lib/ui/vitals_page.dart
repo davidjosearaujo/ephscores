@@ -53,7 +53,7 @@ class VitalsPage extends StatelessWidget {
           if (range == null) return null;
           final value = v[vital];
           final flag = value == null ? null : childFlag(vital, value, age!);
-          if (flag != null) return _Flag(severity: flag.$1, text: flag.$2);
+          if (flag != null) return FlagNote(severity: flag.$1, text: flag.$2);
           return Padding(
             padding: const EdgeInsets.fromLTRB(4, 6, 4, 0),
             child: Text(
@@ -140,7 +140,7 @@ class VitalsPage extends StatelessWidget {
                 Vital.glucose,
                 below: flag == null
                     ? null
-                    : _Flag(severity: flag.$1, text: flag.$2),
+                    : FlagNote(severity: flag.$1, text: flag.$2),
               ),
               if (shock != null) _ShockIndexCard(shock),
             ],
@@ -328,21 +328,11 @@ class _AvdsField extends StatelessWidget {
           ),
           if (level == 0) ...[
             const SizedBox(height: 8),
-            SelectableTile(
+            CheckTile(
+              label: 'Confusão recente',
+              detail: 'Na NEWS2 pontua como V, D ou S',
               selected: newConfusion,
               onTap: () => onConfusion(!newConfusion),
-              builder: (fg) => Row(
-                children: [
-                  Expanded(
-                    child: TileLabel(
-                      'Confusão recente',
-                      detail: 'Na NEWS2 pontua como V, D ou S',
-                      color: fg,
-                    ),
-                  ),
-                  if (newConfusion) Icon(Icons.check, color: fg, size: 20),
-                ],
-              ),
             ),
           ],
         ],
@@ -375,35 +365,6 @@ class _FlaccLink extends StatelessWidget {
           ),
           trailing: ResultPill(result),
           onTap: () => pushPage(context, ScorePage(score: flacc)),
-        ),
-      ),
-    );
-  }
-}
-
-class _Flag extends StatelessWidget {
-  const _Flag({required this.severity, required this.text});
-
-  final Severity severity;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: Palette.severity(severity, scheme),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            color: Palette.onSeverity(severity, scheme),
-          ),
         ),
       ),
     );

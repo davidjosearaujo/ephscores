@@ -56,7 +56,7 @@ class ScorePage extends StatelessWidget {
               for (final dep in score.dependsOn)
                 _LinkedScoreCard(allScores[dep]!),
               for (final item in score.visibleItems(answers))
-                _ItemSection(
+                ScoreItemSection(
                   item: item,
                   picks: answers.of(item.id),
                   vitals: store.vitals,
@@ -146,18 +146,23 @@ void _answer(
     );
 }
 
-class _ItemSection extends StatelessWidget {
-  const _ItemSection({
+/// One question of a score and its options. Also used outside the score
+/// page (the APGAR at each minute after birth).
+class ScoreItemSection extends StatelessWidget {
+  const ScoreItemSection({
+    super.key,
     required this.item,
     required this.picks,
-    required this.vitals,
-    required this.fromVitals,
     required this.onTap,
+    this.vitals,
+    this.fromVitals = false,
   });
 
   final ScoreItem item;
   final Set<int> picks;
-  final VitalSigns vitals;
+
+  /// For items answered from the vital signs.
+  final VitalSigns? vitals;
 
   /// Answered by the vital signs: the options open them instead.
   final bool fromVitals;
@@ -191,8 +196,8 @@ class _ItemSection extends StatelessWidget {
               ),
             ),
           ),
-        if (item.vital != null)
-          _VitalsLink(binding: item.vital!, vitals: vitals, used: fromVitals),
+        if ((item.vital, vitals) case (final binding?, final vitals?))
+          _VitalsLink(binding: binding, vitals: vitals, used: fromVitals),
         LayoutBuilder(
           builder: (context, constraints) {
             const gap = 8.0;

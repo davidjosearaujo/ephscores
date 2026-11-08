@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../app.dart';
-import '../format.dart';
 import '../patient/patient.dart';
 import '../theme.dart';
 import 'widgets.dart';
@@ -458,20 +457,6 @@ class EventsPanel extends StatelessWidget {
   final double tailX;
   final bool tailBelow;
 
-  Future<void> _edit(
-    BuildContext context,
-    PatientStore patient,
-    PatientEvent event,
-    DateTime current,
-  ) async {
-    final at = await pickClockTime(
-      context,
-      initial: current,
-      title: event.label,
-    );
-    if (at != null) patient.setEvent(event, at);
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -529,79 +514,16 @@ class EventsPanel extends StatelessWidget {
                 for (final (i, event) in PatientEvent.values.indexed)
                   Padding(
                     padding: EdgeInsets.only(top: i == 0 ? 0 : 6),
-                    child: _EventTile(
-                      event: event,
+                    child: TimeStampTile(
+                      label: event.label,
                       at: events[event],
-                      onStamp: () => patient.setEvent(event, DateTime.now()),
-                      onEdit: () =>
-                          _edit(context, patient, event, events[event]!),
-                      onClear: () => patient.setEvent(event, null),
+                      onChanged: (at) => patient.setEvent(event, at),
                     ),
                   ),
               ],
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class _EventTile extends StatelessWidget {
-  const _EventTile({
-    required this.event,
-    required this.at,
-    required this.onStamp,
-    required this.onEdit,
-    required this.onClear,
-  });
-
-  final PatientEvent event;
-  final DateTime? at;
-  final VoidCallback onStamp;
-  final VoidCallback onEdit;
-  final VoidCallback onClear;
-
-  @override
-  Widget build(BuildContext context) {
-    final at = this.at;
-    return SelectableTile(
-      selected: at != null,
-      onTap: at == null ? onStamp : onEdit,
-      padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
-      builder: (fg) => Row(
-        children: [
-          Expanded(child: TileLabel(event.label, color: fg)),
-          if (at == null)
-            Padding(
-              padding: const EdgeInsets.only(right: 10),
-              child: Text(
-                'Registar',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: fg.withValues(alpha: 0.7),
-                ),
-              ),
-            )
-          else ...[
-            Text(
-              formatClock(at),
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                color: fg,
-                fontFeatures: const [FontFeature.tabularFigures()],
-              ),
-            ),
-            IconButton(
-              tooltip: 'Limpar ${event.label}',
-              color: fg,
-              onPressed: onClear,
-              icon: const Icon(Icons.close),
-            ),
-          ],
-        ],
       ),
     );
   }

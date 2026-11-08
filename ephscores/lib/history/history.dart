@@ -84,9 +84,7 @@ class MemoryHistoryStore extends HistoryStore {
   @override
   Future<void> save(PatientStore patient) async {
     if (!available || !patient.isFinished) return;
-    _rows[HistoryStore.idOf(patient)] = jsonEncode(
-      patient.toJson(),
-    );
+    _rows[HistoryStore.idOf(patient)] = jsonEncode(patient.toJson());
     notifyListeners();
   }
 

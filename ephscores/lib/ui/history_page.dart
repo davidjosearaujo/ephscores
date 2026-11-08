@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../app.dart';
 import '../format.dart';
 import '../history/history.dart';
-import '../history/secure_screen.dart';
+import '../platform/window_flags.dart';
 import '../history/unlock.dart';
 import '../patient/summary.dart';
 import '../theme.dart';
@@ -275,6 +275,10 @@ class _EntryCard extends StatelessWidget {
     final alerts = last == null ? const <String>[] : alterations(last);
     final details = [
       if (last?.scores.vitals[Vital.age] case final age?) '$age anos',
+      if (p.pregnancy?.birth case final b?)
+        'Parto às ${formatClock(b.bornAt)}'
+      else if (p.pregnancy != null)
+        'Grávida',
       if (pathways.isNotEmpty) 'Vias Verdes: ${pathways.join(', ')}',
       ...alerts.take(2),
     ];

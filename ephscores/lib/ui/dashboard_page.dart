@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../app.dart';
 import '../format.dart';
 import '../history/history.dart';
+import '../obstetrics/obstetrics.dart';
 import '../patient/patient.dart';
 import '../scores/adult.dart';
 import '../scores/model.dart';
@@ -17,6 +18,7 @@ import 'brand.dart';
 import 'burn_page.dart';
 import 'contacts_page.dart';
 import 'evolution_page.dart';
+import 'obstetrics_page.dart';
 import 'score_list_page.dart';
 import 'via_verde_page.dart';
 import 'vitals_page.dart';
@@ -77,6 +79,13 @@ class DashboardPage extends StatelessWidget {
                   scores: pediatricScores,
                 ),
               ),
+            ),
+            _MenuCard(
+              icon: Icons.pregnant_woman,
+              title: 'Grávida e parto',
+              subtitle: 'Idade gestacional · alertas · parto · APGAR',
+              badge: _pregnancyBadge(scope.patient.pregnancy, vitals),
+              onTap: () => open(const ObstetricsPage()),
             ),
             _MenuCard(
               icon: Icons.local_fire_department,
@@ -149,6 +158,17 @@ class DashboardPage extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "38 semanas · Nascimento 14:05 · 2 alertas".
+String? _pregnancyBadge(Pregnancy? p, VitalSigns vitals) {
+  if (p == null) return null;
+  final alerts = pregnancyFlags(p, vitals).length;
+  return [
+    p.weeks == null ? 'Grávida' : formatCount(p.weeks!, 'semana', 'semanas'),
+    if (p.birth case final b?) 'Nascimento ${formatClock(b.bornAt)}',
+    if (alerts > 0) formatCount(alerts, 'alerta', 'alertas'),
+  ].join(' · ');
 }
 
 /// "Critérios: AVC" when a pathway is met, otherwise the ones to check.

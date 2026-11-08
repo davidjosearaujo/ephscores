@@ -214,6 +214,10 @@ class _SummaryCard extends StatelessWidget {
             for (final MapEntry(key: event, value: at)
                 in patient.events.entries)
               Text('${event.label}: ${formatClock(at)}', style: body),
+            if (patient.pregnancy case final p?)
+              Text(p.headline(), style: body),
+            if (patient.pregnancy?.birth case final b?)
+              Text('Nascimento: ${formatClock(b.bornAt)}', style: body),
             if (patient.onset case final onset?)
               Text(onsetLine(onset, end ?? DateTime.now()), style: body),
             if (expiresAt case final at?)
@@ -415,8 +419,7 @@ class _TrendTable extends StatelessWidget {
                             ),
                             for (final v in vitals)
                               cell(vitalCell(e.scores.vitals, v)),
-                            if (shock)
-                              cell(pill(e.scores.vitals.shockResult)),
+                            if (shock) cell(pill(e.scores.vitals.shockResult)),
                             for (final s in scores) cell(pill(e.results[s.id])),
                             if (burns)
                               cell(

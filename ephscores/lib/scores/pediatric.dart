@@ -6,7 +6,7 @@ final apgar = ScoreDefinition(
   id: 'apgar',
   name: 'APGAR',
   fullName: 'Índice de APGAR',
-  description: 'Avaliação do recém-nascido ao 1.º e 5.º minuto.',
+  description: 'Avaliação do recém-nascido ao 1.º, 5.º e 10.º minuto.',
   items: const [
     ScoreItem(
       id: 'color',

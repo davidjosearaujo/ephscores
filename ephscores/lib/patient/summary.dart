@@ -1,5 +1,6 @@
 import '../burn/burn.dart';
 import '../format.dart';
+import '../obstetrics/obstetrics.dart';
 import '../scores/model.dart';
 import '../scores/score_store.dart';
 import '../viaverde/via_verde.dart';
@@ -72,8 +73,10 @@ String patientSummary(PatientRecord patient, {DateTime? now}) {
   }
 
   final age = vitals?[Vital.age];
+  final pregnancy = patient.pregnancy;
   section('I', 'Identificação', [
     age == null ? 'Idade não registada' : 'Vítima de $age anos',
+    if (pregnancy != null) pregnancy.headline(),
   ]);
 
   final onset = patient.onset;
@@ -81,6 +84,14 @@ String patientSummary(PatientRecord patient, {DateTime? now}) {
   final situation = [
     if (onset != null) onsetLine(onset, end),
     for (final (p, c) in pathways) '${p.fullName}: ${c.result.label}',
+    if (pregnancy != null) ...[
+      ...pregnancyFlags(pregnancy, vitals ?? VitalSigns()),
+      if (pregnancy.watersAt case final at?)
+        'Rotura de membranas às ${formatClock(at)}',
+      if (pregnancy.birth case final b?
+          when b.haemorrhage(vitals ?? VitalSigns()))
+        'Suspeita de hemorragia pós-parto',
+    ],
     if (last != null) ...alterations(last),
     if (last == null) 'Sem avaliações registadas',
   ];
@@ -103,6 +114,10 @@ String patientSummary(PatientRecord patient, {DateTime? now}) {
         '  ${scoreLine(allScores[id]!, r)}',
       if (last.burns.hasBurns) '  ${burnLine(last.burns)}',
     ],
+    if (pregnancy?.birth case final b?) ...[
+      'Parto:',
+      for (final line in birthLines(b)) '  $line',
+    ],
     if (evaluations.length > 1) ...[
       'Evolução:',
       for (final (i, e) in evaluations.indexed)
@@ -115,6 +130,23 @@ String patientSummary(PatientRecord patient, {DateTime? now}) {
     if (pathways.isEmpty) 'Sem critérios de Via Verde',
   ]);
   return out.toString().trimRight();
+}
+
+/// The birth for the handover, one fact per line.
+List<String> birthLines(Birth b) {
+  final apgar = [
+    for (final m in apgarMinutes)
+      if (b.apgarAt(m) case final r?) '$m.º min ${r.display}',
+  ];
+  return [
+    'Nascimento às ${formatClock(b.bornAt)}',
+    if (b.clampedAt case final at?) 'Clampagem do cordão às ${formatClock(at)}',
+    if (apgar.isNotEmpty) 'APGAR: ${apgar.join(' · ')}',
+    if (b.placentaAt case final at?) 'Dequitadura às ${formatClock(at)}',
+    if (b.uterusFirm case final firm?)
+      firm ? 'Útero contraído' : 'Útero não contraído',
+    if (b.heavyBleeding) 'Perda hemática abundante',
+  ];
 }
 
 /// What is abnormal at [e]: scores in amber or red, the shock index and the

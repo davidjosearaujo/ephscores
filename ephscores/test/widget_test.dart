@@ -1,7 +1,7 @@
 import 'package:ephscores/app.dart';
 import 'package:ephscores/burn/burn.dart';
 import 'package:ephscores/history/history.dart';
-import 'package:ephscores/history/secure_screen.dart';
+import 'package:ephscores/platform/window_flags.dart';
 import 'package:ephscores/history/unlock.dart';
 import 'package:ephscores/ui/history_page.dart';
 import 'package:ephscores/patient/patient.dart';
@@ -361,12 +361,12 @@ void main() {
     ) async {
       final calls = <Object?>[];
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        secureScreenChannel,
+        windowChannel,
         (call) async => calls.add(call.arguments),
       );
       addTearDown(
         () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-          secureScreenChannel,
+          windowChannel,
           null,
         ),
       );
@@ -424,6 +424,48 @@ void main() {
       expect(find.text('Histórico'), findsNothing);
       expect(app.history.available, isFalse);
     });
+  });
+
+  testWidgets('pregnancy and birth, with the screen kept on', (tester) async {
+    final calls = <String>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      windowChannel,
+      (call) async => calls.add('${call.method} ${call.arguments}'),
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        windowChannel,
+        null,
+      ),
+    );
+    final app = await buildApp(tester);
+    await tester.pumpWidget(app);
+    await openFromHome(tester, 'Grávida e parto');
+    await tester.pumpAndSettle();
+    expect(calls, ['keepScreenOn true']);
+    await tester.tap(find.text('Doente grávida'));
+    await tester.pumpAndSettle();
+    expect(find.text('NEWS2 não validada na gravidez'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Nascimento'),
+      300,
+      scrollable: pageScrollable,
+    );
+    await tester.tap(find.text('Nascimento'));
+    await tester.pumpAndSettle();
+    expect(app.patient.pregnancy!.birth, isNotNull);
+    await tester.scrollUntilVisible(
+      find.text('APGAR ao 1.º minuto'),
+      300,
+      scrollable: pageScrollable,
+    );
+    expect(find.textContaining('faltam'), findsWidgets);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(calls.last, 'keepScreenOn false');
+    expect(find.textContaining('Grávida · Nascimento'), findsOneWidget);
   });
 
   testWidgets('cancelling a patient with no evaluations', (tester) async {

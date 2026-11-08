@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../burn/burn.dart';
+import '../obstetrics/obstetrics.dart';
 import '../persistence.dart';
 import '../scores/model.dart';
 import '../scores/score_store.dart';
@@ -78,6 +79,9 @@ abstract interface class PatientRecord {
 
   /// Occurrence times, in form order.
   Map<PatientEvent, DateTime> get events;
+
+  /// Set when the patient is pregnant (or has just given birth).
+  Pregnancy? get pregnancy;
 }
 
 /// A patient read back from its JSON (the format of [PatientStore.toJson]),
@@ -90,6 +94,7 @@ class SavedPatient implements PatientRecord {
     required this.onset,
     required Set<String> checks,
     required Map<PatientEvent, DateTime> events,
+    required this.pregnancy,
   }) : evaluations = List.unmodifiable(evaluations),
        checks = Set.unmodifiable(checks),
        events = Map.unmodifiable(events);
@@ -102,6 +107,7 @@ class SavedPatient implements PatientRecord {
     final end = data['end'] as int?;
     final onset = data['onset'] as Map<String, dynamic>?;
     final events = (data['events'] as Map<String, dynamic>?) ?? const {};
+    final pregnancy = data['pregnancy'] as Map<String, dynamic>?;
     return SavedPatient._(
       startedAt: DateTime.fromMillisecondsSinceEpoch(start),
       finishedAt: end == null ? null : DateTime.fromMillisecondsSinceEpoch(end),
@@ -116,6 +122,7 @@ class SavedPatient implements PatientRecord {
           if (events[e.name] case final int ms)
             e: DateTime.fromMillisecondsSinceEpoch(ms),
       },
+      pregnancy: pregnancy == null ? null : Pregnancy.fromJson(pregnancy),
     );
   }
 
@@ -133,6 +140,8 @@ class SavedPatient implements PatientRecord {
   final Set<String> checks;
   @override
   final Map<PatientEvent, DateTime> events;
+  @override
+  final Pregnancy? pregnancy;
 }
 
 /// The patient being assessed (or the last one, once finished) and the
@@ -149,12 +158,20 @@ class PatientStore extends PersistedStore implements PatientRecord {
   Onset? _onset;
   final Set<String> _checks = {};
   final Map<PatientEvent, DateTime> _events = {};
+  Pregnancy? _pregnancy;
+
+  @override
+  Pregnancy? get pregnancy => _pregnancy;
+
+  set pregnancy(Pregnancy? value) {
+    _pregnancy = value;
+    changed();
+  }
 
   /// Times stamped so far, in form order.
   @override
   Map<PatientEvent, DateTime> get events => {
-    for (final e in PatientEvent.values)
-      e: ?_events[e],
+    for (final e in PatientEvent.values) e: ?_events[e],
   };
 
   /// Stamps [event] at [at] (now by default), or clears it with null.
@@ -253,6 +270,7 @@ class PatientStore extends PersistedStore implements PatientRecord {
     _onset = null;
     _checks.clear();
     _events.clear();
+    _pregnancy = null;
   }
 
   /// Whether [scores] and [burns] differ from the last registered
@@ -275,6 +293,7 @@ class PatientStore extends PersistedStore implements PatientRecord {
         for (final MapEntry(:key, :value) in events.entries)
           key.name: value.millisecondsSinceEpoch,
       },
+    'pregnancy': ?_pregnancy?.toJson(),
   };
 
   @override
@@ -287,5 +306,6 @@ class PatientStore extends PersistedStore implements PatientRecord {
     _onset = saved.onset;
     _checks.addAll(saved.checks);
     _events.addAll(saved.events);
+    _pregnancy = saved.pregnancy;
   }
 }

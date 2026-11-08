@@ -267,7 +267,12 @@ class SelectableTile extends StatelessWidget {
     required this.onTap,
     required this.builder,
     this.padding = const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+    this.color,
   });
+
+  /// Fill when not selected, instead of the plain tile (e.g. amber when
+  /// something is due).
+  final Color? color;
 
   final bool selected;
   final VoidCallback onTap;
@@ -282,10 +287,10 @@ class SelectableTile extends StatelessWidget {
       selected: selected,
       button: true,
       child: Material(
-        color: selected ? scheme.primary : scheme.tile,
+        color: selected ? scheme.primary : color ?? scheme.tile,
         shape: RoundedRectangleBorder(
           borderRadius: radius,
-          side: selected
+          side: selected || color != null
               ? BorderSide.none
               : BorderSide(color: scheme.tileBorder),
         ),
@@ -300,6 +305,38 @@ class SelectableTile extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// A [SelectableTile] that is ticked on and off.
+class CheckTile extends StatelessWidget {
+  const CheckTile({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.detail,
+  });
+
+  final String label;
+  final String? detail;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SelectableTile(
+      selected: selected,
+      onTap: onTap,
+      builder: (fg) => Row(
+        children: [
+          Expanded(
+            child: TileLabel(label, detail: detail, color: fg),
+          ),
+          if (selected) Icon(Icons.check, color: fg, size: 20),
+        ],
       ),
     );
   }
@@ -368,6 +405,115 @@ Future<DateTime?> pickClockTime(
     helpText: title,
   );
   return picked == null ? null : resolveClockTime(picked, DateTime.now());
+}
+
+/// A time to register with one tap: "Registar" stamps now; once stamped,
+/// tap to change it on the clock, ✕ to clear it.
+class TimeStampTile extends StatelessWidget {
+  const TimeStampTile({
+    super.key,
+    required this.label,
+    required this.at,
+    required this.onChanged,
+    this.detail,
+  });
+
+  final String label;
+  final String? detail;
+  final DateTime? at;
+  final ValueChanged<DateTime?> onChanged;
+
+  Future<void> _edit(BuildContext context, DateTime current) async {
+    final picked = await pickClockTime(context, initial: current, title: label);
+    if (picked != null) onChanged(picked);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final at = this.at;
+    return SelectableTile(
+      selected: at != null,
+      onTap: at == null
+          ? () => onChanged(DateTime.now())
+          : () => _edit(context, at),
+      padding: const EdgeInsets.fromLTRB(14, 4, 4, 4),
+      builder: (fg) => Row(
+        children: [
+          Expanded(
+            child: TileLabel(label, detail: detail, color: fg),
+          ),
+          if (at == null)
+            Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: Text(
+                'Registar',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: fg.withValues(alpha: 0.7),
+                ),
+              ),
+            )
+          else ...[
+            Text(
+              formatClock(at),
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: fg,
+                fontFeatures: const [FontFeature.tabularFigures()],
+              ),
+            ),
+            IconButton(
+              tooltip: 'Limpar $label',
+              color: fg,
+              onPressed: () => onChanged(null),
+              icon: const Icon(Icons.close),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// A coloured note: a flag in amber or red, or a grey reminder
+/// ([Severity.incomplete]).
+class FlagNote extends StatelessWidget {
+  const FlagNote({
+    super.key,
+    required this.severity,
+    required this.text,
+    this.top = 8,
+  });
+
+  final Severity severity;
+  final String text;
+  final double top;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: EdgeInsets.only(top: top),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: Palette.severity(severity, scheme),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: severity == Severity.incomplete
+                ? FontWeight.w500
+                : FontWeight.w700,
+            color: Palette.onSeverity(severity, scheme),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// Bold heading above a question, field or group, with an optional grey

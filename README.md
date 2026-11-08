@@ -30,6 +30,12 @@ de forma rápida e simples, no terreno.
 - **Escalas gerais:** Cincinnati, Glasgow (ECG), MGAP, NEWS2, ProACS, RACE e RTS
 - **Escalas pediátricas:** APGAR, Glasgow pediátrica, FLACC, Triângulo de
   Avaliação Pediátrica (TAP) e PTS
+- **Grávida e parto:** idade gestacional (em semanas ou pela última
+  menstruação), dados do Boletim de Saúde da Grávida e alertas automáticos
+  (hipertensão com sinais de gravidade, líquido amniótico, SpO₂ alvo,
+  decúbito lateral esquerdo); no parto, horas do nascimento, da clampagem e
+  da dequitadura, APGAR ao 1.º, 5.º e 10.º minuto com aviso quando chega a
+  hora, e verificação da hemorragia pós-parto. O ecrã mantém-se ligado
 - **Avaliação do queimado:** regra dos nove para adulto e criança, com grau por região
 - **Triagem START:** algoritmo passo a passo e contagem de vítimas por
   prioridade, separada do doente
