@@ -1,9 +1,10 @@
 import 'package:ephscores/app.dart';
 import 'package:ephscores/burn/burn.dart';
 import 'package:ephscores/history/history.dart';
-import 'package:ephscores/platform/window_flags.dart';
+import 'package:ephscores/platform/android.dart';
 import 'package:ephscores/history/unlock.dart';
 import 'package:ephscores/ui/history_page.dart';
+import 'package:ephscores/patient/chamu.dart';
 import 'package:ephscores/patient/patient.dart';
 import 'package:ephscores/scores/adult.dart';
 import 'package:ephscores/scores/score_store.dart';
@@ -17,6 +18,7 @@ import 'package:ephscores/ui/score_list_page.dart';
 import 'package:ephscores/ui/score_page.dart';
 import 'package:ephscores/ui/start_page.dart';
 import 'package:ephscores/ui/via_verde_page.dart';
+import 'package:ephscores/ui/widgets.dart' show ChoiceField;
 import 'package:ephscores/ui/vitals_page.dart';
 import 'package:ephscores/ui/welcome_page.dart';
 import 'package:ephscores/viaverde/via_verde.dart';
@@ -361,12 +363,13 @@ void main() {
     ) async {
       final calls = <Object?>[];
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        windowChannel,
-        (call) async => calls.add(call.arguments),
+        androidChannel,
+        (call) async =>
+            call.method == 'takeShortcut' ? null : calls.add(call.arguments),
       );
       addTearDown(
         () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-          windowChannel,
+          androidChannel,
           null,
         ),
       );
@@ -429,12 +432,14 @@ void main() {
   testWidgets('pregnancy and birth, with the screen kept on', (tester) async {
     final calls = <String>[];
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      windowChannel,
-      (call) async => calls.add('${call.method} ${call.arguments}'),
+      androidChannel,
+      (call) async => call.method == 'takeShortcut'
+          ? null
+          : calls.add('${call.method} ${call.arguments}'),
     );
     addTearDown(
       () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        windowChannel,
+        androidChannel,
         null,
       ),
     );
@@ -466,6 +471,182 @@ void main() {
     await tester.pumpAndSettle();
     expect(calls.last, 'keepScreenOn false');
     expect(find.textContaining('Grávida · Nascimento'), findsOneWidget);
+  });
+
+  testWidgets('the re-assessment reminder, reset by each evaluation', (
+    tester,
+  ) async {
+    final app = await buildApp(tester);
+    app.patient.reminderMinutes = 10;
+    await tester.pumpWidget(app);
+    await tester.pump(const Duration(minutes: 9));
+    expect(find.textContaining('Reavaliar o doente'), findsNothing);
+
+    // Registering starts the count again.
+    app.patient.register(app.scores.sheet, app.burn.sheet);
+    await tester.pump(const Duration(minutes: 9));
+    expect(find.textContaining('Reavaliar o doente'), findsNothing);
+
+    await tester.pump(const Duration(minutes: 1));
+    await tester.pump();
+    expect(find.textContaining('Reavaliar o doente'), findsOneWidget);
+
+    // No reminder once it is off.
+    app.patient.reminderMinutes = null;
+    await tester.pump(const Duration(minutes: 30));
+    expect(find.textContaining('Reavaliar o doente'), findsOneWidget);
+  });
+
+  testWidgets('choosing the reminder on the dashboard', (tester) async {
+    final app = await buildApp(tester);
+    await tester.pumpWidget(app);
+    await tester.tap(find.byTooltip('Lembrete de reavaliação'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Reavaliar a cada 15 min'));
+    await tester.pumpAndSettle();
+    expect(app.patient.reminderMinutes, 15);
+    expect(find.byIcon(Icons.notifications_active), findsOneWidget);
+    // Kept with the patient, and gone with the next one.
+    expect(
+      PatientStore(await SharedPreferences.getInstance()).reminderMinutes,
+      15,
+    );
+    app.patient.start();
+    expect(app.patient.reminderMinutes, isNull);
+  });
+
+  group('launcher shortcuts', () {
+    void mockLaunch(WidgetTester tester, String? shortcut) {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        androidChannel,
+        (call) async => call.method == 'takeShortcut' ? shortcut : null,
+      );
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          androidChannel,
+          null,
+        ),
+      );
+    }
+
+    testWidgets('"Novo doente" starts one from the start screen', (
+      tester,
+    ) async {
+      mockLaunch(tester, 'new_patient');
+      final app = await buildApp(tester, openPatient: false);
+      await tester.pumpWidget(app);
+      await tester.pumpAndSettle();
+      expect(app.patient.isActive, isTrue);
+      expect(find.text('Sinais vitais'), findsOneWidget);
+    });
+
+    testWidgets('"Novo doente" leaves a patient in progress alone', (
+      tester,
+    ) async {
+      mockLaunch(tester, 'new_patient');
+      final app = await buildApp(tester);
+      final started = app.patient.startedAt;
+      app.patient.reminderMinutes = 5;
+      await tester.pumpWidget(app);
+      await tester.pumpAndSettle();
+      expect(app.patient.startedAt, started);
+      expect(app.patient.reminderMinutes, 5);
+    });
+
+    testWidgets('"Contactos" and "Triagem START" open their pages, also while '
+        'the app is running', (tester) async {
+      mockLaunch(tester, 'contacts');
+      final app = await buildApp(tester, openPatient: false);
+      await tester.pumpWidget(app);
+      await tester.pumpAndSettle();
+      expect(find.byType(ContactsPage), findsOneWidget);
+
+      await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+        androidChannel.name,
+        androidChannel.codec.encodeMethodCall(
+          const MethodCall('shortcut', 'start'),
+        ),
+        (_) {},
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(StartPage), findsOneWidget);
+      expect(find.byType(ContactsPage), findsNothing);
+    });
+  });
+
+  testWidgets('a child\'s estimated weight shows with the age', (tester) async {
+    final app = await buildApp(tester);
+    await tester.pumpWidget(app);
+    await openFromHome(tester, 'Sinais vitais');
+    expect(find.textContaining('Peso estimado'), findsNothing);
+    app.scores.setVital(Vital.age, 5);
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Peso estimado: cerca de 18 kg (fórmulas APLS)'),
+      findsOneWidget,
+    );
+    app.scores.setVital(Vital.age, 40);
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Peso estimado'), findsNothing);
+  });
+
+  testWidgets('CHAMU: dropdowns, a text area for "Outra", medication as text', (
+    tester,
+  ) async {
+    final app = await buildApp(tester);
+    await tester.pumpWidget(app);
+    await openFromHome(tester, 'CHAMU');
+    await tester.pumpAndSettle();
+
+    // Circumstances: one choice; the text area opens only for "Outra".
+    expect(find.text('Descreva a situação'), findsNothing);
+    await tester.tap(find.byType(ChoiceField).at(0));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Queda'));
+    await tester.pumpAndSettle();
+    expect(find.text('Queda'), findsOneWidget);
+    expect(find.text('Descreva a situação'), findsNothing);
+
+    await tester.tap(find.text('Queda'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Outra'));
+    await tester.pumpAndSettle();
+    expect(find.text('Descreva a situação'), findsOneWidget);
+    await tester.enterText(find.byType(TextField).first, 'caiu da bicicleta');
+    expect(
+      app.patient.chamu.lineFor(chamuQuestions.first),
+      'Outra: caiu da bicicleta',
+    );
+
+    // Allergies: several at once, kept open until "Concluído".
+    await tester.scrollUntilVisible(
+      find.text('A · Alergias'),
+      300,
+      scrollable: pageScrollable,
+    );
+    // Circumstances, antecedents, allergies.
+    await tester.tap(find.byType(ChoiceField).at(2));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Alimentos'));
+    await tester.pump();
+    await tester.tap(find.text('Látex'));
+    await tester.pump();
+    await tester.tap(find.text('Concluído'));
+    await tester.pumpAndSettle();
+    expect(find.text('Alimentos, Látex'), findsOneWidget);
+    expect(find.text('A quê'), findsOneWidget);
+
+    // Medication is only a text area.
+    await tester.scrollUntilVisible(
+      find.text('Nomes dos medicamentos'),
+      300,
+      scrollable: pageScrollable,
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, '').last,
+      'Varfarina',
+    );
+    expect(app.patient.chamu.note('m'), 'Varfarina');
   });
 
   testWidgets('cancelling a patient with no evaluations', (tester) async {

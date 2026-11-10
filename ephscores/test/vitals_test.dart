@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  childWeightTests();
   late ScoreStore store;
 
   setUp(() async {
@@ -377,6 +378,26 @@ void main() {
     test('10 is severe', () {
       final r = flaccWith([2, 2, 2, 2, 2]);
       expect((r.value, r.severity), (10, Severity.danger));
+    });
+  });
+}
+
+void childWeightTests() {
+  group('estimated child weight (APLS)', () {
+    test('formulas by age', () {
+      expect(childWeight(1), (10.0, 10.0));
+      expect(childWeight(5), (18.0, 18.0));
+      expect(childWeight(6), (25.0, 25.0));
+      expect(childWeight(12), (43.0, 43.0));
+      expect(childWeight(13), isNull);
+      expect(childWeight(45), isNull);
+    });
+
+    test('a range in the first year', () {
+      expect(childWeight(0), (3.5, 9.5));
+      expect(childWeightLabel(0), 'cerca de 3,5 a 9,5 kg');
+      expect(childWeightLabel(7), 'cerca de 28 kg');
+      expect(childWeightLabel(30), isNull);
     });
   });
 }

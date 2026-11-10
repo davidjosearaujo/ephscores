@@ -7,6 +7,7 @@ import '../app.dart';
 import '../format.dart';
 import '../history/history.dart';
 import '../obstetrics/obstetrics.dart';
+import '../patient/chamu.dart';
 import '../patient/patient.dart';
 import '../scores/adult.dart';
 import '../scores/model.dart';
@@ -16,8 +17,10 @@ import '../viaverde/via_verde.dart';
 import '../vitals/vitals.dart';
 import 'brand.dart';
 import 'burn_page.dart';
+import 'chamu_page.dart';
 import 'contacts_page.dart';
 import 'evolution_page.dart';
+import 'injuries_page.dart';
 import 'obstetrics_page.dart';
 import 'score_list_page.dart';
 import 'via_verde_page.dart';
@@ -60,6 +63,15 @@ class DashboardPage extends StatelessWidget {
               onTap: () => open(const VitalsPage()),
             ),
             _MenuCard(
+              icon: Icons.assignment,
+              title: 'CHAMU',
+              subtitle:
+                  'Circunstâncias · História · Alergias · Medicação · '
+                  'Última refeição',
+              badge: _chamuBadge(scope.patient.chamu),
+              onTap: () => open(const ChamuPage()),
+            ),
+            _MenuCard(
               icon: Icons.person,
               title: 'Escalas gerais',
               subtitle: adultScores.map((s) => s.name).join(' · '),
@@ -86,6 +98,16 @@ class DashboardPage extends StatelessWidget {
               subtitle: 'Idade gestacional · alertas · parto · APGAR',
               badge: _pregnancyBadge(scope.patient.pregnancy, vitals),
               onTap: () => open(const ObstetricsPage()),
+            ),
+            _MenuCard(
+              icon: Icons.personal_injury,
+              title: 'Mapa de lesões',
+              subtitle: 'Fraturas · feridas · hemorragias · contusões',
+              badge: switch (scope.patient.injuries.affected.length) {
+                0 => null,
+                final n => formatCount(n, 'região', 'regiões'),
+              },
+              onTap: () => open(const InjuriesPage()),
             ),
             _MenuCard(
               icon: Icons.local_fire_department,
@@ -160,6 +182,12 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
+/// "3 de 5": the letters of CHAMU with something recorded.
+String? _chamuBadge(Chamu chamu) => switch (chamu.answeredCount) {
+  0 => null,
+  final n => '$n de 5',
+};
+
 /// "38 semanas · Nascimento 14:05 · 2 alertas".
 String? _pregnancyBadge(Pregnancy? p, VitalSigns vitals) {
   if (p == null) return null;
@@ -233,10 +261,45 @@ class _Header extends StatelessWidget {
                   ],
                 ),
               ),
+              _ReminderMenu(patient: patient),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Chooses how often to be reminded to re-assess the patient.
+class _ReminderMenu extends StatelessWidget {
+  const _ReminderMenu({required this.patient});
+
+  final PatientStore patient;
+
+  @override
+  Widget build(BuildContext context) {
+    final current = patient.reminderMinutes;
+    return PopupMenuButton<int>(
+      tooltip: 'Lembrete de reavaliação',
+      icon: Icon(
+        current == null ? Icons.notifications_none : Icons.notifications_active,
+        color: Colors.white,
+      ),
+      initialValue: current ?? 0,
+      onSelected: (m) {
+        patient.reminderMinutes = m == 0 ? null : m;
+        showToast(
+          context,
+          m == 0
+              ? 'Lembrete de reavaliação desligado'
+              : 'Lembrete de reavaliação a cada $m min (com a aplicação aberta)',
+        );
+      },
+      itemBuilder: (_) => [
+        const PopupMenuItem(value: 0, child: Text('Sem lembrete')),
+        for (final m in reminderChoices)
+          PopupMenuItem(value: m, child: Text('Reavaliar a cada $m min')),
+      ],
     );
   }
 }

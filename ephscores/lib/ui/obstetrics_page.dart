@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import '../app.dart';
 import '../format.dart';
 import '../obstetrics/obstetrics.dart';
-import '../platform/window_flags.dart';
+import '../platform/android.dart';
 import '../scores/model.dart';
 import '../scores/pediatric.dart' as pediatric show apgar;
 import '../theme.dart';
@@ -442,66 +442,47 @@ class _GestationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final fg = theme.colorScheme.onPrimaryContainer;
     final label = pregnancy.gestationLabel;
-    return Card(
-      color: theme.colorScheme.primaryContainer,
-      shape: filledCardShape,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    return HeroCard(
+      title: 'Idade gestacional',
+      fill: true,
+      children: [
+        Text(
+          label ?? 'Não registada',
+          style: label == null
+              ? null
+              : Theme.of(context).textTheme.headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.w800),
+        ),
+        if (pregnancy.term case final term?) Text(term.label),
+        const SizedBox(height: 12),
+        Row(
           children: [
-            Text(
-              'Idade gestacional',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: fg,
-                fontWeight: FontWeight.w700,
+            Expanded(
+              child: FilledButton(
+                onPressed: () => _weeks(context),
+                child: const FitText('Semanas'),
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              label ?? 'Não registada',
-              style: label == null
-                  ? theme.textTheme.bodyMedium?.copyWith(color: fg)
-                  : theme.textTheme.headlineSmall?.copyWith(
-                      color: fg,
-                      fontWeight: FontWeight.w800,
-                    ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: FilledButton(
+                onPressed: () => _lastPeriod(context),
+                child: const FitText('Última menstruação'),
+              ),
             ),
-            if (pregnancy.term case final term?)
-              Text(term.label, style: TextStyle(color: fg)),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () => _weeks(context),
-                    child: const FitText('Semanas'),
-                  ),
+            if (label != null)
+              IconButton(
+                tooltip: 'Limpar idade gestacional',
+                color: HeroCard.foreground(context),
+                onPressed: () => update(
+                  (p) => p.copyWith(weeks: () => null, days: () => null),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () => _lastPeriod(context),
-                    child: const FitText('Última menstruação'),
-                  ),
-                ),
-                if (label != null)
-                  IconButton(
-                    tooltip: 'Limpar idade gestacional',
-                    color: fg,
-                    onPressed: () => update(
-                      (p) => p.copyWith(weeks: () => null, days: () => null),
-                    ),
-                    icon: const Icon(Icons.close),
-                  ),
-              ],
-            ),
+                icon: const Icon(Icons.close),
+              ),
           ],
         ),
-      ),
+      ],
     );
   }
 }

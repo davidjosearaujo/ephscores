@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 
 import '../burn/burn.dart';
@@ -122,7 +123,9 @@ Path _buildRegionPath(BurnPatient patient, BodyRegion region) {
   return path.transform(mirror);
 }
 
-/// Tappable body outline for one view, coloured by burn degree.
+/// Tappable body outline for one view, coloured by what was found in each
+/// region (burn degree, injuries) and labelled with its surface percentage
+/// unless [labelFor] says otherwise.
 class BodyDiagram extends StatelessWidget {
   const BodyDiagram({
     super.key,
@@ -131,7 +134,11 @@ class BodyDiagram extends StatelessWidget {
     required this.regions,
     required this.colorFor,
     required this.onTap,
+    this.labelFor,
   });
+
+  /// Text drawn on a region; empty for none. Defaults to its percentage.
+  final String Function(BodyRegion)? labelFor;
 
   final BurnPatient patient;
   final BodyView view;
@@ -164,6 +171,10 @@ class BodyDiagram extends StatelessWidget {
                 patient: patient,
                 regions: visible,
                 colors: [for (final r in visible) colorFor(r)],
+                labels: [
+                  for (final r in visible)
+                    labelFor?.call(r) ?? formatNumber(r.percent),
+                ],
                 gap: scheme.surface,
                 scale: scale,
               ),
@@ -184,6 +195,7 @@ class _BodyPainter extends CustomPainter {
     required this.patient,
     required this.regions,
     required this.colors,
+    required this.labels,
     required this.gap,
     required this.scale,
   });
@@ -191,6 +203,7 @@ class _BodyPainter extends CustomPainter {
   final BurnPatient patient;
   final List<BodyRegion> regions;
   final List<Color> colors;
+  final List<String> labels;
   final Color gap;
   final double scale;
 
@@ -208,7 +221,7 @@ class _BodyPainter extends CustomPainter {
 
       final text = TextPainter(
         text: TextSpan(
-          text: formatNumber(region.percent),
+          text: labels[i],
           style: TextStyle(
             fontSize: region.part == BodyPart.genitals ? 10 : 13,
             fontWeight: FontWeight.w700,
@@ -230,13 +243,110 @@ class _BodyPainter extends CustomPainter {
       old.gap != gap ||
       old.scale != scale ||
       old.regions != regions ||
-      !_listEquals(old.colors, colors);
+      !listEquals(old.colors, colors) ||
+      !listEquals(old.labels, labels);
+}
 
-  static bool _listEquals(List<Color> a, List<Color> b) {
-    if (a.length != b.length) return false;
-    for (var i = 0; i < a.length; i++) {
-      if (a[i] != b[i]) return false;
-    }
-    return true;
+/// The front and back views side by side, with the patient's right and left
+/// marked on each.
+class BodyPair extends StatelessWidget {
+  const BodyPair({
+    super.key,
+    required this.patient,
+    required this.regions,
+    required this.colorFor,
+    required this.onTap,
+    this.labelFor,
+  });
+
+  final BurnPatient patient;
+  final List<BodyRegion> regions;
+  final Color Function(BodyRegion) colorFor;
+  final ValueChanged<BodyRegion> onTap;
+  final String Function(BodyRegion)? labelFor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final view in BodyView.values) ...[
+          if (view == BodyView.back) const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              children: [
+                Text(
+                  view == BodyView.front ? 'Anterior' : 'Posterior',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                _SideLabels(view: view),
+                BodyDiagram(
+                  patient: patient,
+                  view: view,
+                  regions: regions,
+                  colorFor: colorFor,
+                  labelFor: labelFor,
+                  onTap: onTap,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+/// Patient's right/left markers; mirrored between front and back views.
+class _SideLabels extends StatelessWidget {
+  const _SideLabels({required this.view});
+
+  final BodyView view;
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.labelSmall;
+    final (left, right) = view == BodyView.front
+        ? ('Dir', 'Esq')
+        : ('Esq', 'Dir');
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(left, style: style),
+        Text(right, style: style),
+      ],
+    );
+  }
+}
+
+/// Adult or child, for the body maps.
+class PatientTypeSelector extends StatelessWidget {
+  const PatientTypeSelector({
+    super.key,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final BurnPatient selected;
+  final ValueChanged<BurnPatient> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SegmentedButton<BurnPatient>(
+      segments: const [
+        ButtonSegment(
+          value: BurnPatient.adult,
+          label: Text('Adulto'),
+          icon: Icon(Icons.person),
+        ),
+        ButtonSegment(
+          value: BurnPatient.child,
+          label: Text('Criança'),
+          icon: Icon(Icons.child_care),
+        ),
+      ],
+      selected: {selected},
+      onSelectionChanged: (s) => onChanged(s.first),
+    );
   }
 }

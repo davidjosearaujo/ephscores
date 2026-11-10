@@ -6,6 +6,7 @@ library;
 
 import '../burn/burn.dart';
 import '../format.dart';
+import '../injuries/injuries.dart';
 import '../scores/model.dart';
 import '../scores/score_store.dart';
 import '../vitals/vitals.dart';
@@ -40,7 +41,11 @@ class ClinicalState {
     required this.now,
     this.onset,
     this.checks = const {},
+    this.injuries = const InjuryMap(),
   });
+
+  /// What the injury map shows.
+  final InjuryMap injuries;
 
   final ScoreSheet scores;
   final BurnSheet burns;
@@ -459,11 +464,12 @@ final viaVerdeTrauma = ViaVerde(
   groups: [
     // Vital signs and scores alone don't make a trauma: a septic patient
     // with PAS < 90 must not light up this pathway.
-    const CriteriaGroup('Contexto', [
+    CriteriaGroup('Contexto', [
       Criterion(
         'trauma',
         'Vítima de trauma',
         detail: 'Ou assinalar uma lesão ou mecanismo abaixo',
+        auto: (s) => s.injuries.traumaSigns ? 'lesões no mapa de lesões' : null,
       ),
     ]),
     CriteriaGroup('Repercussões fisiológicas', [
@@ -529,12 +535,15 @@ final viaVerdeTrauma = ViaVerde(
       const Criterion('inhalation', 'Queimaduras com inalação'),
     ]),
     CriteriaGroup('Mecanismo da lesão', [
-      const Criterion(
+      Criterion(
         'penetrating',
         'Trauma penetrante',
         detail:
             'Cabeça, pescoço, tórax, abdómen, períneo, proximal ao '
             'cotovelo e/ou joelho',
+        auto: (s) => s.injuries.penetratingTrunk
+            ? 'ferida penetrante da cabeça ou do tronco'
+            : null,
       ),
       const Criterion('ejection', 'Projeção da vítima'),
       const Criterion(

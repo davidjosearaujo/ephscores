@@ -177,69 +177,45 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final fg = theme.colorScheme.onPrimaryContainer;
     final start = patient.startedAt!;
     final end = patient.finishedAt;
-    final n = patient.evaluations.length;
-    final body = theme.textTheme.bodyMedium?.copyWith(color: fg);
-    return Card(
-      color: theme.colorScheme.primaryContainer,
-      shape: filledCardShape,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              end == null ? 'Em curso' : 'Finalizado',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: fg,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Início: ${formatDate(start)} ${formatClock(start)}',
-              style: body,
-            ),
-            Text(
-              end == null
-                  ? 'Há ${formatDuration(DateTime.now().difference(start))}'
-                  : 'Fim: ${formatClock(end)} · '
-                        'duração ${formatDuration(end.difference(start))}',
-              style: body,
-            ),
-            Text(formatCount(n, 'avaliação', 'avaliações'), style: body),
-            for (final MapEntry(key: event, value: at)
-                in patient.events.entries)
-              Text('${event.label}: ${formatClock(at)}', style: body),
-            if (patient.pregnancy case final p?)
-              Text(p.headline(), style: body),
-            if (patient.pregnancy?.birth case final b?)
-              Text('Nascimento: ${formatClock(b.bornAt)}', style: body),
-            if (patient.onset case final onset?)
-              Text(onsetLine(onset, end ?? DateTime.now()), style: body),
-            if (expiresAt case final at?)
-              Text('Guardado até ${formatDate(at)}', style: body),
-            if (unsaved) ...[
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Icon(Icons.edit_note, size: 18, color: fg),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Há alterações por registar no painel.',
-                      style: body?.copyWith(fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
+    return HeroCard(
+      title: end == null ? 'Em curso' : 'Finalizado',
+      children: [
+        Text('Início: ${formatDate(start)} ${formatClock(start)}'),
+        Text(
+          end == null
+              ? 'Há ${formatDuration(DateTime.now().difference(start))}'
+              : 'Fim: ${formatClock(end)} · '
+                    'duração ${formatDuration(end.difference(start))}',
+        ),
+        Text(
+          formatCount(patient.evaluations.length, 'avaliação', 'avaliações'),
+        ),
+        for (final MapEntry(key: event, value: at) in patient.events.entries)
+          Text('${event.label}: ${formatClock(at)}'),
+        if (patient.pregnancy case final p?) Text(p.headline()),
+        if (patient.pregnancy?.birth case final b?)
+          Text('Nascimento: ${formatClock(b.bornAt)}'),
+        if (patient.onset case final onset?)
+          Text(onsetLine(onset, end ?? DateTime.now())),
+        if (expiresAt case final at?) Text('Guardado até ${formatDate(at)}'),
+        if (unsaved) ...[
+          const SizedBox(height: 8),
+          const Row(
+            children: [
+              Icon(Icons.edit_note, size: 18),
+              SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'Há alterações por registar no painel.',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
               ),
             ],
-          ],
-        ),
-      ),
+          ),
+        ],
+      ],
     );
   }
 }

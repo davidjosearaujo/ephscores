@@ -102,6 +102,13 @@ class VitalsPage extends StatelessWidget {
                 hint:
                     'Menos de 16 anos: a NEWS2 não é preenchida e FR, FC e '
                     'PAS são comparadas com o normal para a idade.',
+                below: switch (age == null ? null : childWeightLabel(age)) {
+                  final weight? => FlagNote(
+                    severity: Severity.incomplete,
+                    text: 'Peso estimado: $weight (fórmulas APLS)',
+                  ),
+                  null => null,
+                },
               ),
               _AvdsField(
                 level: v[Vital.avds]?.toInt(),

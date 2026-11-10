@@ -18,12 +18,24 @@ de forma rápida e simples, no terreno.
 - **Horas da ocorrência:** a caminho do local, chegada à vítima, contacto
   CODU, transporte e disponível, registadas com um toque a partir de uma
   bolha flutuante presente em todos os ecrãs
+- **CHAMU:** circunstâncias, história, alergias, medicação habitual e
+  última refeição, como no verbete: listas de escolha (com várias opções onde
+  faz sentido), uma caixa de texto que abre em "Outra" e nas alergias, e a
+  medicação escrita à mão; preenche os antecedentes do resumo ISBAR
+- **Mapa de lesões:** toque numa região do corpo (adulto ou criança) e marque
+  o tipo de lesão: hemorragia, ferida penetrante, amputação, fratura,
+  deformidade, ferida, contusão ou dor. Alimenta o resumo ISBAR e a Via Verde
+  Trauma
+- **Lembrete de reavaliação:** vibração e aviso a cada 5, 10 ou 15 minutos
+  desde a última avaliação, com a aplicação aberta
+- **Atalhos:** premir o ícone da aplicação (Android) oferece *Novo doente*,
+  *Triagem START* e *Contactos*
 - **Sinais vitais:** os campos do verbete nacional (AVDS, FR, SpO₂, O₂, FC,
   PA, temperatura, dor por escala numérica ou de faces, e glicemia),
   registados uma vez e usados por todas as
   escalas que deles precisam; a NEWS2 fica calculada sem mais toques, com o
   índice de choque ao lado; nas crianças, FR, FC e PAS são comparadas com o
-  normal para a idade
+  normal para a idade, e o peso estimado da criança pela idade
 - **Vias Verdes:** hora de início dos sintomas e critérios das Vias Verdes
   AVC, Coronária, Sépsis e Trauma, assinalados automaticamente a partir dos
   sinais vitais, das escalas e do mapa de queimaduras

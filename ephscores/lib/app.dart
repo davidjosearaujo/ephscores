@@ -10,6 +10,8 @@ import 'start/start.dart';
 import 'theme.dart';
 import 'viaverde/via_verde.dart';
 import 'ui/events_overlay.dart';
+import 'ui/reminder.dart';
+import 'ui/shortcut_handler.dart';
 import 'ui/root_page.dart';
 
 class EPHScoresApp extends StatelessWidget {
@@ -62,6 +64,8 @@ class EPHScoresApp extends StatelessWidget {
             children: [
               child!,
               EventsBubble(navigatorKey: navigatorKey, popups: popups),
+              const ReassessmentReminder(),
+              ShortcutHandler(navigatorKey: navigatorKey),
             ],
           ),
         ),
@@ -177,6 +181,7 @@ extension PatientFlow on AppScope {
     burns: burn.sheet,
     onset: patient.onset,
     checks: patient.checks,
+    injuries: patient.injuries,
     now: now ?? DateTime.now(),
   );
 }

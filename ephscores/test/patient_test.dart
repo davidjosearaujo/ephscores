@@ -140,7 +140,7 @@ S — Situação atual
 - Sem alterações de gravidade
 
 B — Antecedentes
-- A completar: doenças, medicação habitual, alergias
+- A completar: antecedentes, alergias, medicação habitual, última refeição
 
 A — Avaliação
 - Avaliação 2 (14:29):

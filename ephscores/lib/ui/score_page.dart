@@ -198,31 +198,19 @@ class ScoreItemSection extends StatelessWidget {
           ),
         if ((item.vital, vitals) case (final binding?, final vitals?))
           _VitalsLink(binding: binding, vitals: vitals, used: fromVitals),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            const gap = 8.0;
-            final width = compact
-                ? (constraints.maxWidth - gap) / 2
-                : constraints.maxWidth;
-            return Wrap(
-              spacing: gap,
-              runSpacing: gap,
-              children: [
-                for (final (i, option) in item.options.indexed)
-                  SizedBox(
-                    width: width,
-                    child: _OptionTile(
-                      option: option,
-                      selected: picks.contains(i),
-                      // Items like "lado do défice" carry no points; don't show "0".
-                      showPoints:
-                          !item.multi && item.options.any((o) => o.points != 0),
-                      onTap: () => onTap(i),
-                    ),
-                  ),
-              ],
-            );
-          },
+        TileGrid(
+          columns: compact ? 2 : 1,
+          children: [
+            for (final (i, option) in item.options.indexed)
+              _OptionTile(
+                option: option,
+                selected: picks.contains(i),
+                // Items like "lado do défice" carry no points; don't show "0".
+                showPoints:
+                    !item.multi && item.options.any((o) => o.points != 0),
+                onTap: () => onTap(i),
+              ),
+          ],
         ),
       ],
     );

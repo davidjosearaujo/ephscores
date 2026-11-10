@@ -1,4 +1,5 @@
 import 'package:ephscores/burn/burn.dart';
+import 'package:ephscores/injuries/injuries.dart';
 import 'package:ephscores/patient/patient.dart';
 import 'package:ephscores/patient/summary.dart';
 import 'package:ephscores/scores/adult.dart';
@@ -33,6 +34,7 @@ void main() {
     burns: burns.sheet,
     onset: patient.onset,
     checks: patient.checks,
+    injuries: patient.injuries,
     now: now,
   );
 
@@ -200,6 +202,44 @@ void main() {
       patient.toggleCheck('trauma.trauma');
       c = check(viaVerdeTrauma);
       expect(c.result.severity, Severity.danger);
+    });
+
+    test('the injury map makes it a trauma, and penetrating wounds count', () {
+      scores.setVital(Vital.sbp, 80);
+      expect(
+        check(viaVerdeTrauma).result.label,
+        'Assinalar se é vítima de trauma',
+      );
+
+      BodyRegion region(String id) =>
+          bodyRegions[BurnPatient.adult]!.firstWhere((r) => r.id == id);
+      // Pain alone isn't an injury.
+      patient.injuries = patient.injuries.toggle(
+        region('front.rightArm'),
+        InjuryType.pain,
+      );
+      expect(check(viaVerdeTrauma).met('trauma'), isFalse);
+
+      patient.injuries = patient.injuries.toggle(
+        region('front.rightArm'),
+        InjuryType.fracture,
+      );
+      final c = check(viaVerdeTrauma);
+      expect(c.met('trauma'), isTrue);
+      expect(c.result.severity, Severity.danger);
+      expect(c.met('penetrating'), isFalse);
+
+      // A penetrating wound of a limb can't tell how far up; of the trunk can.
+      patient.injuries = patient.injuries.toggle(
+        region('front.rightArm'),
+        InjuryType.penetrating,
+      );
+      expect(check(viaVerdeTrauma).met('penetrating'), isFalse);
+      patient.injuries = patient.injuries.toggle(
+        region('front.upperTorso'),
+        InjuryType.penetrating,
+      );
+      expect(check(viaVerdeTrauma).met('penetrating'), isTrue);
     });
 
     test('vital signs alone are not a trauma', () {

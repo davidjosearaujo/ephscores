@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../app.dart';
 import '../format.dart';
 import '../history/history.dart';
-import '../platform/window_flags.dart';
+import '../platform/android.dart';
 import '../history/unlock.dart';
 import '../patient/summary.dart';
 import '../theme.dart';

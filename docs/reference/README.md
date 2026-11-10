@@ -14,6 +14,8 @@ critérios da Via Verde Sépsis.
 |---|---|
 | INEM, *TAS – Emergências Médicas* (março 2024) | Critérios e atuação da Via Verde AVC; atuação na dor torácica e na sépsis; limiares de glicemia |
 | INEM, *TAS – Emergências de Obstetrícia* (março 2024) | Grávida e parto: idade gestacional, alertas, clampagem do cordão, APGAR ao 1.º, 5.º e 10.º minuto, dequitadura e hemorragia pós-parto |
+| INEM, *Verbete Nacional de Socorro* (Mod.INEM.415/01) | CHAMU: Circunstâncias, História de doenças e/ou gravidez, Alergias, Medicação habitual, Última refeição |
+| APLS (*Advanced Paediatric Life Support*) | Peso estimado da criança pela idade: 3,5 kg ao nascer; 0,5 × meses + 4 no 1.º ano; 2 × anos + 8 de 1 a 5 anos; 3 × anos + 7 de 6 a 12 anos |
 | DGS, Norma 015/2017, *Via Verde do AVC no Adulto* | Via Verde AVC |
 | DGS, Norma 003/2025, *Via Verde Coronária no Adulto* | Janela de 12 h da Via Verde Coronária |
 | DGS, Norma 012/2022, *Via Verde do Trauma no Adulto* (Anexo II) | Critérios de ativação da Via Verde Trauma |

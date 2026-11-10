@@ -267,6 +267,26 @@ const _childNormals = [
 int childHypotension(num age) =>
     age < 1 ? 70 : (age < 10 ? 70 + 2 * age.toInt() : 90);
 
+/// Estimated weight in kg of a child of [age] years, by the APLS formulas:
+/// 3,5 kg newborn, 0,5 × months + 4 in the first year, 2 × years + 8 from 1
+/// to 5, 3 × years + 7 from 6 to 12. A range in the first year, since the
+/// age is in whole years; null from 13.
+(double, double)? childWeight(num age) {
+  if (age < 1) return (3.5, 9.5);
+  if (age <= 5) return (2.0 * age + 8, 2.0 * age + 8);
+  if (age <= 12) return (3.0 * age + 7, 3.0 * age + 7);
+  return null;
+}
+
+/// "cerca de 18 kg", "cerca de 3,5 a 9,5 kg" (first year); null from 13.
+String? childWeightLabel(num age) => switch (childWeight(age)) {
+  (final low, final high) when low == high =>
+    'cerca de ${formatNumber(low)} kg',
+  (final low, final high) =>
+    'cerca de ${formatNumber(low)} a ${formatNumber(high)} kg',
+  null => null,
+};
+
 /// "aos 4 anos", "no 1.º ano de vida".
 String childAgeLabel(num age) => age < 1
     ? 'no 1.º ano de vida'

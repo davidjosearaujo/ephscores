@@ -54,21 +54,9 @@ class _BurnPageState extends State<BurnPage> {
           body: ListView(
             padding: listPadding,
             children: [
-              SegmentedButton<BurnPatient>(
-                segments: const [
-                  ButtonSegment(
-                    value: BurnPatient.adult,
-                    label: Text('Adulto'),
-                    icon: Icon(Icons.person),
-                  ),
-                  ButtonSegment(
-                    value: BurnPatient.child,
-                    label: Text('Criança'),
-                    icon: Icon(Icons.child_care),
-                  ),
-                ],
-                selected: {store.patient},
-                onSelectionChanged: (s) => store.patient = s.first,
+              PatientTypeSelector(
+                selected: store.patient,
+                onChanged: (p) => store.patient = p,
               ),
               const SizedBox(height: 16),
               _TbsaCard(store: store),
@@ -78,32 +66,11 @@ class _BurnPageState extends State<BurnPage> {
                 onChanged: (d) => setState(() => _brush = d),
               ),
               const SizedBox(height: 16),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (final view in BodyView.values) ...[
-                    if (view == BodyView.back) const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Text(
-                            view == BodyView.front ? 'Anterior' : 'Posterior',
-                            style: Theme.of(context).textTheme.titleSmall,
-                          ),
-                          _SideLabels(view: view),
-                          BodyDiagram(
-                            patient: store.patient,
-                            view: view,
-                            regions: store.regions,
-                            colorFor: (r) =>
-                                degreeColor(store.degreeOf(r), scheme),
-                            onTap: (r) => store.paint(r, _brush),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
+              BodyPair(
+                patient: store.patient,
+                regions: store.regions,
+                colorFor: (r) => degreeColor(store.degreeOf(r), scheme),
+                onTap: (r) => store.paint(r, _brush),
               ),
               const SizedBox(height: 8),
               Text(
@@ -141,28 +108,6 @@ class _BurnPageState extends State<BurnPage> {
           ),
         );
       },
-    );
-  }
-}
-
-/// Patient's right/left markers; mirrored between front and back views.
-class _SideLabels extends StatelessWidget {
-  const _SideLabels({required this.view});
-
-  final BodyView view;
-
-  @override
-  Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.labelSmall;
-    final (left, right) = view == BodyView.front
-        ? ('Dir', 'Esq')
-        : ('Esq', 'Dir');
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(left, style: style),
-        Text(right, style: style),
-      ],
     );
   }
 }

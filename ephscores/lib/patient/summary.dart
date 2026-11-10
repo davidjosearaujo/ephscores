@@ -5,6 +5,7 @@ import '../scores/model.dart';
 import '../scores/score_store.dart';
 import '../viaverde/via_verde.dart';
 import '../vitals/vitals.dart';
+import 'chamu.dart';
 import 'patient.dart';
 
 /// One line per answered score: "ECG: 13 — Ligeiro (O3 V4 M6)".
@@ -75,13 +76,26 @@ String patientSummary(PatientRecord patient, {DateTime? now}) {
   final age = vitals?[Vital.age];
   final pregnancy = patient.pregnancy;
   section('I', 'Identificação', [
-    age == null ? 'Idade não registada' : 'Vítima de $age anos',
+    age == null
+        ? 'Idade não registada'
+        : [
+            'Vítima de $age anos',
+            if (childWeightLabel(age) case final weight?)
+              'peso estimado $weight',
+          ].join(', '),
     if (pregnancy != null) pregnancy.headline(),
   ]);
 
   final onset = patient.onset;
   final pathways = viaVerdeStatus(patient);
+  final chamu = patient.chamu;
+  final circumstances = chamu.lineFor(chamuQuestions.first);
   final situation = [
+    if (circumstances != null) 'Circunstâncias: $circumstances',
+    if (patient.injuries.lines() case final lines when lines.isNotEmpty) ...[
+      'Lesões:',
+      for (final l in lines) '  $l',
+    ],
     if (onset != null) onsetLine(onset, end),
     for (final (p, c) in pathways) '${p.fullName}: ${c.result.label}',
     if (pregnancy != null) ...[
@@ -101,9 +115,7 @@ String patientSummary(PatientRecord patient, {DateTime? now}) {
     situation.isEmpty ? ['Sem alterações de gravidade'] : situation,
   );
 
-  section('B', 'Antecedentes', [
-    'A completar: doenças, medicação habitual, alergias',
-  ]);
+  section('B', 'Antecedentes', backgroundLines(chamu));
 
   section('A', 'Avaliação', [
     if (last != null) ...[
@@ -130,6 +142,32 @@ String patientSummary(PatientRecord patient, {DateTime? now}) {
     if (pathways.isEmpty) 'Sem critérios de Via Verde',
   ]);
   return out.toString().trimRight();
+}
+
+/// The history for the "B" of the handover: what was recorded of H, A, M and
+/// U, then what is still to be asked.
+List<String> backgroundLines(Chamu chamu) {
+  final meal = chamu.lastMeal;
+  final mealNote = chamu.note(chamuMealNote);
+  final lines = <String>[];
+  final missing = <String>[];
+  for (final q in chamuQuestions.skip(1)) {
+    final line = chamu.lineFor(q);
+    if (line == null) {
+      missing.add(q.summaryTitle.toLowerCase());
+    } else {
+      lines.add('${q.summaryTitle}: $line');
+    }
+  }
+  if (meal != null || mealNote.isNotEmpty) {
+    lines.add(
+      'Última refeição: ${[if (meal != null) formatClock(meal), if (mealNote.isNotEmpty) mealNote].join(' · ')}',
+    );
+  } else {
+    missing.add('última refeição');
+  }
+  if (missing.isNotEmpty) lines.add('A completar: ${missing.join(', ')}');
+  return lines;
 }
 
 /// The birth for the handover, one fact per line.
@@ -197,6 +235,7 @@ List<(ViaVerde, CriteriaCheck)> viaVerdeStatus(PatientRecord patient) {
     burns: last.burns,
     onset: patient.onset,
     checks: patient.checks,
+    injuries: patient.injuries,
     now: last.registeredAt,
   );
   return [

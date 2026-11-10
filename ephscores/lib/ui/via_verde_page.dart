@@ -89,115 +89,94 @@ class _OnsetCardState extends State<_OnsetCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    final fg = scheme.onPrimaryContainer;
     final patient = widget.patient;
     final onset = patient.onset;
     final now = DateTime.now();
-    final body = theme.textTheme.bodyMedium?.copyWith(color: fg);
-    return Card(
-      color: theme.colorScheme.primaryContainer,
-      shape: filledCardShape,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              onset?.label ?? 'Início dos sintomas',
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: fg,
-                fontWeight: FontWeight.w700,
-              ),
+    return HeroCard(
+      title: onset?.label ?? 'Início dos sintomas',
+      fill: true,
+      children: [
+        if (onset == null)
+          const Text(
+            'Não registado. Necessário para as janelas de tempo das '
+            'Vias Verdes AVC e Coronária.',
+          )
+        else ...[
+          Text(
+            [
+              if (!DateUtils.isSameDay(onset.at, now)) formatDate(onset.at),
+              formatClock(onset.at),
+            ].join(' '),
+            style: theme.textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.w800,
             ),
-            const SizedBox(height: 4),
-            if (onset == null)
-              Text(
-                'Não registado. Necessário para as janelas de tempo das '
-                'Vias Verdes AVC e Coronária.',
-                style: body,
-              )
-            else ...[
-              Text(
-                [
-                  if (!DateUtils.isSameDay(onset.at, now)) formatDate(onset.at),
-                  formatClock(onset.at),
-                ].join(' '),
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  color: fg,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              Text(
-                'Há ${formatDuration(now.difference(onset.at))}',
-                style: body,
-              ),
-              const SizedBox(height: 12),
-              SegmentedButton<bool>(
-                segments: const [
-                  ButtonSegment(value: false, label: FitText('Hora exata')),
-                  ButtonSegment(
-                    value: true,
-                    label: FitText('Visto bem pela última vez'),
-                  ),
-                ],
-                selected: {onset.lastSeenWell},
-                showSelectedIcon: false,
-                // Solid colours: the default tints vanish on the blue card.
-                style: SegmentedButton.styleFrom(
-                  backgroundColor: scheme.tile,
-                  foregroundColor: scheme.onSurface,
-                  selectedBackgroundColor: scheme.primary,
-                  selectedForegroundColor: scheme.onPrimary,
-                  side: BorderSide(color: scheme.outline),
-                ),
-                onSelectionChanged: (s) =>
-                    patient.onset = Onset(onset.at, lastSeenWell: s.first),
+          ),
+          Text('Há ${formatDuration(now.difference(onset.at))}'),
+          const SizedBox(height: 12),
+          SegmentedButton<bool>(
+            segments: const [
+              ButtonSegment(value: false, label: FitText('Hora exata')),
+              ButtonSegment(
+                value: true,
+                label: FitText('Visto bem pela última vez'),
               ),
             ],
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () => patient.onset = Onset(
-                      DateTime.now(),
-                      lastSeenWell: onset?.lastSeenWell ?? false,
-                    ),
-                    child: const FitText('Agora'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(64, 56),
-                      textStyle: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      side: BorderSide(color: scheme.outline),
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(16)),
-                      ),
-                    ),
-                    onPressed: _pick,
-                    child: FitText(onset == null ? 'Escolher hora' : 'Alterar'),
-                  ),
-                ),
-                if (onset != null) ...[
-                  const SizedBox(width: 8),
-                  IconButton(
-                    tooltip: 'Limpar hora',
-                    color: fg,
-                    onPressed: () => patient.onset = null,
-                    icon: const Icon(Icons.close),
-                  ),
-                ],
-              ],
+            selected: {onset.lastSeenWell},
+            showSelectedIcon: false,
+            // Solid colours: the default tints vanish on the blue card.
+            style: SegmentedButton.styleFrom(
+              backgroundColor: scheme.tile,
+              foregroundColor: scheme.onSurface,
+              selectedBackgroundColor: scheme.primary,
+              selectedForegroundColor: scheme.onPrimary,
+              side: BorderSide(color: scheme.outline),
             ),
+            onSelectionChanged: (s) =>
+                patient.onset = Onset(onset.at, lastSeenWell: s.first),
+          ),
+        ],
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: FilledButton(
+                onPressed: () => patient.onset = Onset(
+                  DateTime.now(),
+                  lastSeenWell: onset?.lastSeenWell ?? false,
+                ),
+                child: const FitText('Agora'),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(64, 56),
+                  textStyle: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  side: BorderSide(color: scheme.outline),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16)),
+                  ),
+                ),
+                onPressed: _pick,
+                child: FitText(onset == null ? 'Escolher hora' : 'Alterar'),
+              ),
+            ),
+            if (onset != null) ...[
+              const SizedBox(width: 8),
+              IconButton(
+                tooltip: 'Limpar hora',
+                color: HeroCard.foreground(context),
+                onPressed: () => patient.onset = null,
+                icon: const Icon(Icons.close),
+              ),
+            ],
           ],
         ),
-      ),
+      ],
     );
   }
 }

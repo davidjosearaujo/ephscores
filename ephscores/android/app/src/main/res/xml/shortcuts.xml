@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What a long press on the app icon offers. The extra tells the app which. -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="new_patient"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_new_patient"
+        android:shortcutLongLabel="@string/shortcut_new_patient_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.davidaraujo.ephscores"
+            android:targetClass="com.davidaraujo.ephscores.MainActivity">
+            <extra android:name="shortcut" android:value="new_patient" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="start"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_start"
+        android:shortcutLongLabel="@string/shortcut_start_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.davidaraujo.ephscores"
+            android:targetClass="com.davidaraujo.ephscores.MainActivity">
+            <extra android:name="shortcut" android:value="start" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="contacts"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_contacts"
+        android:shortcutLongLabel="@string/shortcut_contacts_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.davidaraujo.ephscores"
+            android:targetClass="com.davidaraujo.ephscores.MainActivity">
+            <extra android:name="shortcut" android:value="contacts" />
+        </intent>
+    </shortcut>
+</shortcuts>

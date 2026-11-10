@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shortcut_new_patient">Novo doente</string>
+    <string name="shortcut_new_patient_long">Começar a avaliar um novo doente</string>
+    <string name="shortcut_start">Triagem START</string>
+    <string name="shortcut_start_long">Triagem de vítimas múltiplas (START)</string>
+    <string name="shortcut_contacts">Contactos</string>
+    <string name="shortcut_contacts_long">Contactos úteis</string>
+</resources>

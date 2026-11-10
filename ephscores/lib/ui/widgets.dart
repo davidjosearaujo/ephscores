@@ -104,6 +104,61 @@ class BurnPill extends StatelessWidget {
   }
 }
 
+/// The blue card at the top of a page: a bold [title] and what it says, in
+/// the foreground colour of the card (plain [Text] and icons inside pick it
+/// up). [fill] makes the children as wide as the card.
+class HeroCard extends StatelessWidget {
+  const HeroCard({
+    super.key,
+    required this.title,
+    required this.children,
+    this.fill = false,
+  });
+
+  final String title;
+  final List<Widget> children;
+  final bool fill;
+
+  /// Colour of text and icons on the card.
+  static Color foreground(BuildContext context) =>
+      Theme.of(context).colorScheme.onPrimaryContainer;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final fg = foreground(context);
+    return Card(
+      color: theme.colorScheme.primaryContainer,
+      shape: filledCardShape,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: DefaultTextStyle.merge(
+          style: TextStyle(color: fg),
+          child: IconTheme.merge(
+            data: IconThemeData(color: fg),
+            child: Column(
+              crossAxisAlignment: fill
+                  ? CrossAxisAlignment.stretch
+                  : CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: fg,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                ...children,
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// A result shown on a tinted card: a score this one depends on, or the
 /// shock index.
 class ResultCard extends StatelessWidget {
@@ -246,12 +301,14 @@ Future<bool> confirmDelete(
   return confirm(context, title: title, message: message, action: 'Apagar');
 }
 
-void showToast(BuildContext context, String message) {
+void showToast(
+  BuildContext context,
+  String message, {
+  Duration duration = const Duration(seconds: 2),
+}) {
   ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(content: Text(message), duration: const Duration(seconds: 2)),
-    );
+    ..showSnackBar(SnackBar(content: Text(message), duration: duration));
 }
 
 /// Opens [page] on top of the current one.
@@ -302,6 +359,182 @@ class SelectableTile extends StatelessWidget {
             child: Padding(
               padding: padding,
               child: builder(selected ? scheme.onPrimary : scheme.onSurface),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Tiles in rows of [columns] with an 8-pixel gap, each as wide as its
+/// share of the row. Those in [fullWidth] (by index) take a whole row.
+class TileGrid extends StatelessWidget {
+  const TileGrid({
+    super.key,
+    required this.children,
+    this.columns = 2,
+    this.fullWidth = const {},
+  });
+
+  final List<Widget> children;
+  final int columns;
+  final Set<int> fullWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const gap = 8.0;
+        final cell = (constraints.maxWidth - gap * (columns - 1)) / columns;
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: [
+            for (final (i, child) in children.indexed)
+              SizedBox(
+                width: fullWidth.contains(i) ? constraints.maxWidth : cell,
+                child: child,
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// A dropdown: a field showing the choice (or [hint]) that opens a list to
+/// pick from. With [multi] the list has checkboxes and stays open until
+/// "Concluído"; otherwise a tap picks and closes. The list is built from
+/// [selected] each time [listenable] changes, so it follows the store.
+class ChoiceField extends StatelessWidget {
+  const ChoiceField({
+    super.key,
+    required this.title,
+    required this.hint,
+    required this.options,
+    required this.selected,
+    required this.onToggle,
+    required this.listenable,
+    this.multi = true,
+  });
+
+  final String title;
+  final String hint;
+
+  /// Id and label, in display order.
+  final List<(String, String)> options;
+  final Set<String> Function() selected;
+  final ValueChanged<String> onToggle;
+  final Listenable listenable;
+  final bool multi;
+
+  Future<void> _open(BuildContext context) => showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    useSafeArea: true,
+    showDragHandle: true,
+    builder: (context) => ListenableBuilder(
+      listenable: listenable,
+      builder: (context, _) {
+        final picked = selected();
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+            ),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  for (final (id, label) in options)
+                    multi
+                        ? CheckboxListTile(
+                            value: picked.contains(id),
+                            title: Text(label),
+                            controlAffinity: ListTileControlAffinity.leading,
+                            onChanged: (_) => onToggle(id),
+                          )
+                        : ListTile(
+                            title: Text(label),
+                            trailing: picked.contains(id)
+                                ? const Icon(Icons.check)
+                                : null,
+                            onTap: () {
+                              onToggle(id);
+                              Navigator.pop(context);
+                            },
+                          ),
+                ],
+              ),
+            ),
+            if (multi)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                child: FilledButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Concluído'),
+                ),
+              ),
+          ],
+        );
+      },
+    ),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final picked = selected();
+    final text = [
+      for (final (id, label) in options)
+        if (picked.contains(id)) label,
+    ].join(', ');
+    final radius = BorderRadius.circular(14);
+    return Semantics(
+      button: true,
+      label: title,
+      child: Material(
+        color: scheme.tile,
+        shape: RoundedRectangleBorder(
+          borderRadius: radius,
+          side: BorderSide(color: scheme.tileBorder),
+        ),
+        child: InkWell(
+          onTap: () => _open(context),
+          borderRadius: radius,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 56),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      text.isEmpty ? hint : text,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: text.isEmpty
+                            ? FontWeight.w400
+                            : FontWeight.w500,
+                        color: text.isEmpty
+                            ? scheme.onSurfaceVariant
+                            : scheme.onSurface,
+                      ),
+                    ),
+                  ),
+                  Icon(Icons.arrow_drop_down, color: scheme.onSurfaceVariant),
+                ],
+              ),
             ),
           ),
         ),
