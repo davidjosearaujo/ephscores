@@ -9,6 +9,7 @@ import 'scores/score_store.dart';
 import 'start/start.dart';
 import 'theme.dart';
 import 'viaverde/via_verde.dart';
+import 'ui/cpr_tab.dart';
 import 'ui/events_overlay.dart';
 import 'ui/reminder.dart';
 import 'ui/shortcut_handler.dart';
@@ -64,6 +65,7 @@ class EPHScoresApp extends StatelessWidget {
             children: [
               child!,
               EventsBubble(navigatorKey: navigatorKey, popups: popups),
+              CprTab(navigatorKey: navigatorKey, popups: popups),
               const ReassessmentReminder(),
               ShortcutHandler(navigatorKey: navigatorKey),
             ],

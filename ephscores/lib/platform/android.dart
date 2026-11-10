@@ -1,5 +1,6 @@
 /// What only the Android shell can do, over one platform channel: window
-/// flags and the launcher shortcuts. Everywhere else these do nothing.
+/// flags, the metronome click, gesture exclusion and the launcher shortcuts. Everywhere else
+/// these do nothing.
 library;
 
 import 'package:flutter/foundation.dart';
@@ -25,8 +26,38 @@ Future<void> setSecureScreen(bool secure) => _flag('setSecure', secure);
 /// with a birth. Android only.
 Future<void> keepScreenOn(bool on) => _flag('keepScreenOn', on);
 
+/// One short beep, for the CPR metronome. Android only.
+Future<void> androidClick() async {
+  if (kIsWeb) return;
+  try {
+    await androidChannel.invokeMethod<void>('click');
+  } on MissingPluginException {
+    // Not Android (or a test without the channel).
+  }
+}
+
+/// Keeps the system's back swipe from the screen edge off [area] (in
+/// physical pixels), so a tab there can be dragged; null puts it back.
+/// Android 10 and later.
+Future<void> excludeFromBackGesture(Rect? area) async {
+  if (kIsWeb) return;
+  try {
+    await androidChannel.invokeMethod<void>('excludeGestures', [
+      if (area != null) ...[
+        area.left.round(),
+        area.top.round(),
+        area.right.round(),
+        area.bottom.round(),
+      ],
+    ]);
+  } on MissingPluginException {
+    // Not Android (or a test without the channel).
+  }
+}
+
 /// What a long press on the app icon offers.
 enum AppShortcut {
+  cpr('cpr'),
   newPatient('new_patient'),
   start('start'),
   contacts('contacts');

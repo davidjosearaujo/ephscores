@@ -3,6 +3,11 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// A time saved as milliseconds since the epoch, or null when [ms] is
+/// missing or isn't one.
+DateTime? timeFromJson(Object? ms) =>
+    ms is int ? DateTime.fromMillisecondsSinceEpoch(ms) : null;
+
 /// A [ChangeNotifier] that saves itself as one JSON value under [_key] after
 /// every change, so nothing is lost if the app is killed, and restores itself
 /// on start-up, discarding data it can't read instead of crashing.

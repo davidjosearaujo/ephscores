@@ -5,6 +5,8 @@ library;
 
 import 'package:flutter/foundation.dart';
 
+import '../persistence.dart' show timeFromJson;
+
 class ChamuOption {
   const ChamuOption(this.id, this.label);
 
@@ -148,10 +150,7 @@ class Chamu {
             in ((json['notes'] as Map?) ?? const {}).entries)
           if ((value as String).isNotEmpty) key as String: value,
       },
-      lastMeal: switch (json['meal']) {
-        final int ms => DateTime.fromMillisecondsSinceEpoch(ms),
-        _ => null,
-      },
+      lastMeal: timeFromJson(json['meal']),
     );
   }
 

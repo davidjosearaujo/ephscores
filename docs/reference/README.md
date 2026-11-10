@@ -22,3 +22,4 @@ critérios da Via Verde Sépsis.
 | DGS, Orientação 014/2010, *Avaliação da dor nas crianças* | Escala FLACC (versão portuguesa) e escolha da escala por idade |
 | AHA, *PALS* (2020) | Sinais vitais normais e hipotensão por idade nas crianças |
 | Recomendações para a sépsis no pré-hospitalar português, *Acta Médica Portuguesa* (2025) | Limiar de 0,7 do índice de choque |
+| ERC *Guidelines* (2021) e AHA | Ritmo das compressões torácicas: 100 a 120 por minuto |

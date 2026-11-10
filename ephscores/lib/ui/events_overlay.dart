@@ -5,14 +5,15 @@ import 'package:flutter/material.dart';
 import '../app.dart';
 import '../patient/patient.dart';
 import '../theme.dart';
+import 'cpr_page.dart' show cprRoute;
 import 'widgets.dart';
 
 /// Name of the route of the occurrence-times panel.
 const _panelRoute = 'events';
 
-/// Counts the dialogs and sheets open on the navigator, so the bubble can
-/// step aside while one is shown, and tracks its own panel, which keeps the
-/// bubble in view.
+/// Counts the dialogs and sheets open on the navigator, so the floating
+/// bubble and tab can step aside while one is shown, and tracks the times
+/// panel, which keeps the bubble in view, and the CPR page.
 class PopupTracker extends NavigatorObserver {
   /// Dialogs other than the times panel.
   final open = ValueNotifier<int>(0);
@@ -20,7 +21,14 @@ class PopupTracker extends NavigatorObserver {
   /// The times panel is showing.
   final panelOpen = ValueNotifier<bool>(false);
 
+  /// The CPR page is showing.
+  final cprOpen = ValueNotifier<bool>(false);
+
   void _change(Route<dynamic>? route, int by) {
+    if (route?.settings.name == cprRoute) {
+      cprOpen.value = by > 0;
+      return;
+    }
     if (route is! PopupRoute) return;
     if (route.settings.name == _panelRoute) {
       panelOpen.value = by > 0;

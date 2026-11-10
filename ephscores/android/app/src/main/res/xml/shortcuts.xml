@@ -2,6 +2,19 @@
 <!-- What a long press on the app icon offers. The extra tells the app which. -->
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
     <shortcut
+        android:shortcutId="cpr"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_cpr"
+        android:shortcutLongLabel="@string/shortcut_cpr_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.davidaraujo.ephscores"
+            android:targetClass="com.davidaraujo.ephscores.MainActivity">
+            <extra android:name="shortcut" android:value="cpr" />
+        </intent>
+    </shortcut>
+    <shortcut
         android:shortcutId="new_patient"
         android:enabled="true"
         android:icon="@mipmap/ic_launcher"

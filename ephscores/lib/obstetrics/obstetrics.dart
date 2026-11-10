@@ -5,6 +5,7 @@ library;
 import 'package:flutter/foundation.dart';
 
 import '../format.dart';
+import '../persistence.dart' show timeFromJson;
 import '../scores/model.dart';
 import '../scores/pediatric.dart' as pediatric show apgar;
 import '../vitals/vitals.dart';
@@ -68,9 +69,6 @@ Set<T> _enums<T extends Enum>(List<T> values, Object? json) => {
 
 List<String> _names(Set<Enum> values) => [for (final v in values) v.name];
 
-DateTime? _time(Object? ms) =>
-    ms is int ? DateTime.fromMillisecondsSinceEpoch(ms) : null;
-
 /// The birth: its times, the newborn's APGAR and the mother after the
 /// placenta.
 @immutable
@@ -85,9 +83,9 @@ class Birth {
   });
 
   factory Birth.fromJson(Map<String, dynamic> json) => Birth(
-    bornAt: _time(json['born'])!,
-    clampedAt: _time(json['clamped']),
-    placentaAt: _time(json['placenta']),
+    bornAt: timeFromJson(json['born'])!,
+    clampedAt: timeFromJson(json['clamped']),
+    placentaAt: timeFromJson(json['placenta']),
     apgar: {
       for (final MapEntry(:key, :value)
           in ((json['apgar'] as Map?) ?? const {}).entries)
@@ -194,7 +192,7 @@ class Pregnancy {
     twins: json['twins'] == true,
     presentation: Presentation.values.asNameMap()[json['presentation']],
     booklet: json['booklet'] == true,
-    watersAt: _time(json['waters']),
+    watersAt: timeFromJson(json['waters']),
     fluid: _enums(FluidSign.values, json['fluid']),
     severe: _enums(SevereSign.values, json['severe']),
     birth: json['birth'] == null

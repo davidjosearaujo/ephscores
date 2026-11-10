@@ -275,6 +275,7 @@ class _EntryCard extends StatelessWidget {
     final alerts = last == null ? const <String>[] : alterations(last);
     final details = [
       if (last?.scores.vitals[Vital.age] case final age?) '$age anos',
+      if (p.cpr case final cpr?) 'RCP: ${cpr.counts}',
       if (p.pregnancy?.birth case final b?)
         'Parto às ${formatClock(b.bornAt)}'
       else if (p.pregnancy != null)

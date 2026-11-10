@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../burn/burn.dart';
+import '../cpr/cpr.dart';
 import '../injuries/injuries.dart';
 import '../obstetrics/obstetrics.dart';
 import '../persistence.dart';
@@ -94,6 +95,9 @@ abstract interface class PatientRecord {
 
   /// What was found where on the body.
   InjuryMap get injuries;
+
+  /// The cardiac arrest, when there was one.
+  Cpr? get cpr;
 }
 
 /// A patient read back from its JSON (the format of [PatientStore.toJson]),
@@ -109,6 +113,7 @@ class SavedPatient implements PatientRecord {
     required this.pregnancy,
     required this.chamu,
     required this.injuries,
+    required this.cpr,
     required this.reminderMinutes,
   }) : evaluations = List.unmodifiable(evaluations),
        checks = Set.unmodifiable(checks),
@@ -125,6 +130,7 @@ class SavedPatient implements PatientRecord {
     final pregnancy = data['pregnancy'] as Map<String, dynamic>?;
     final chamu = data['chamu'] as Map<String, dynamic>?;
     final injuries = data['injuries'] as Map<String, dynamic>?;
+    final cpr = data['cpr'] as Map<String, dynamic>?;
     return SavedPatient._(
       startedAt: DateTime.fromMillisecondsSinceEpoch(start),
       finishedAt: end == null ? null : DateTime.fromMillisecondsSinceEpoch(end),
@@ -144,6 +150,7 @@ class SavedPatient implements PatientRecord {
       injuries: injuries == null
           ? const InjuryMap()
           : InjuryMap.fromJson(injuries),
+      cpr: cpr == null ? null : Cpr.fromJson(cpr),
       reminderMinutes: switch (data['reminder']) {
         final int m when reminderChoices.contains(m) => m,
         _ => null,
@@ -171,6 +178,8 @@ class SavedPatient implements PatientRecord {
   final Chamu chamu;
   @override
   final InjuryMap injuries;
+  @override
+  final Cpr? cpr;
 
   /// Minutes between reminders to re-assess; null for none.
   final int? reminderMinutes;
@@ -193,6 +202,7 @@ class PatientStore extends PersistedStore implements PatientRecord {
   Pregnancy? _pregnancy;
   Chamu _chamu = const Chamu();
   InjuryMap _injuries = const InjuryMap();
+  Cpr? _cpr;
   int? _reminderMinutes;
 
   /// Minutes after the last evaluation to remind of the next one; null for
@@ -201,6 +211,14 @@ class PatientStore extends PersistedStore implements PatientRecord {
 
   set reminderMinutes(int? value) {
     _reminderMinutes = value;
+    changed();
+  }
+
+  @override
+  Cpr? get cpr => _cpr;
+
+  set cpr(Cpr? value) {
+    _cpr = value;
     changed();
   }
 
@@ -333,6 +351,7 @@ class PatientStore extends PersistedStore implements PatientRecord {
     _pregnancy = null;
     _chamu = const Chamu();
     _injuries = const InjuryMap();
+    _cpr = null;
     _reminderMinutes = null;
   }
 
@@ -359,6 +378,7 @@ class PatientStore extends PersistedStore implements PatientRecord {
     'pregnancy': ?_pregnancy?.toJson(),
     if (!_chamu.isEmpty) 'chamu': _chamu.toJson(),
     if (!_injuries.isEmpty) 'injuries': _injuries.toJson(),
+    'cpr': ?_cpr?.toJson(),
     'reminder': ?_reminderMinutes,
   };
 
@@ -375,6 +395,7 @@ class PatientStore extends PersistedStore implements PatientRecord {
     _pregnancy = saved.pregnancy;
     _chamu = saved.chamu;
     _injuries = saved.injuries;
+    _cpr = saved.cpr;
     _reminderMinutes = saved.reminderMinutes;
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../app.dart';
+import '../cpr/cpr.dart';
 import '../format.dart';
 import '../history/history.dart';
 import '../obstetrics/obstetrics.dart';
@@ -19,6 +20,7 @@ import 'brand.dart';
 import 'burn_page.dart';
 import 'chamu_page.dart';
 import 'contacts_page.dart';
+import 'cpr_page.dart';
 import 'evolution_page.dart';
 import 'injuries_page.dart';
 import 'obstetrics_page.dart';
@@ -53,6 +55,13 @@ class DashboardPage extends StatelessWidget {
           final vitals = scope.scores.vitals;
           final recorded = Vital.values.where((v) => vitals[v] != null).length;
           final entries = [
+            _MenuCard(
+              icon: Icons.favorite,
+              title: 'PCR e RCP',
+              subtitle: 'SBV/DAE · metrónomo · ciclos · choques',
+              badge: _cprBadge(scope.patient.cpr),
+              onTap: () => open(const CprPage()),
+            ),
             _MenuCard(
               icon: Icons.monitor_heart,
               title: 'Sinais vitais',
@@ -180,6 +189,12 @@ class DashboardPage extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "Em curso · 3 ciclos · 1 choque".
+String? _cprBadge(Cpr? cpr) {
+  if (cpr == null) return null;
+  return [cpr.isOngoing ? 'Em curso' : cpr.end!.label, cpr.counts].join(' · ');
 }
 
 /// "3 de 5": the letters of CHAMU with something recorded.

@@ -1,5 +1,6 @@
 import 'package:ephscores/app.dart';
 import 'package:ephscores/burn/burn.dart';
+import 'package:ephscores/cpr/cpr.dart';
 import 'package:ephscores/history/history.dart';
 import 'package:ephscores/platform/android.dart';
 import 'package:ephscores/history/unlock.dart';
@@ -11,6 +12,7 @@ import 'package:ephscores/scores/score_store.dart';
 import 'package:ephscores/start/start.dart';
 import 'package:ephscores/ui/burn_page.dart';
 import 'package:ephscores/ui/contacts_page.dart';
+import 'package:ephscores/ui/cpr_page.dart';
 import 'package:ephscores/ui/dashboard_page.dart';
 import 'package:ephscores/ui/events_overlay.dart';
 import 'package:ephscores/ui/evolution_page.dart';
@@ -27,6 +29,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+/// Channel calls the tests that record the others leave out: the shortcut
+/// asked for at launch, and the PCR tab's keeping the back swipe off.
+const _quietCalls = {'takeShortcut', 'excludeGestures'};
 
 /// Phone-sized viewport (360x780 logical pixels). By default a patient is
 /// already open, so the app starts on the dashboard.
@@ -364,8 +370,9 @@ void main() {
       final calls = <Object?>[];
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
         androidChannel,
-        (call) async =>
-            call.method == 'takeShortcut' ? null : calls.add(call.arguments),
+        (call) async => _quietCalls.contains(call.method)
+            ? null
+            : calls.add(call.arguments),
       );
       addTearDown(
         () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
@@ -433,7 +440,7 @@ void main() {
     final calls = <String>[];
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       androidChannel,
-      (call) async => call.method == 'takeShortcut'
+      (call) async => _quietCalls.contains(call.method)
           ? null
           : calls.add('${call.method} ${call.arguments}'),
     );
@@ -528,6 +535,18 @@ void main() {
         ),
       );
     }
+
+    testWidgets('"PCR" starts the resuscitation, with a patient if none', (
+      tester,
+    ) async {
+      mockLaunch(tester, 'cpr');
+      final app = await buildApp(tester, openPatient: false);
+      await tester.pumpWidget(app);
+      await tester.pumpAndSettle();
+      expect(app.patient.isActive, isTrue);
+      expect(app.patient.cpr!.isOngoing, isTrue);
+      expect(find.byType(CprPage), findsOneWidget);
+    });
 
     testWidgets('"Novo doente" starts one from the start screen', (
       tester,
@@ -873,6 +892,116 @@ void main() {
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text('Critérios: Trauma'), findsOneWidget);
+  });
+
+  testWidgets('the PCR tab starts the resuscitation when pulled past half', (
+    tester,
+  ) async {
+    final app = await buildApp(tester);
+    await tester.pumpWidget(app);
+    final tab = find.bySemanticsLabel('PCR, paragem cardiorrespiratória');
+    expect(tab, findsOneWidget);
+    expect(app.patient.cpr, isNull);
+
+    // On a page deeper in the app too. Short of halfway it goes back.
+    await openFromHome(tester, 'Sinais vitais');
+    await tester.pumpAndSettle();
+    final hold = await tester.startGesture(tester.getCenter(tab));
+    await hold.moveBy(const Offset(60, 0));
+    await tester.pump();
+    expect(find.text('Começar SBV/DAE'), findsOneWidget);
+    await hold.up();
+    await tester.pumpAndSettle();
+    expect(find.byType(CprPage), findsNothing);
+    expect(app.patient.cpr, isNull);
+    // A tap only nudges it.
+    await tester.tap(tab);
+    await tester.pumpAndSettle();
+    expect(find.byType(CprPage), findsNothing);
+    expect(app.patient.cpr, isNull);
+
+    // Pulled past halfway, it opens the CPR page.
+    await tester.drag(tab, const Offset(200, 0));
+    await tester.pumpAndSettle();
+    expect(find.byType(CprPage), findsOneWidget);
+    expect(app.patient.cpr!.isOngoing, isTrue);
+    // The page has the metronome running, and the tab steps aside.
+    expect(find.text('110 /min'), findsOneWidget);
+    expect(find.byIcon(Icons.stop), findsOneWidget);
+    expect(tab, findsNothing);
+
+    // The big button counts a cycle each time; undo takes the last back.
+    final cycles = find.text('ciclos');
+    expect(cycles, findsOneWidget);
+    await tester.tap(cycles);
+    await tester.tap(cycles);
+    await tester.pump();
+    expect(app.patient.cpr!.cycles, 2);
+    expect(find.text('2'), findsOneWidget);
+    await tester.tap(find.byTooltip('Desfazer o último ciclo'));
+    await tester.pump();
+    expect(app.patient.cpr!.cycles, 1);
+    await tester.tap(find.text('choques'));
+    await tester.pump();
+    expect(app.patient.cpr!.shocks, 1);
+
+    // The rate moves within 100 and 120.
+    await tester.tap(find.byTooltip('Mais rápido'));
+    await tester.pump();
+    expect(find.text('115 /min'), findsOneWidget);
+
+    // The SIV/SAV arrival is stamped with a tap, and can be cleared.
+    await tester.scrollUntilVisible(find.text('SIV/SAV'), 200);
+    await tester.tap(find.text('SIV/SAV'));
+    await tester.pump();
+    expect(app.patient.cpr!.sivAt, isNotNull);
+    await tester.tap(find.byTooltip('Limpar SIV/SAV'));
+    await tester.pump();
+    expect(app.patient.cpr!.sivAt, isNull);
+    await tester.tap(find.text('SIV/SAV'));
+    await tester.pump();
+    expect(app.patient.cpr!.sivAt, isNotNull);
+
+    await tester.ensureVisible(find.text('Recuperou circulação'));
+    await tester.tap(find.text('Recuperou circulação'));
+    await tester.pump();
+    expect(app.patient.cpr!.end, CprEnd.rosc);
+    expect(find.byIcon(Icons.stop), findsNothing);
+    await tester.ensureVisible(find.text('Retomar a RCP'));
+    await tester.tap(find.text('Retomar a RCP'));
+    await tester.pump();
+    expect(app.patient.cpr!.isOngoing, isTrue);
+    expect(app.patient.cpr!.cycles, 1);
+
+    // Back out: the tab returns, and takes you back to this resuscitation
+    // without starting another.
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(tab, findsOneWidget);
+    final started = app.patient.cpr!.startedAt;
+    await tester.drag(tab, const Offset(200, 0));
+    await tester.pumpAndSettle();
+    expect(find.byType(CprPage), findsOneWidget);
+    expect(app.patient.cpr!.startedAt, started);
+    expect(app.patient.cpr!.cycles, 1);
+  });
+
+  testWidgets('the PCR tab opens a patient when there is none', (tester) async {
+    final app = await buildApp(tester, openPatient: false);
+    await tester.pumpWidget(app);
+    expect(app.patient.isActive, isFalse);
+    await tester.drag(
+      find.bySemanticsLabel('PCR, paragem cardiorrespiratória'),
+      const Offset(200, 0),
+    );
+    await tester.pumpAndSettle();
+    expect(app.patient.isActive, isTrue);
+    expect(app.patient.cpr!.isOngoing, isTrue);
+    expect(find.byType(CprPage), findsOneWidget);
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.text('PCR e RCP'), findsOneWidget);
+    expect(find.text('Em curso · 0 ciclos · 0 choques'), findsOneWidget);
   });
 
   testWidgets('the times bubble opens the panel from any page', (tester) async {

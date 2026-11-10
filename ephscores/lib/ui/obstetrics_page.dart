@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import '../app.dart';
 import '../format.dart';
 import '../obstetrics/obstetrics.dart';
-import '../platform/android.dart';
 import '../scores/model.dart';
 import '../scores/pediatric.dart' as pediatric show apgar;
 import '../theme.dart';
@@ -25,19 +24,7 @@ class ObstetricsPage extends StatefulWidget {
   State<ObstetricsPage> createState() => _ObstetricsPageState();
 }
 
-class _ObstetricsPageState extends State<ObstetricsPage> {
-  @override
-  void initState() {
-    super.initState();
-    keepScreenOn(true);
-  }
-
-  @override
-  void dispose() {
-    keepScreenOn(false);
-    super.dispose();
-  }
-
+class _ObstetricsPageState extends State<ObstetricsPage> with KeepScreenOn {
   @override
   Widget build(BuildContext context) {
     final scope = AppScope.of(context);

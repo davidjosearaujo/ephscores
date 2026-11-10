@@ -18,6 +18,13 @@ de forma rápida e simples, no terreno.
 - **Horas da ocorrência:** a caminho do local, chegada à vítima, contacto
   CODU, transporte e disponível, registadas com um toque a partir de uma
   bolha flutuante presente em todos os ecrãs
+- **PCR e RCP:** um separador vermelho "PCR" na margem esquerda de todos os
+  ecrãs, com ou sem doente aberto: puxado mais de metade, abre a paragem
+  cardiorrespiratória e começa o SBV/DAE; largado antes, volta para trás.
+  Tem um metrónomo de 100 a 120 compressões por minuto, um contador de ciclos
+  (um toque de cada vez que o DAE analisa, com o tempo desde o último), um
+  contador de choques e a hora de recuperação de circulação ou de suspensão.
+  Entra no resumo ISBAR
 - **CHAMU:** circunstâncias, história, alergias, medicação habitual e
   última refeição, como no verbete: listas de escolha (com várias opções onde
   faz sentido), uma caixa de texto que abre em "Outra" e nas alergias, e a
@@ -28,7 +35,7 @@ de forma rápida e simples, no terreno.
   Trauma
 - **Lembrete de reavaliação:** vibração e aviso a cada 5, 10 ou 15 minutos
   desde a última avaliação, com a aplicação aberta
-- **Atalhos:** premir o ícone da aplicação (Android) oferece *Novo doente*,
+- **Atalhos:** premir o ícone da aplicação (Android) oferece *PCR*, *Novo doente*,
   *Triagem START* e *Contactos*
 - **Sinais vitais:** os campos do verbete nacional (AVDS, FR, SpO₂, O₂, FC,
   PA, temperatura, dor por escala numérica ou de faces, e glicemia),

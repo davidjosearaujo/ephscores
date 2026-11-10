@@ -2,8 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../format.dart';
+import '../platform/android.dart';
 import '../scores/model.dart';
 import '../theme.dart';
+
+/// Keeps the screen lit while the page is open, for the pages whose hands are
+/// busy (a birth, a resuscitation). Android only.
+mixin KeepScreenOn<T extends StatefulWidget> on State<T> {
+  @override
+  void initState() {
+    super.initState();
+    keepScreenOn(true);
+  }
+
+  @override
+  void dispose() {
+    keepScreenOn(false);
+    super.dispose();
+  }
+}
 
 /// Text that shrinks to fit the space it is given, instead of wrapping or
 /// overflowing (labels on buttons and chips, large system fonts). It has no

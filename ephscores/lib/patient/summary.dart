@@ -92,6 +92,8 @@ String patientSummary(PatientRecord patient, {DateTime? now}) {
   final circumstances = chamu.lineFor(chamuQuestions.first);
   final situation = [
     if (circumstances != null) 'Circunstâncias: $circumstances',
+    if (patient.cpr case final cpr?)
+      ...cpr.lines(end, open: !patient.isFinished),
     if (patient.injuries.lines() case final lines when lines.isNotEmpty) ...[
       'Lesões:',
       for (final l in lines) '  $l',
