@@ -1,7 +1,7 @@
 // Builds the Google Play listing graphics in docs/store/:
 //   pt/          phone screenshots (1080x1920) = a raw emulator capture from
 //                docs/store/raw/ framed under a caption, and the feature graphic
-//                (1024x500).
+//                (1024x500: the brand beside the app's result cards).
 // The raw captures are 1080x1920 screenshots of the app (UI in Portuguese).
 // Run:  cd scripts/icons && npm run store
 import { mkdirSync, readdirSync } from 'node:fs';
@@ -20,21 +20,34 @@ const CORNER = 56;
 // One entry per raw capture, in file order: [title, subtitle].
 const captions = {
   pt: [
-    ['Tudo num só painel', 'Sinais vitais, escalas e Vias Verdes'],
-    ['Sinais vitais', 'Registados uma vez, como no verbete'],
+    ['Tudo num só painel', 'Avaliação, Vias Verdes e PCR à mão'],
+    ['PCR: SBV/DAE', 'Metrónomo, ciclos, choques e SIV/SAV'],
     ['Escalas automáticas', 'NEWS2 preenchida pelos sinais vitais'],
     ['Vias Verdes', 'AVC, Coronária, Sépsis e Trauma'],
-    ['Avaliação da dor', 'Faces, FLACC e índice de choque'],
-    ['Evolução do doente', 'Tendência e resumo para copiar'],
-    ['Regra dos nove', 'Grau por região e SCQ em tempo real'],
-    ['Triagem START', 'Prioridade, passo a passo'],
+    ['Mapa de lesões', 'Marque o tipo de lesão em cada região'],
+    ['Grávida e parto', 'Alertas, tempos e APGAR'],
+    ['CHAMU', 'História clínica como no verbete'],
+    ['Evolução e ISBAR', 'Tendência e resumo para partilhar'],
   ],
 };
 
+// Feature graphic: the tagline, a note, and the result cards of the app
+// (title, detail, value, colour of the value), two columns from the top.
+const GREEN = '#34A853', AMBER = '#FBBC04', RED = '#EA4335';
 const banner = {
   pt: {
-    tagline: 'Escalas de emergência pré-hospitalar',
-    chips: [['Sinais vitais', 'Vias Verdes'], ['Escalas', 'Evolução do doente']],
+    tagline: ['Escalas de emergência', 'pré-hospitalar'],
+    note: '100 % offline · Android e iPhone',
+    cards: [
+      ['PCR', '3 ciclos', '06:54', NAVY],
+      ['NEWS2', 'Risco alto', '18', RED],
+      ['ECG', 'Ligeiro', '13', GREEN],
+      ['Sépsis', 'Via Verde', '4/4', RED],
+      ['RTS', 'Alterado', '11', AMBER],
+      ['APGAR', '5.º minuto', '9', GREEN],
+      ['Queimado', 'Regra dos nove', '27%', AMBER],
+      ['CHAMU', '5 de 5', '5/5', GREEN],
+    ],
   },
 };
 
@@ -59,26 +72,34 @@ async function screenshot(file, [title, subtitle], out) {
     .toFile(out);
 }
 
-// Same layout as the README banner (make_banner.mjs), in either language.
-async function featureGraphic({ tagline, chips }, out) {
+// The Google Play feature graphic: the brand on navy, with the app's own
+// result cards (the colours of the traffic light) beside it. Either language.
+async function featureGraphic({ tagline, note, cards }, out) {
   const w = 1024, h = 500;
-  const chipWidth = (s) => Math.round(s.length * 12 + 40);
+  const CARD_W = 228, CARD_H = 84, GAP = 12, LEFT = 516, TOP = 50, STAGGER = 26;
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">
-    <rect width="${w}" height="${h}" fill="#EAEBF3"/>
-    <text x="416" y="232" font-family="Roboto" font-size="104" fill="${NAVY}"><tspan font-weight="800">EPH</tspan><tspan font-weight="400">Scores</tspan></text>
-    ${text(420, 286, tagline, 29, '#59606B')}`;
-  chips.forEach((row, r) => {
-    let x = 420;
-    for (const label of row) {
-      const cw = chipWidth(label);
-      svg += `<rect x="${x}" y="${330 + r * 62}" width="${cw}" height="46" rx="23" fill="#FFFFFF" stroke="#C4C9D4" stroke-width="2"/>`;
-      svg += text(x + 20, 361 + r * 62, label, 22, NAVY, 500);
-      x += cw + 14;
-    }
+    <rect width="${w}" height="${h}" fill="${NAVY}"/>
+    <rect x="56" y="64" width="112" height="112" rx="28" fill="#FFFFFF"/>
+    <text x="192" y="131" font-family="Roboto" font-size="56" fill="#FFFFFF"><tspan font-weight="800">EPH</tspan><tspan font-weight="400">Scores</tspan></text>
+    ${tagline.map((line, i) => text(58, 236 + i * 40, line, 32, '#C9D6E6')).join('')}
+    <rect x="58" y="332" width="44" height="10" rx="5" fill="${GREEN}"/>
+    <rect x="110" y="332" width="44" height="10" rx="5" fill="${AMBER}"/>
+    <rect x="162" y="332" width="44" height="10" rx="5" fill="${RED}"/>
+    ${text(58, 412, note, 24, '#FFFFFF', 500)}`;
+  cards.forEach(([title, detail, value, colour], i) => {
+    const x = LEFT + (i % 2) * (CARD_W + GAP);
+    const y = TOP + Math.floor(i / 2) * (CARD_H + GAP) + (i % 2) * STAGGER;
+    const pill = Math.max(60, value.length * 15 + 30);
+    const dark = colour === AMBER;
+    svg += `<rect x="${x}" y="${y}" width="${CARD_W}" height="${CARD_H}" rx="22" fill="#FFFFFF"/>
+      ${text(x + 18, y + 38, title, 23, NAVY, 800)}
+      ${text(x + 18, y + 62, detail, 16, '#59606B')}
+      <rect x="${x + CARD_W - pill - 14}" y="${y + 20}" width="${pill}" height="44" rx="13" fill="${colour}"/>
+      <text x="${x + CARD_W - 14 - pill / 2}" y="${y + 51}" text-anchor="middle" font-family="Roboto" font-size="25" font-weight="800" fill="${dark ? '#202124' : '#FFFFFF'}">${value}</text>`;
   });
   svg += '</svg>';
   await sharp(Buffer.from(svg))
-    .composite([{ input: await renderLogo(330), left: 56, top: 85 }])
+    .composite([{ input: await renderLogo(92), left: 66, top: 74 }])
     .png()
     .toFile(out);
 }
