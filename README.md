@@ -1,6 +1,6 @@
 # EPHScores
 
-![EPHScores](docs/design/banner.png)
+![EPHScores](docs/store/pt/feature-graphic.png)
 
 ## O que é?
 
